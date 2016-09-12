@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="pref_cat_general"
+        android:title="@string/pref_settings_general">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="prefs_low_priority_note"
+            android:summary="@string/settings_low_priority_note_flavor"
+            android:title="@string/settings_low_priority_note_title"/>
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/DateDetails"
+            android:entryValues="@array/DateDetailsData"
+            android:key="prefs_date_detail"
+            android:summary="@string/prefs_currently_selected"
+            android:title="@string/prefs_date_detail_title"
+            />
+
+        <ListPreference
+            android:defaultValue="2"
+            android:entries="@array/DateDetails"
+            android:entryValues="@array/DateDetailsData"
+            android:key="prefs_time_detail"
+            android:summary="@string/prefs_currently_selected"
+            android:title="@string/prefs_time_detail"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_cat_advanced"
+        android:title="@string/advanced">
+        <EditTextPreference
+            android:defaultValue="5"
+            android:inputType="number"
+            android:key="prefs_homescreen_lines"
+            android:summary="@string/prefs_homescreen_lines_summary"
+            android:title="@string/prefs_homescreen_lines_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_cat_info"
+        android:title="@string/info">
+
+        <Preference
+            android:key="pref_about"
+            android:title="@string/prefs_about_title"
+            android:summary="@string/prefs_about_summary"
+            />
+        <Preference
+            android:key="pref_share_app"
+            android:title="@string/prefs_share_app_title"
+            android:summary="@string/prefs_share_app_summary"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

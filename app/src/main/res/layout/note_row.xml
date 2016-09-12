@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/layout"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/note_row_image_bt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/enabled"
+            android:focusable="false"
+            app:srcCompat="@mipmap/ic_launcher"/>
+    </RelativeLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="0">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.wavegate.tos.lockscreennotes.imported.view.LinedEditText
+                android:id="@+id/note_row_text_tf"
+                android:layout_width="match_parent"
+                android:ems="10"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:minHeight="125dp"
+                android:textIsSelectable="true"
+                android:windowSoftInputMode="stateHidden|adjustPan"
+                />
+
+            <ImageButton
+                android:id="@+id/image_row_deleteBT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/delete"
+                android:focusable="false"
+                app:srcCompat="@android:drawable/ic_menu_delete"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/note_row_timestamp"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="none"
+                android:focusable="false"
+                android:scrollHorizontally="false"
+                android:text="@string/timestamp"/>
+
+            <TextView
+                android:id="@+id/note_row_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:focusable="false"
+                android:gravity="end"
+                android:text="@string/position"/>
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

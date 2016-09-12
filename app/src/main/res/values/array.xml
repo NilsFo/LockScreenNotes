@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="DateDetails">
+        <item>@string/prefs_full</item>
+        <item>@string/prefs_long</item>
+        <item>@string/prefs_medium</item>
+        <item>@string/prefs_short</item>
+    </string-array>
+
+    <string-array name="DateDetailsData">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+</resources>
