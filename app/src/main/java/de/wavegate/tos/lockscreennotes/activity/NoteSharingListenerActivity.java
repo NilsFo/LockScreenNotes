@@ -2,7 +2,9 @@ package de.wavegate.tos.lockscreennotes.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -55,8 +57,10 @@ public class NoteSharingListenerActivity extends Activity {
 	private void addNewNote(String receivedText) {
 		DBAdapter databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		Note note = new Note(receivedText, true, new Date().getTime());
+		boolean enabled = sharedPreferences.getBoolean("prefs_auto_enable_new_notes", true);
+		Note note = new Note(receivedText, enabled, new Date().getTime());
 		databaseAdapter.insertRow(note.getText(), note.isEnabledSQL(), note.getTimestamp());
 
 		databaseAdapter.close();

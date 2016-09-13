@@ -1,6 +1,8 @@
 package de.wavegate.tos.lockscreennotes.view.fragment;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -18,6 +20,7 @@ import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+	public static final String GITHUB_URL = "https://github.com/NilsFo/LockScreenNotes";
 	public static final String HOME_SCREEN_LINES_KEY = "prefs_homescreen_lines";
 	public static final String LOD_DATE_KEY = "prefs_date_detail";
 	public static final String LOD_TIME_KEY = "prefs_time_detail";
@@ -36,12 +39,26 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 			}
 		});
 
+		myPref = findPreference("pref_view_on_github");
+		myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			public boolean onPreferenceClick(Preference preference) {
+				viewOnGithub();
+				return false;
+			}
+		});
+
 		updatePreferenceSummaries();
 	}
 
 	private void shareApp() {
 		//TODO add android store URL later
 		Toast.makeText(getActivity(), R.string.error_not_in_android_store_yet, Toast.LENGTH_LONG).show();
+	}
+
+	private void viewOnGithub() {
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(GITHUB_URL));
+		startActivity(i);
 	}
 
 	@Override
@@ -62,7 +79,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 		if (key.equals(HOME_SCREEN_LINES_KEY)) {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-			int lines = Integer.parseInt(preferences.getString(HOME_SCREEN_LINES_KEY, "?"));
+			int lines = 0;
+			try {
+				lines = Integer.parseInt(preferences.getString(HOME_SCREEN_LINES_KEY, "?"));
+			} catch (NumberFormatException e) {
+				preferences.edit().putString(HOME_SCREEN_LINES_KEY, String.valueOf(MIN_HOME_SCREEN_LINES)).apply();
+				Toast.makeText(getActivity(), R.string.error_invalid_value, Toast.LENGTH_LONG).show();
+			}
 
 			if (lines < MIN_HOME_SCREEN_LINES) {
 				preferences.edit().putString(HOME_SCREEN_LINES_KEY, String.valueOf(MIN_HOME_SCREEN_LINES)).apply();
@@ -78,8 +101,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 	private void updatePreferenceSummaries() {
 		Preference pref = findPreference(HOME_SCREEN_LINES_KEY);
-		String lod_date = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(LOD_DATE_KEY, "<Unknown>");
-		String lod_time = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(LOD_TIME_KEY, "<Unknown>");
+		String lod_date = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(LOD_DATE_KEY, getString(R.string.error_unknown));
+		String lod_time = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(LOD_TIME_KEY, getString(R.string.error_unknown));
 
 		try {
 			int lod = Integer.parseInt(lod_date);

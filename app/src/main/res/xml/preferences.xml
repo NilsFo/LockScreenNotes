@@ -7,9 +7,21 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="prefs_auto_enable_new_notes"
+            android:summary="@string/settings_auto_enable_new_notes_flavor"
+            android:title="@string/settings_auto_enable_new_notes_title"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="prefs_low_priority_note"
             android:summary="@string/settings_low_priority_note_flavor"
             android:title="@string/settings_low_priority_note_title"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefs_dismissable_notes"
+            android:summary="@string/settings_dismissable_notes_flavor"
+            android:title="@string/settings_dismissable_notes_tilte"/>
 
         <ListPreference
             android:defaultValue="1"
@@ -39,6 +51,12 @@
             android:key="prefs_homescreen_lines"
             android:summary="@string/prefs_homescreen_lines_summary"
             android:title="@string/prefs_homescreen_lines_title"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefs_seperate_notes"
+            android:summary="@string/prefs_seperate_notes_flavor"
+            android:title="@string/prefs_seperate_notes_tilte"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -54,6 +72,12 @@
             android:key="pref_share_app"
             android:title="@string/prefs_share_app_title"
             android:summary="@string/prefs_share_app_summary"
+            />
+
+        <Preference
+            android:key="pref_view_on_github"
+            android:title="@string/pref_view_on_github_title"
+            android:summary="@string/pref_view_on_github_summary"
             />
 
     </PreferenceCategory>

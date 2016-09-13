@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
@@ -30,7 +31,7 @@ public class NotesNotificationManager {
 
 	public static final String PRFERENCE_LOW_PRIORITY_NOTE = "prefs_low_priority_note";
 
-	public static final int NOTIFICATION_ID = 1;
+	public static final int DEFAULT_NOTIFICATION_ID = 1;
 	public static final int NOTE_PREVIEW_SIZE = 15;
 	private Context context;
 	private ArrayList<Note> notesList;
@@ -80,6 +81,7 @@ public class NotesNotificationManager {
 
 	public void showNotifications() {
 		isFamiliarActivityActive();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		Log.i(LOGTAG, "NotesNotificationManager: Request to show notifications received!");
 
 		if (!hasNotifications()) {
@@ -87,22 +89,20 @@ public class NotesNotificationManager {
 			return;
 		}
 
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder.setSmallIcon(R.drawable.notification_ticker_bar);
-		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
-		builder.setContentTitle(context.getString(R.string.app_name));
-		builder.setTicker(context.getString(R.string.notification_ticker));
-		builder.setAutoCancel(true);
-		builder.setOngoing(true);
-		builder.setPriority(getNotificationPriority());
+		NotificationCompat.Builder builder = getBuilder();
 
 		String text;
 		String bigtext;
 		if (hasOnlyOneNotification()) {
 			Note note = notesList.get(0);
 			text = note.getTextPreview(NOTE_PREVIEW_SIZE);
-			bigtext = notesList.get(0).getText();
+			bigtext = note.getText();
 		} else {
+			if(sharedPreferences.getBoolean("prefs_seperate_notes",false)){
+				displayMultipleNotifications();
+				return;
+			}
+
 			text = String.format(context.getString(R.string.notification_multiple_notes), String.valueOf(getNotificationCount()));
 			builder.setNumber(getNotificationCount());
 			bigtext = "";
@@ -115,16 +115,46 @@ public class NotesNotificationManager {
 		builder.setStyle(new NotificationCompat.BigTextStyle()
 				.bigText(bigtext));
 
-		PendingIntent notificationIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
-		builder.setContentIntent(notificationIntent);
-
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = builder.build();
-		manager.notify(NOTIFICATION_ID, notification);
+		manager.notify(DEFAULT_NOTIFICATION_ID, notification);
 
 		//Toast.makeText(context, "Notification created. Debug Code: " + new Random().nextInt(500), Toast.LENGTH_LONG).show();
 	}
 
+	private void displayMultipleNotifications(){
+		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		for(Note n:notesList){
+			String text = n.getTextPreview(NOTE_PREVIEW_SIZE);
+			String bigtext = n.getText();
+
+			NotificationCompat.Builder builder = getBuilder();
+			builder.setContentText(text);
+			builder.setStyle(new NotificationCompat.BigTextStyle()
+					.bigText(bigtext));
+
+			long id = n.getDatabaseID() % Integer.MAX_VALUE;
+			manager.notify((int) id, builder.build());
+		}
+
+	}
+
+	private NotificationCompat.Builder getBuilder() {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+		builder.setSmallIcon(R.drawable.notification_ticker_bar);
+		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
+		builder.setContentTitle(context.getString(R.string.app_name));
+		builder.setTicker(context.getString(R.string.notification_ticker));
+		builder.setAutoCancel(true);
+		builder.setOngoing(!sharedPreferences.getBoolean("prefs_dismissable_notes", false));
+		builder.setPriority(getNotificationPriority());
+		PendingIntent notificationIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
+		builder.setContentIntent(notificationIntent);
+
+		return builder;
+	}
 
 	public void hideNotifications() {
 		Log.i(LOGTAG, "NotesNotificationManager: Request to hide notifications received!");

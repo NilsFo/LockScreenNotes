@@ -2,12 +2,13 @@ package de.wavegate.tos.lockscreennotes;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -154,7 +155,7 @@ public class MainActivity extends NotesActivity implements Observer {
 	}
 
 	private void requestDisableAll() {
-		for (int i =0;i<noteAdapter.getCount();i++){
+		for (int i = 0; i < noteAdapter.getCount(); i++) {
 			Note n = noteAdapter.getItem(i);
 			if (n != null) {
 				n.setEnabled(false);
@@ -197,7 +198,9 @@ public class MainActivity extends NotesActivity implements Observer {
 	}
 
 	public void addNewNote(String text) {
-		Note note = new Note(text, false, new Date().getTime());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean enabled = sharedPreferences.getBoolean("prefs_auto_enable_new_notes", true);
+		Note note = new Note(text, enabled, new Date().getTime());
 		long id = databaseAdapter.insertRow(note.getText(), note.isEnabledSQL(), note.getTimestamp());
 		note.setDatabaseID(id);
 
