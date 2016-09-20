@@ -40,7 +40,7 @@
     <string name="prefs_homescreen_lines_summary">Im Hauptmenü, die minimale Anzahl an Zeilen, welche eine Notiz haben muss. Derzeitig ausgewählt: %1$s</string>
     <string name="prefs_homescreen_lines_title">Minimale Zeilen</string>
     <string name="prefs_long">Lang</string>
-    <string name="prefs_medium">Mitel</string>
+    <string name="prefs_medium">Mittel</string>
     <string name="prefs_seperate_notes_flavor">Wenn aktiviert, wird für jede Notiz die Sie erstellt haben eine eigene Benachrichtigung im Sperrbildschirm erstellt. Andernfalls werden alle Notizen in einer einzelnen Benachrichtigung vereint.</string>
     <string name="prefs_seperate_notes_tilte">Separate Notizen</string>
     <string name="prefs_share_app_summary">Helfen Sie mit diese App populärer zu machen in dem Sie anderen davon erzählen.</string>

@@ -2,6 +2,7 @@ package de.wavegate.tos.lockscreennotes.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -125,9 +127,14 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		});
 
 		enabledBT.setImageResource(getEnabledIcon(note.isEnabled()));
+		//text.setTextColor(getTextColor(note.isEnabled()));
 		text.setText(String.format(getContext().getString(R.string.last_edited), getNoteTime(note)));
 		positionTF.setText(String.format(getContext().getString(R.string.note_position), String.valueOf(position + 1)));
 		deleteBT.setBackground(view.getBackground());
+
+		//RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)view.getLayoutParams();
+		//params.setMargins(80, 0, 0, 0); //substitute parameters for left, top, right, bottom
+		//view.setLayoutParams(params);
 
 		return view;
 	}
@@ -166,7 +173,11 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 	private int getEnabledIcon(boolean enabled) {
 		if (enabled) return R.drawable.enabled_button;
 		return R.drawable.disabled_button;
+	}
 
+	private int getTextColor(boolean enabled){
+		if (enabled) return android.R.color.black;
+		return android.R.color.holo_red_dark;
 	}
 
 	private String getNoteTime(Note note) {

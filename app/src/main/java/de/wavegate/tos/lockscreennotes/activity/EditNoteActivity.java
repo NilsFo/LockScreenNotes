@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
@@ -35,7 +36,8 @@ public class EditNoteActivity extends NotesActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_edit_note);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		ActionBar bar =getSupportActionBar();
+		if (bar!=null) bar.setDisplayHomeAsUpEnabled(true);
 
 		long id = getIntent().getExtras().getLong(NOTE_ACTIVITY_NOTE_ID, ILLEGAL_NOTE_ID);
 		if (id == ILLEGAL_NOTE_ID) {
@@ -59,8 +61,9 @@ public class EditNoteActivity extends NotesActivity {
 		if (savedInstanceState == null) {
 			actionMoveToBottom();
 		}
-		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		imm.showSoftInput(noteTF, InputMethodManager.SHOW_IMPLICIT);
+		//InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+		//imm.showSoftInput(noteTF, InputMethodManager.SHOW_IMPLICIT);
+		requestKeyBoard();
 	}
 
 	private void actionClear() {
@@ -94,7 +97,6 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void actionShare() {
-		//TODO test todo
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
 		sendIntent.putExtra(Intent.EXTRA_TEXT, noteTF.getText().toString());
@@ -190,6 +192,7 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void handleIllegalNote() {
+		//TODO handle
 	}
 
 	@Override

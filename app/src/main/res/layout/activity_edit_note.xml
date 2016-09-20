@@ -15,6 +15,7 @@
         android:layout_gravity="top"
         android:ems="10"
         android:gravity="top"
+        android:imeOptions="flagNoExtractUi"
         android:inputType="textCapSentences|textMultiLine"
         />
 </LinearLayout>

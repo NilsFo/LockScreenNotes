@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import de.wavegate.tos.lockscreennotes.MainActivity;
 import de.wavegate.tos.lockscreennotes.R;
 import de.wavegate.tos.lockscreennotes.data.Note;
+import de.wavegate.tos.lockscreennotes.receiver.NotificationDismissedReceiver;
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
 
 import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
@@ -30,6 +31,7 @@ import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 public class NotesNotificationManager {
 
 	public static final String PRFERENCE_LOW_PRIORITY_NOTE = "prefs_low_priority_note";
+	public static final String INTENT_EXTRA_NOTE_ID = "de.wavegate.tos.lockscreennotes.notification_id";
 
 	public static final int DEFAULT_NOTIFICATION_ID = 1;
 	public static final int NOTE_PREVIEW_SIZE = 15;
@@ -114,6 +116,7 @@ public class NotesNotificationManager {
 		builder.setContentText(text);
 		builder.setStyle(new NotificationCompat.BigTextStyle()
 				.bigText(bigtext));
+		builder.setDeleteIntent(getOnDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = builder.build();
@@ -121,6 +124,8 @@ public class NotesNotificationManager {
 
 		//Toast.makeText(context, "Notification created. Debug Code: " + new Random().nextInt(500), Toast.LENGTH_LONG).show();
 	}
+
+	public static final int INTENT_EXTRA_NOTE_ID_NONE = -1;
 
 	private void displayMultipleNotifications(){
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -134,10 +139,18 @@ public class NotesNotificationManager {
 			builder.setStyle(new NotificationCompat.BigTextStyle()
 					.bigText(bigtext));
 
-			long id = n.getDatabaseID() % Integer.MAX_VALUE;
-			manager.notify((int) id, builder.build());
+			int id = (int) (n.getDatabaseID() % Integer.MAX_VALUE);
+			builder.setDeleteIntent(getOnDismissIntent(id));
+			manager.notify( id, builder.build());
 		}
 
+	}
+
+	private PendingIntent getOnDismissIntent(int notificationId){
+		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
+		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
+		Log.i(LOGTAG,"Creating a dismiss intent. ID: "+notificationId);
+		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
 	}
 
 	private NotificationCompat.Builder getBuilder() {

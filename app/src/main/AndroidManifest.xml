@@ -17,6 +17,10 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="de.wavegate.tos.lockscreennotes.receiver.NotificationDismissedReceiver"
+            android:exported="false" >
+        </receiver>
 
         <activity
             android:name=".MainActivity"
@@ -60,11 +64,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.wavegate.tos.lockscreennotes.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".TestActivity"
-            android:label="@string/title_activity_test"
-            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
