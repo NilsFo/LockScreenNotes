@@ -13,8 +13,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,8 +37,14 @@ import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
 public class MainActivity extends NotesActivity implements Observer {
 
 	public static final String LOGTAG = "HomeScreenNotes";
+	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
+
 	private DBAdapter databaseAdapter;
 	private NoteAdapter noteAdapter;
+	private ScrollView tutorialView;
+	private ListView notesList;
+	private CheckBox tutorialDontShowAgainCB;
+	private TextView nothingToDisplayLB;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +55,21 @@ public class MainActivity extends NotesActivity implements Observer {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		ListView notesList = (ListView) findViewById(R.id.notes_list);
+		notesList = (ListView) findViewById(R.id.notes_list);
+		tutorialView = (ScrollView) findViewById(R.id.tutorial_view);
+		nothingToDisplayLB = (TextView) findViewById(R.id.nothing_to_display);
+
+		tutorialDontShowAgainCB = (CheckBox) findViewById(R.id.tutorial_dont_show_again_cb);
+		tutorialDontShowAgainCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				onTutorialCBclicked(isChecked);
+			}
+		});
+
+		new Date();
+
+		//tutorialDontShowAgainCB.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
 		databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
@@ -75,6 +99,16 @@ public class MainActivity extends NotesActivity implements Observer {
 				addNewNote();
 			}
 		});
+
+		if (notesList.getCount() == 0)
+			tutorialView.animate().alpha(1f).setDuration(2000);
+	}
+
+	private void onTutorialCBclicked(boolean isChecked) {
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+		editor.putBoolean(PREFS_HIDE_TUTORIAL, isChecked);
+		Log.i(LOGTAG, "Changed the 'dont show tutorial again' prefs: " + isChecked);
+		editor.apply();
 	}
 
 	private void loadNotesFromDB() {
@@ -88,6 +122,7 @@ public class MainActivity extends NotesActivity implements Observer {
 		for (Note n : list) noteAdapter.add(n);
 
 		noteAdapter.notifyDataSetChanged();
+		updateTutorialView();
 	}
 
 	private void saveNotesToDB() {
@@ -168,7 +203,7 @@ public class MainActivity extends NotesActivity implements Observer {
 	}
 
 	private void deleteNote(long id) {
-		databaseAdapter.deleteRow(id);
+		databaseAdapter.deleteRow(id);    //we can request changes to the database here, and this object listens to changes and updates
 	}
 
 	@Override
@@ -190,8 +225,27 @@ public class MainActivity extends NotesActivity implements Observer {
 		databaseAdapter.open();
 		loadNotesFromDB();
 
+		tutorialDontShowAgainCB.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREFS_HIDE_TUTORIAL, false));
+
 		Log.i(LOGTAG, "Mainactivity: onResume()");
 		new NotesNotificationManager(this).hideNotifications();
+	}
+
+	private void updateTutorialView() {
+		boolean prefs_hide = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREFS_HIDE_TUTORIAL, false);
+		boolean tut = noteAdapter.getCount() == 0;
+		tutorialView.setVisibility(View.GONE);
+		nothingToDisplayLB.setVisibility(View.GONE);
+		notesList.setVisibility(View.VISIBLE);
+		Log.i(LOGTAG, "Checking data for displaying the tutorial now. Empty? " + tut + " Preferences 'HIDE'? " + prefs_hide);
+		if (tut) {
+			notesList.setVisibility(View.GONE);
+			if (prefs_hide) {
+				nothingToDisplayLB.setVisibility(View.VISIBLE);
+			} else {
+				tutorialView.setVisibility(View.VISIBLE);
+			}
+		}
 	}
 
 	public void addNewNote() {

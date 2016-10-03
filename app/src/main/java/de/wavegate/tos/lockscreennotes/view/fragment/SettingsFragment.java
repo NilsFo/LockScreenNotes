@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import de.wavegate.tos.lockscreennotes.R;
 
 import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
+import static de.wavegate.tos.lockscreennotes.MainActivity.PREFS_HIDE_TUTORIAL;
 
 /**
  * Created by Nils on 01.09.2016.
@@ -46,6 +48,25 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 				return false;
 			}
 		});
+
+		myPref = findPreference("prefs_reset_tutorial");
+		myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			public boolean onPreferenceClick(Preference preference) {
+				resetTutorial();
+				return false;
+			}
+		});
+
+		updatePreferenceSummaries();
+	}
+
+	private void resetTutorial() {
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+		editor.putBoolean(PREFS_HIDE_TUTORIAL, false);
+		editor.apply();
+		Log.i(LOGTAG, "Request to reset tutorial recieved. Shared pref 'hide_tutorial' is now: " + PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(PREFS_HIDE_TUTORIAL, false));
+
+		Toast.makeText(getActivity(), R.string.prefs_reset_tutorial_success, Toast.LENGTH_LONG).show();
 
 		updatePreferenceSummaries();
 	}
@@ -103,6 +124,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		Preference pref = findPreference(HOME_SCREEN_LINES_KEY);
 		String lod_date = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(LOD_DATE_KEY, getString(R.string.error_unknown));
 		String lod_time = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(LOD_TIME_KEY, getString(R.string.error_unknown));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 		try {
 			int lod = Integer.parseInt(lod_date);
@@ -125,6 +147,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 		pref = findPreference(LOD_TIME_KEY);
 		pref.setSummary(String.format(getString(R.string.prefs_currently_selected), lod_time));
+
+		boolean dont_show_tutorial = prefs.getBoolean(PREFS_HIDE_TUTORIAL, false);
+		Log.i(LOGTAG, "PreferenceFragment here. Don't show tutorial? " + dont_show_tutorial);
+		if (!dont_show_tutorial) {
+			PreferenceCategory mCategory = (PreferenceCategory) findPreference("pref_cat_advanced");
+			pref = findPreference("prefs_reset_tutorial");
+			mCategory.removePreference(pref);
+		}
 	}
 
 	public String getValue(SharedPreferences sharedPreferences, String key) {

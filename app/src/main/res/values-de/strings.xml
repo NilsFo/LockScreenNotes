@@ -56,4 +56,16 @@
     <string name="success_note_sharing_listener">Ihre Notiz wurde ohne Proble erstellt</string>
     <string name="timestamp">Zeitstempel</string>
     <string name="title_activity_test">Test Aktivität</string>
+    <string name="settings_auto_enable_new_notes_flavor">Wenn Sie eine Notiz hinzufügen wird diese automatisch für Benachrichtigungen freigegeben.</string>
+    <string name="settings_auto_enable_new_notes_title">Notizen automatisch aktivieren</string>
+    <string name="tutorial_disabled">Keine Benachrichtigungen</string>
+    <string name="tutorial_dont_show_again">Nicht nochmal anzeigen</string>
+    <string name="tutorial_enabled">Benachrichtigungen</string>
+    <string name="tutorial_main_text">Tippen Sie auf das Icon neben einer Notiz, um Benachrichtigung von dieser zu erhalten solange die App geschlossen ist.\n\nBeachten Sie auch die App-Einstellungen um anzupassen wie die Benachrichtigungen angezeigt werden.</string>
+    <string name="tutorial_starting_instructions">Erstellen Sie eine neue Notiz indem Sie auf den Button in der underen Ecke tippen.</string>
+    <string name="tutorial_welcome">Legen wir los!</string>
+    <string name="nothing_to_display">Nichts zum anzeigen</string>
+    <string name="prefs_reset_tutorial_success">Das Tutorial wurde zurückgesetzt.</string>
+    <string name="prefs_reset_tutorial_summary">Während Sie keine Notizen erstellt haben wird das Tutorial wieder angezeigt.</string>
+    <string name="prefs_reset_tutorial_title">Tutorial zurücksetzen</string>
 </resources>

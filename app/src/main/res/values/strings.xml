@@ -57,4 +57,14 @@
     <string name="pref_view_on_github_summary">This app is free and open source. You can view this app\'s sourcecode online if you tap here.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
     <string name="settings_auto_enable_new_notes_flavor">When you add a new note it will automatically be enabled.</string>
+    <string name="tutorial_welcome">Let\'s get started!</string>
+    <string name="tutorial_main_text">Tap on a note\'s icon to toggle whether a notification for it will be displayed while the app is closed.\n\nRemember to check the settings to customize the notification style.</string>
+    <string name="tutorial_disabled">No notifications</string>
+    <string name="tutorial_enabled">Notifications</string>
+    <string name="tutorial_starting_instructions">Add a new note by tapping on the button below.</string>
+    <string name="tutorial_dont_show_again">Don\'t show this again</string>
+    <string name="prefs_reset_tutorial_title">Reset tutorial</string>
+    <string name="prefs_reset_tutorial_summary">While you have no notes stored on this device the app\'s tutorial will be displayed again.</string>
+    <string name="prefs_reset_tutorial_success">Tutorial has been reset.</string>
+    <string name="nothing_to_display">Nothing to display.</string>
 </resources>

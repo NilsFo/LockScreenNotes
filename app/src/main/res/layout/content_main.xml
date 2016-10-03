@@ -12,13 +12,36 @@
     tools:context="de.wavegate.tos.lockscreennotes.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <TextView
+        android:id="@+id/nothing_to_display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin_double"
+        android:gravity="center"
+        android:text="@string/nothing_to_display"
+        android:textAppearance="@android:style/TextAppearance.Medium"/>
+
+    <ScrollView
+        android:id="@+id/tutorial_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            layout="@layout/layout_tutorial"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </ScrollView>
+
     <ListView
         android:id="@+id/notes_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:descendantFocusability="beforeDescendants"
+        android:scrollbars="horizontal"
         tools:layout_editor_absoluteX="59dp"
-        tools:layout_editor_absoluteY="224dp"
-        android:scrollbars="horizontal"/>
+        tools:layout_editor_absoluteY="224dp"/>
 
 </LinearLayout>

@@ -57,6 +57,11 @@
             android:key="prefs_seperate_notes"
             android:summary="@string/prefs_seperate_notes_flavor"
             android:title="@string/prefs_seperate_notes_tilte"/>
+
+        <Preference
+            android:key="prefs_reset_tutorial"
+            android:summary="@string/prefs_reset_tutorial_summary"
+            android:title="@string/prefs_reset_tutorial_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory
