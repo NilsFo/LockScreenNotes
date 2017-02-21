@@ -1,1 +1,17 @@
 /build
+
+build.gradle
+local.properties
+
+/.idea/
+*.iml
+
+.DS_Store
+.DS_Store?
+
+app/build/
+app/build.gradle
+.gradle/
+/.idea/*
+
+/app/src/main/assets/fonts/*

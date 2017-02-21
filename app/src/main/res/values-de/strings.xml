@@ -8,7 +8,6 @@
     <string name="action_delete_all">Alle Notizen löschen</string>
     <string name="action_disable_all">Alle Notizen deaktivieren</string>
     <string name="action_move_to_bottom">Zum Ende bewegen</string>
-    <string name="action_select_all">Alles auswählen</string>
     <string name="action_settings">Einstellungen</string>
     <string name="action_share">Teilen</string>
     <string name="advanced">Erweitert</string>
@@ -24,15 +23,14 @@
     <string name="error_invalid_value">Konnte nicht mit diesem Wert umgehen. Wird zurückgesetzt.</string>
     <string name="home_screen_lines_too_small">Die angegebene Zahl der Linien ist zu klein.</string>
     <string name="info">Info</string>
-    <string name="last_edited">Zuletzt bearbeitet: %1$s</string>
+    <string name="last_edited">Zuletzt bearbeitet: %1$s - %2$s</string>
     <string name="note_position">#%1$s</string>
     <string name="notification_multiple_notes">%1$s Notizen!</string>
     <string name="notification_ticker">Sperrbildschirm-Notiz wurde erstellt</string>
     <string name="position">Position</string>
     <string name="pref_settings_general">Allgemein</string>
-    <string name="pref_view_on_github_summary">Diese App ist gratis und open source. Sie können sich den Quellcode online anschauen wenn Sie hier tippen.</string>
+    <string name="pref_view_on_github_summary">Diese App ist gratis und open source. Sie können sich den Quellcode online anschauen (und dazu beitragen) wenn Sie hier tippen.</string>
     <string name="pref_view_on_github_title">Die App auf GitHub ansehen</string>
-    <string name="prefs_about_summary">Sperrbildschirm Notizen, erstellt von Nils Förster</string>
     <string name="prefs_about_title">Über</string>
     <string name="prefs_currently_selected">Derzeitig ausgewählt: %1$s</string>
     <string name="prefs_date_detail_title">Detailgrad: Datum</string>
@@ -53,9 +51,8 @@
     <string name="settings_low_priority_note_title">Subtile Benachrichtigungen</string>
     <string name="share_using">Notiz teilen via</string>
     <string name="share_via_this_app">Neue Notiz anlegen</string>
-    <string name="success_note_sharing_listener">Ihre Notiz wurde ohne Proble erstellt</string>
+    <string name="success_note_sharing_listener">Ihre Notiz wurde ohne Probleme erstellt</string>
     <string name="timestamp">Zeitstempel</string>
-    <string name="title_activity_test">Test Aktivität</string>
     <string name="settings_auto_enable_new_notes_flavor">Wenn Sie eine Notiz hinzufügen wird diese automatisch für Benachrichtigungen freigegeben.</string>
     <string name="settings_auto_enable_new_notes_title">Notizen automatisch aktivieren</string>
     <string name="tutorial_disabled">Keine Benachrichtigungen</string>
@@ -68,4 +65,5 @@
     <string name="prefs_reset_tutorial_success">Das Tutorial wurde zurückgesetzt.</string>
     <string name="prefs_reset_tutorial_summary">Während Sie keine Notizen erstellt haben wird das Tutorial wieder angezeigt.</string>
     <string name="prefs_reset_tutorial_title">Tutorial zurücksetzen</string>
+    <string name="error_internal_error">Ein interner Fehler ist aufgetreten.</string>
 </resources>

@@ -9,10 +9,14 @@
     </string-array>
 
     <string-array name="DateDetailsData">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
+        <item>@string/val_0</item>
+        <item>@string/val_1</item>
+        <item>@string/val_2</item>
+        <item>@string/val_3</item>
     </string-array>
 
+    <string name="val_0" translatable="false">0</string>
+    <string name="val_1" translatable="false">1</string>
+    <string name="val_2" translatable="false">2</string>
+    <string name="val_3" translatable="false">3</string>
 </resources>

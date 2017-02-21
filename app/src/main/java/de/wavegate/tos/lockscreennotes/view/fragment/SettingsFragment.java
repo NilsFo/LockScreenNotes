@@ -8,13 +8,11 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import de.wavegate.tos.lockscreennotes.R;
 
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
-import static de.wavegate.tos.lockscreennotes.MainActivity.PREFS_HIDE_TUTORIAL;
+import static de.wavegate.tos.lockscreennotes.activity.MainActivity.PREFS_HIDE_TUTORIAL;
 
 /**
  * Created by Nils on 01.09.2016.
@@ -31,15 +29,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.preferences);
+		addPreferencesFromResource(R.xml.prefs_general);
 
-		Preference myPref = findPreference("pref_share_app");
-		myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			public boolean onPreferenceClick(Preference preference) {
-				shareApp();
-				return false;
-			}
-		});
+		Preference myPref;
+		//myPref = findPreference("pref_share_app");
+		//myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+		//	public boolean onPreferenceClick(Preference preference) {
+		//		shareApp();
+		//		return false;
+		//	}
+		//});
 
 		myPref = findPreference("pref_view_on_github");
 		myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -64,7 +63,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
 		editor.putBoolean(PREFS_HIDE_TUTORIAL, false);
 		editor.apply();
-		Log.i(LOGTAG, "Request to reset tutorial recieved. Shared pref 'hide_tutorial' is now: " + PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(PREFS_HIDE_TUTORIAL, false));
+		//Log.i(LOGTAG, "Request to reset tutorial recieved. Shared pref 'hide_tutorial' is now: " + PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(PREFS_HIDE_TUTORIAL, false));
 
 		Toast.makeText(getActivity(), R.string.prefs_reset_tutorial_success, Toast.LENGTH_LONG).show();
 
@@ -96,7 +95,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		Log.i(LOGTAG, "Preference changed: " + sharedPreferences + " key: " + key + " is now: " + getValue(sharedPreferences, key));
+		//Log.i(LOGTAG, "Preference changed: " + sharedPreferences + " key: " + key + " is now: " + getValue(sharedPreferences, key));
 
 		if (key.equals(HOME_SCREEN_LINES_KEY)) {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -149,11 +148,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		pref.setSummary(String.format(getString(R.string.prefs_currently_selected), lod_time));
 
 		boolean dont_show_tutorial = prefs.getBoolean(PREFS_HIDE_TUTORIAL, false);
-		Log.i(LOGTAG, "PreferenceFragment here. Don't show tutorial? " + dont_show_tutorial);
+		//Log.i(LOGTAG, "PreferenceFragment here. Don't show tutorial? " + dont_show_tutorial);
 		if (!dont_show_tutorial) {
 			PreferenceCategory mCategory = (PreferenceCategory) findPreference("pref_cat_advanced");
 			pref = findPreference("prefs_reset_tutorial");
-			mCategory.removePreference(pref);
+			if (mCategory != null && pref != null) {
+				mCategory.removePreference(pref);
+			}
 		}
 	}
 

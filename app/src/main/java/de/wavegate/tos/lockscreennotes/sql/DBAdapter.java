@@ -8,11 +8,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.Observable;
 
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
+import static de.wavegate.tos.lockscreennotes.activity.MainActivity.LOGTAG;
 
 
 // TO USE:
@@ -52,7 +51,7 @@ public class DBAdapter extends Observable {
 
 	private static final String DATABASE_CREATE_SQL =
 			"create table " + DATABASE_TABLE
-					+ " (" + KEY_ROWID + " integer primary key autoincrement, "
+					+ " (" + KEY_ROWID + " integer primary key auto_increment, "
 			/*
 			 * CHANGE 2:
 			 */
@@ -142,7 +141,7 @@ public class DBAdapter extends Observable {
 	}
 
 	// Return all data in the database.
-	public Cursor getAllRows() {
+	public synchronized Cursor getAllRows() {
 		String where = null;
 		Cursor c = db.query(true, DATABASE_TABLE, ALL_KEYS,
 				where, null, null, null, null, null);
@@ -212,8 +211,8 @@ public class DBAdapter extends Observable {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase _db, int oldVersion, int newVersion) {
-			Log.w(TAG, "Upgrading application's database from version " + oldVersion
-					+ " to " + newVersion + ", which will destroy all old data!");
+			//Log.w(TAG, "Upgrading application's database from version " + oldVersion
+			//		+ " to " + newVersion + ", which will destroy all old data!");
 
 			// Destroy old database:
 			_db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);

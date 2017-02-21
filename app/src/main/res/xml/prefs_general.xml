@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="pref_cat_general"
+        android:title="@string/pref_settings_general">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="prefs_auto_enable_new_notes"
+            android:summary="@string/settings_auto_enable_new_notes_flavor"
+            android:title="@string/settings_auto_enable_new_notes_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_cat_advanced"
+        android:title="@string/advanced">
+        <EditTextPreference
+            android:defaultValue="5"
+            android:inputType="number"
+            android:singleLine="true"
+            android:key="prefs_homescreen_lines"
+            android:title="@string/prefs_homescreen_lines_title"/>
+
+        <Preference
+            android:key="prefs_reset_tutorial"
+            android:summary="@string/prefs_reset_tutorial_summary"
+            android:title="@string/prefs_reset_tutorial_title"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

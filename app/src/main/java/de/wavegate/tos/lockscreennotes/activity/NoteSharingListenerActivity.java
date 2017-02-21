@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -14,8 +13,6 @@ import de.wavegate.tos.lockscreennotes.R;
 import de.wavegate.tos.lockscreennotes.data.Note;
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
 import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
-
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 
 /**
  * Created by Nils on 06.09.2016.
@@ -32,7 +29,7 @@ public class NoteSharingListenerActivity extends Activity {
 		//Handling intent
 		String receivedAction = receivedIntent.getAction();
 		String receivedType = receivedIntent.getType();
-		Log.i(LOGTAG, "I opened via intent. Action: '" + receivedAction + "' Type: '" + receivedType + "'");
+		//Log.i(LOGTAG, "I opened via intent. Action: '" + receivedAction + "' Type: '" + receivedType + "'");
 		boolean error = true;
 
 		if (receivedAction != null && receivedAction.equals(Intent.ACTION_SEND)) {

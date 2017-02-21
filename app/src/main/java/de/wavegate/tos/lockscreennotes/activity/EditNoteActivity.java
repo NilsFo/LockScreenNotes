@@ -8,7 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import android.text.Layout;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
@@ -19,10 +20,9 @@ import java.util.Date;
 
 import de.wavegate.tos.lockscreennotes.R;
 import de.wavegate.tos.lockscreennotes.data.Note;
+import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
 import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
-
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 
 public class EditNoteActivity extends NotesActivity {
 	public static final String NOTE_ACTIVITY_NOTE_ID = "EditNoteActivity_note_id";
@@ -36,8 +36,8 @@ public class EditNoteActivity extends NotesActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_edit_note);
-		ActionBar bar =getSupportActionBar();
-		if (bar!=null) bar.setDisplayHomeAsUpEnabled(true);
+		ActionBar bar = getSupportActionBar();
+		if (bar != null) bar.setDisplayHomeAsUpEnabled(true);
 
 		long id = getIntent().getExtras().getLong(NOTE_ACTIVITY_NOTE_ID, ILLEGAL_NOTE_ID);
 		if (id == ILLEGAL_NOTE_ID) {
@@ -91,7 +91,7 @@ public class EditNoteActivity extends NotesActivity {
 		requestKeyBoard();
 	}
 
-	private void requestKeyBoard(){
+	private void requestKeyBoard() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.showSoftInput(noteTF, InputMethodManager.SHOW_IMPLICIT);
 	}
@@ -119,13 +119,19 @@ public class EditNoteActivity extends NotesActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.edit_note_menu, menu);
+
+		menu.findItem(R.id.action_move_to_bottom).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_down));
+		menu.findItem(R.id.action_clear).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_clear));
+		menu.findItem(R.id.action_share).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_share));
+		menu.findItem(R.id.action_copy_note).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_copy));
+
 		return true;
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.i(LOGTAG, "EditNoteFrame: Paused");
+		//Log.i(LOGTAG, "EditNoteFrame: Paused");
 		saveNote();
 		databaseAdapter.close();
 
@@ -146,7 +152,7 @@ public class EditNoteActivity extends NotesActivity {
 		String text = noteTF.getText().toString();
 		boolean changed = !oldText.equals(text);
 
-		Log.i(LOGTAG, "EditNoteFrame: Saving the note. Has something changed? " + changed);
+		//Log.i(LOGTAG, "EditNoteFrame: Saving the note. Has something changed? " + changed);
 
 		if (changed) {
 
@@ -155,6 +161,10 @@ public class EditNoteActivity extends NotesActivity {
 
 			databaseAdapter.updateRow(myNote.getDatabaseID(), myNote.getText(), myNote.isEnabledSQL(), myNote.getTimestamp());
 		}
+	}
+
+	public void cancelEdit(){
+		onBackPressed();
 	}
 
 	@Override
@@ -181,6 +191,10 @@ public class EditNoteActivity extends NotesActivity {
 			case R.id.action_copy_note:
 				actionCopyText();
 				return true;
+
+			//case R.id.action_cancel_edit:
+			//	cancelEdit();
+			//	return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -192,7 +206,7 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void handleIllegalNote() {
-		//TODO handle
+		Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 	}
 
 	@Override

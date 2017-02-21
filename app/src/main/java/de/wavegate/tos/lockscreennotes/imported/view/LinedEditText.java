@@ -38,6 +38,16 @@ public class LinedEditText extends EditText {
 	}
 
 	@Override
+	public boolean isInEditMode() {
+		return true;
+	}
+
+	@Override
+	public int getMinimumWidth() {
+		return 1;
+	}
+
+	@Override
 	protected void onDraw(Canvas canvas) {
 		//int count = getLineCount();
 		int height = getHeight();

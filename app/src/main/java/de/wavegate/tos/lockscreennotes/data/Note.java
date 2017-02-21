@@ -3,14 +3,11 @@ package de.wavegate.tos.lockscreennotes.data;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
-
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 
 /**
  * Created by Nils on 13.08.2016.
@@ -64,7 +61,7 @@ public class Note implements Comparable<Note> {
 				int id = cursor.getInt(DBAdapter.COL_ROWID);
 				Note note = Note.getNoteFromDB(id, adapter);
 
-				Log.i(LOGTAG, "Adding note with ID: " + id);
+				//Log.i(LOGTAG, "Adding note with ID: " + id);
 				list.add(note);
 			} while (cursor.moveToNext());
 		}
@@ -78,9 +75,11 @@ public class Note implements Comparable<Note> {
 		while (text.contains("  ")) text = text.replace("  ", " ");
 		text = text.trim();
 
-		if (text.length() > characters) {
-			text = text.trim().substring(0, characters);
-			text = text.trim() + "...";
+		if (characters > 0) {
+			if (text.length() > characters) {
+				text = text.trim().substring(0, characters);
+				text = text.trim() + "...";
+			}
 		}
 
 		return text;
@@ -137,6 +136,6 @@ public class Note implements Comparable<Note> {
 
 	@Override
 	public int compareTo(@NonNull Note note) {
-		return (int) (note.getTimestamp() - getTimestamp());
+		return (note.getTimestampAsDate().compareTo(getTimestampAsDate()));
 	}
 }

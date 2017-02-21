@@ -1,29 +1,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="de.wavegate.tos.lockscreennotes.MainActivity">
+      tools:context="de.wavegate.tos.lockscreennotes.activity.MainActivity">
 
     <item
         android:id="@+id/action_move_to_bottom"
-        android:icon="@drawable/ic_action_down"
         android:title="@string/action_move_to_bottom"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_clear"
-        android:icon="@drawable/revert"
         android:title="@string/action_clear"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/ic_action_share"
         android:title="@string/action_share"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_copy_note"
-        android:icon="@drawable/ic_action_copy"
         android:title="@string/action_copy_text"
         app:showAsAction="ifRoom"/>
+
+    <!--
+    <item
+        android:id="@+id/action_cancel_edit"
+        android:title="@string/action_cancel_edit"
+        app:showAsAction="never"/> -->
+
 </menu>

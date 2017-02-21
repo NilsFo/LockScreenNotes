@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:disableDependentsState="true"
+        android:key="prefs_time_relative"
+        android:summary="@string/prefs_time_relative_summary"
+        android:title="@string/prefs_time_relative_title"
+        />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:dependency="prefs_time_relative"
+        android:entries="@array/DateDetails"
+        android:entryValues="@array/DateDetailsData"
+        android:key="prefs_date_detail"
+        android:title="@string/prefs_date_detail_title"
+        />
+
+    <ListPreference
+        android:defaultValue="2"
+        android:dependency="prefs_time_relative"
+        android:entries="@array/DateDetails"
+        android:entryValues="@array/DateDetailsData"
+        android:key="prefs_time_detail"
+        android:title="@string/prefs_time_detail"
+        />
+
+    <!--
+    <EditTextPreference
+        android:key="prefs_time_locale"
+        android:dependency="prefs_time_relative"
+        android:title="@string/prefs_time_locale"
+        android:defaultValue="@string/prefs_time_locale_default_value"
+        /> -->
+
+</PreferenceScreen>

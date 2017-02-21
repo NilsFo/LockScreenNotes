@@ -1,19 +1,21 @@
 package de.wavegate.tos.lockscreennotes.data;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -21,11 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import de.wavegate.tos.lockscreennotes.MainActivity;
+import de.wavegate.tos.lockscreennotes.activity.MainActivity;
 import de.wavegate.tos.lockscreennotes.R;
+import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import de.wavegate.tos.lockscreennotes.view.fragment.SettingsFragment;
-
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 
 /**
  * Created by Nils on 13.08.2016.
@@ -34,15 +35,18 @@ import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
 public class NoteAdapter extends ArrayAdapter<Note> {
 
 	public static final String PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY = "prefs_allow_edit_note_activity";
-	public static final int DEFAULT_LEVEL_OF_DETAIL = DateFormat.MEDIUM;
+	private static final int DEFAULT_LEVEL_OF_DETAIL = DateFormat.MEDIUM;
 	private static final int DEFAULT_MIN_LINES = 5;
+	public static final int DELETE_BT_SIZE = 36;
+	public static final int DELETE_BT_COLOR = Color.GRAY;
 
 	public NoteAdapter(Context context, int resource, List<Note> objects) {
 		super(context, resource, objects);
 	}
 
+	@NonNull
 	@Override
-	public View getView(final int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 		LayoutInflater inflater = LayoutInflater.from(getContext());
 		//View view;
 		//if (convertView == null)
@@ -51,17 +55,18 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		//	view = convertView;
 		//
 		Note note = getItem(position);
-		View view = inflater.inflate(R.layout.note_row, parent, false);
+		@SuppressLint("ViewHolder") View view = inflater.inflate(R.layout.note_row, parent, false);
 
-		TextView text = (TextView) view.findViewById(R.id.note_row_timestamp);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		TextView timestampTF = (TextView) view.findViewById(R.id.note_row_timestamp);
 		TextView positionTF = (TextView) view.findViewById(R.id.note_row_position);
 		ImageButton enabledBT = (ImageButton) view.findViewById(R.id.note_row_image_bt);
 		ImageButton deleteBT = (ImageButton) view.findViewById(R.id.image_row_deleteBT);
 		EditText editText = (EditText) view.findViewById(R.id.note_row_text_tf);
+		View root = enabledBT.getRootView();
 
-		//	editText.setMinHeight(editText.getLineHeight() * getMinLines());
 		editText.setMinLines(getMinLines());
-		editText.setText(note.getText());
+		editText.setText(note != null ? note.getText() : getContext().getText(R.string.error_unknown));
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -75,7 +80,10 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				getItem(position).setText(editable.toString());
+				Note n = getItem(position);
+				if (n != null) {
+					n.setText(editable.toString());
+				}
 			}
 		});
 
@@ -83,7 +91,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 			editText.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					Log.i(LOGTAG, "Turns out... its a click on the Note.");
+					//Log.i(LOGTAG, "Turns out... its a click on the Note.");
 					requestEditNoteActivity(getItem(position));
 				}
 			});
@@ -101,18 +109,23 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 			//});
 			editText.setFocusable(false);
 			editText.setClickable(true);
-			Log.i(LOGTAG, "Seems that it is fullscreenEditMoode... So all listeners have been added.");
+			//Log.i(LOGTAG, "Seems that it is fullscreenEditMoode... So all listeners have been added.");
 		}
 
 		enabledBT.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				Note n = getItem(position);
+				if (n == null) {
+					return;
+				}
 				n.setEnabled(!n.isEnabled());
 
 				notifyDataSetChanged();
 			}
 		});
+		enabledBT.setBackground(root.getBackground());
+
 		deleteBT.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -125,18 +138,24 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 				}
 			}
 		});
+		Drawable drawable = FontAwesomeDrawableBuilder.get(getContext(), R.string.fa_icon_delete, DELETE_BT_SIZE, DELETE_BT_COLOR);
+		deleteBT.setImageDrawable(drawable);
 
-		enabledBT.setImageResource(getEnabledIcon(note.isEnabled()));
-		//text.setTextColor(getTextColor(note.isEnabled()));
-		text.setText(String.format(getContext().getString(R.string.last_edited), getNoteTime(note)));
+		if (preferences.getBoolean("prefs_time_relative", true) && note != null) {
+			long time = note.getTimestamp();
+			timestampTF.setText(formatNoteRelativeTime(getContext(), note.getTimestamp()));
+			RelativeTimeTextfieldContainer.getContainer().add(timestampTF, time);
+		} else
+			timestampTF.setText(getContext().getString(R.string.last_edited, getNoteDateAsString(note), getNoteTimeAsString(note)));
+		enabledBT.setImageResource(getEnabledIcon(note != null && note.isEnabled()));
 		positionTF.setText(String.format(getContext().getString(R.string.note_position), String.valueOf(position + 1)));
 		deleteBT.setBackground(view.getBackground());
 
-		//RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)view.getLayoutParams();
-		//params.setMargins(80, 0, 0, 0); //substitute parameters for left, top, right, bottom
-		//view.setLayoutParams(params);
-
 		return view;
+	}
+
+	public static String formatNoteRelativeTime(Context context, long timestamp) {
+		return context.getString(R.string.last_edited_single, DateUtils.getRelativeTimeSpanString(timestamp, new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL).toString());
 	}
 
 	private int getMinLines() {
@@ -150,7 +169,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
 	private boolean requestEditNoteActivity(Note note) {
 		if (!isFullscreenEditMode()) {
-			Log.i(LOGTAG, "A request was made to edit via fullscreen. But it was not enabled in the preferences.");
+			//Log.i(LOGTAG, "A request was made to edit via fullscreen. But it was not enabled in the prefs_general.");
 			return false;
 		}
 
@@ -175,30 +194,38 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		return R.drawable.disabled_button;
 	}
 
-	private int getTextColor(boolean enabled){
+	@Deprecated
+	private int getNoteTextColor(boolean enabled) {
 		if (enabled) return android.R.color.black;
 		return android.R.color.holo_red_dark;
 	}
 
-	private String getNoteTime(Note note) {
+	private String getNoteTimeAsString(Note note) {
 		Date date = note.getTimestampAsDate();
 		Locale locale = Locale.getDefault();
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		String date_lod = preferences.getString("prefs_date_detail", "?");
-		String time_lod = preferences.getString("prefs_time_detail", "?");
+		String lod = preferences.getString("prefs_time_detail", getContext().getString(R.string.error_unknown));
 
-		DateFormat f = DateFormat.getDateTimeInstance(getLoDviaPreference(date_lod), getLoDviaPreference(time_lod), locale);
-		String formattedDate = f.format(date);
-		//Log.i(LOGTAG, "Parsed date: " + formattedDate + " from locale: " + locale.getCountry());
-		return formattedDate;
+		DateFormat f = DateFormat.getTimeInstance(getLoDviaPreference(lod), locale);
+		return f.format(date);
+	}
+
+	private String getNoteDateAsString(Note note) {
+		Date date = note.getTimestampAsDate();
+		Locale locale = Locale.getDefault();
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		String lod = preferences.getString("prefs_date_detail", getContext().getString(R.string.error_unknown));
+
+		DateFormat f = DateFormat.getDateInstance(getLoDviaPreference(lod), locale);
+		return f.format(date);
 	}
 
 	private int getLoDviaPreference(String lod) {
-		int i = 0;
+		int i = -1;
 		try {
 			i = Integer.parseInt(lod);
 		} catch (NumberFormatException e) {
-			Log.w(LOGTAG, "Warning: Could not interpret this as a number: " + lod);
+			//Log.w(LOGTAG, "Warning: Could not interpret this as a number: " + lod);
 		}
 
 		switch (i) {
@@ -217,7 +244,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		//if (lod.equals(res.getString(R.string.prefs_medium))) return DateFormat.MEDIUM;
 		//if (lod.equals(res.getString(R.string.prefs_short))) return DateFormat.SHORT;
 
-		Log.w(LOGTAG, "Warning: Level of Detail not found, reverting to default. Input: " + lod);
+		//Log.w(LOGTAG, "Warning: Level of Detail not found, reverting to default. Input: " + lod);
 		return DEFAULT_LEVEL_OF_DETAIL;
 	}
 }

@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Lockscreen Notes</string>
     <string name="action_settings">Settings</string>
-    <string name="last_edited">Last edited: %1$s</string>
+    <string name="last_edited">Last edited: %1$s - %2$s</string>
+    <string name="last_edited_single">Last edited: %1$s</string>
     <string name="note_position">#%1$s</string>
     <string name="delete">Delete</string>
     <string name="position">Position</string>
@@ -29,7 +30,7 @@
     <string name="error_unknown"><![CDATA[<unknown>]]></string>
     <string name="info">Info</string>
     <string name="prefs_about_title">About</string>
-    <string name="prefs_about_summary">Lockscreen Notes, created by Nils Förster</string>
+    <string name="prefs_about_summary">%1$s, %2$s created by Nils Förster</string>
     <string name="prefs_share_app_title">Share this app</string>
     <string name="prefs_share_app_summary">Help making this app more popular by telling other people about it.</string>
     <string name="error_not_in_android_store_yet">Error! This app is not in the android App store yet.</string>
@@ -42,19 +43,17 @@
     <string name="action_clear">Clear</string>
     <string name="action_move_to_bottom">Move to bottom</string>
     <string name="action_share">Share</string>
-    <string name="action_select_all">Select all</string>
     <string name="action_copy_text">Copy text</string>
     <string name="action_copy_text_success">Text copied to clipboard.</string>
     <string name="share_using">Share note via</string>
     <string name="action_clear_confirm">Are you sure you want to clear this note\'s text?</string>
-    <string name="title_activity_test">TestActivity</string>
     <string name="pref_view_on_github_title">View this App on GitHub</string>
     <string name="settings_dismissable_notes_tilte">Dismissable notifications</string>
-    <string name="settings_dismissable_notes_flavor">While enabled you can dismiss the notifications in the lockscreen.\nDismissing a note automatically disables future notifications.</string>
+    <string name="settings_dismissable_notes_flavor">While enabled you can dismiss the notifications in the lockscreen.\nDismissing a notification automatically disables the corresponding note.</string>
     <string name="prefs_seperate_notes_tilte">Separate notifications</string>
     <string name="prefs_seperate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.</string>
     <string name="error_invalid_value">Could not handle that value. Resetting to default.</string>
-    <string name="pref_view_on_github_summary">This app is free and open source. You can view this app\'s sourcecode online if you tap here.</string>
+    <string name="pref_view_on_github_summary">This app is free and open source. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
     <string name="settings_auto_enable_new_notes_flavor">When you add a new note it will automatically be enabled.</string>
     <string name="tutorial_welcome">Let\'s get started!</string>
@@ -67,4 +66,18 @@
     <string name="prefs_reset_tutorial_summary">While you have no notes stored on this device the app\'s tutorial will be displayed again.</string>
     <string name="prefs_reset_tutorial_success">Tutorial has been reset.</string>
     <string name="nothing_to_display">Nothing to display.</string>
+    <string name="error_internal_error">An internal error occurred.</string>
+    <string name="pref_header_general">General</string>
+    <string name="pref_heder_info"><![CDATA[Info & About]]></string>
+    <string name="pref_notifications">Notifications</string>
+    <string name="pref_date_and_time"><![CDATA[Date & Time]]></string>
+    <string name="prefs_time_relative_title">Use relative date and time</string>
+    <string name="prefs_time_relative_summary">If enabled dates will be displayed relative to the current time (e.g. \'5 minutes ago\').\nOtherwise absolute dates will be used (e.g. \'May 20, 2017\').</string>
+    <string name="prefs_time_locale_default_value" translatable="false">default locale</string>
+    <string name="pref_credits">Credits</string>
+    <string name="prefs_credits_font_awesome" translatable="false"><i>Font awesome</i> Icon Pack by Dave Gandy</string>
+    <string name="prefs_credits_text_drawable"><i>Text Drawable</i> by Wireless Designs, LLC</string>
+    <string name="prefs_credits_timber"><i>Timber</i> by Jake Wharton</string>
+    <string name="action_cancel_edit">Cancel edit</string>
+
 </resources>

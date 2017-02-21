@@ -1,81 +1,83 @@
 package de.wavegate.tos.lockscreennotes.activity;
 
+
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v4.app.NavUtils;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatDelegate;
-import android.util.Log;
 import android.view.MenuItem;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 import de.wavegate.tos.lockscreennotes.R;
 import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
-import de.wavegate.tos.lockscreennotes.view.fragment.SettingsFragment;
+import de.wavegate.tos.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
+import timber.log.Timber;
 
-import static de.wavegate.tos.lockscreennotes.MainActivity.LOGTAG;
+public class SettingsActivity extends AppCompatPreferenceActivity {
 
-/**
- * Created by Nils on 01.09.2016.
- */
+	public static final SettingsBindPreferenceSummaryToValueListener defaultListener = new SettingsBindPreferenceSummaryToValueListener();
 
-public class SettingsActivity extends PreferenceActivity {
-
-	private AppCompatDelegate mDelegate;
 	private boolean showNotifications;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		getDelegate().installViewFactory();
-		getDelegate().onCreate(savedInstanceState);
-		setShowNotifications(true);
-
-		ActionBar bar = getDelegate().getSupportActionBar();
-
-		if (bar != null) {
-			bar.setDisplayHomeAsUpEnabled(true);
-			bar.setTitle(R.string.action_settings);
-		} else {
-			Log.w(LOGTAG, "Wanted to set up the AppBar. But the bar didn't exist.");
-		}
-
-		getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, new SettingsFragment())
-				.commit();
+	private static boolean isXLargeTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			// Respond to the action bar's Up/Home button
-			case android.R.id.home:
-				setShowNotifications(false);
-				NavUtils.navigateUpFromSameTask(this);
+	public static void bindPreferenceURLAsAction(Preference preference, final Uri uri) {
+		preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+				preference.getContext().startActivity(browserIntent);
 				return true;
+			}
+		});
+	}
+
+	public static void bindPreferenceURLAsAction(Preference preference) {
+		String summary = preference.getSummary().toString();
+		bindPreferenceURLAsAction(preference, Uri.parse(summary));
+	}
+
+	public static void bindPreferenceSummaryToValue(Preference preference) {
+		bindPreferenceSummaryToValue(preference, null);
+	}
+
+	public static void bindPreferenceSummaryToValue(Preference preference, Integer resource) {
+		if (preference == null) return;
+
+		SettingsBindPreferenceSummaryToValueListener listener = defaultListener;
+		if (resource != null) {
+			listener = new SettingsBindPreferenceSummaryToValueListener(resource);
 		}
-		return super.onOptionsItemSelected(item);
-	}
 
-	public boolean isShowNotifications() {
-		return showNotifications;
-	}
-
-	public void setShowNotifications(boolean showNotifications) {
-		this.showNotifications = showNotifications;
-	}
-
-	private AppCompatDelegate getDelegate() {
-		if (mDelegate == null) {
-			mDelegate = AppCompatDelegate.create(this, null);
-		}
-		return mDelegate;
+		preference.setOnPreferenceChangeListener(listener);
+		listener.onPreferenceChange(preference,
+				PreferenceManager
+						.getDefaultSharedPreferences(preference.getContext())
+						.getString(preference.getKey(), preference.getContext().getString(R.string.error_unknown)));
 	}
 
 	@Override
-	public void onBackPressed() {
-		setShowNotifications(false);
-		super.onBackPressed();
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setShowNotifications(true);
+		setupActionBar();
 	}
 
 	@Override
@@ -91,4 +93,120 @@ public class SettingsActivity extends PreferenceActivity {
 		new NotesNotificationManager(this).hideNotifications();
 		setShowNotifications(true);
 	}
+
+	private void setupActionBar() {
+		ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null) {
+			// Show the Up button in the action bar.
+			actionBar.setDisplayHomeAsUpEnabled(true);
+		}
+	}
+
+	public boolean isShowNotifications() {
+		return showNotifications;
+	}
+
+	public void setShowNotifications(boolean showNotifications) {
+		this.showNotifications = showNotifications;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean onIsMultiPane() {
+		return isXLargeTablet(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public void onBuildHeaders(List<PreferenceActivity.Header> target) {
+		loadHeadersFromResource(R.xml.prefs_headers, target);
+	}
+
+	protected boolean isValidFragment(String fragmentName) {
+		return PreferenceFragment.class.getName().equals(fragmentName)
+				|| GeneralPreferenceFragment.class.getName().equals(fragmentName)
+				|| NotificationsPreferenceFragment.class.getName().equals(fragmentName)
+				|| DateAndTimePreferenceFragment.class.getName().equals(fragmentName)
+				|| InfoAndAboutPreferenceFragment.class.getName().equals(fragmentName);
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				super.onBackPressed();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class GeneralPreferenceFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.prefs_general);
+			setHasOptionsMenu(true);
+
+			bindPreferenceSummaryToValue(findPreference("prefs_homescreen_lines"), R.string.prefs_homescreen_lines_summary);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class NotificationsPreferenceFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.prefs_notifications);
+			setHasOptionsMenu(true);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class DateAndTimePreferenceFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.prefs_time);
+			setHasOptionsMenu(true);
+
+			bindPreferenceSummaryToValue(findPreference("prefs_time_detail"));
+			bindPreferenceSummaryToValue(findPreference("prefs_date_detail"));
+			bindPreferenceSummaryToValue(findPreference("prefs_time_locale"));
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class InfoAndAboutPreferenceFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.prefs_info);
+			setHasOptionsMenu(true);
+
+			String versionName = getString(R.string.error_unknown);
+			String appName = getString(R.string.app_name);
+
+			PackageManager manager = getActivity().getPackageManager();
+			try {
+				PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
+				versionName = info.versionName;
+			} catch (PackageManager.NameNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			findPreference("pref_about").setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
+
+			bindPreferenceURLAsAction(findPreference("pref_view_on_github"), Uri.parse(getString(R.string.const_github_url)));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_font_awesome"));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_text_drawable"));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_timber"));
+		}
+
+	}
+
 }
