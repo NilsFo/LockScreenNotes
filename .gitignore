@@ -10,3 +10,5 @@
 /.idea/*
 
 /app/src/main/assets/fonts/*
+
+*.apk

@@ -32,8 +32,8 @@ public class LockScreenNotes extends Application {
 					return LOGTAG + super.createStackElementTag(element) + ":" + element.getLineNumber();
 				}
 			});
-		} else {
-			//Timber.plant(new Timber.);
+		}else{
+			//TODO span up debug tree!
 		}
 		Timber.i("Application started via TIMBER!");
 		Log.i(LOGTAG, "Application started via TINDER!");
