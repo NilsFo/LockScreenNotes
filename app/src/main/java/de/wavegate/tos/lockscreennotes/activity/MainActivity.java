@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +20,9 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +49,7 @@ public class MainActivity extends NotesActivity implements Observer {
 	public static final int ONE_SECOND_IN_MS = 1000;
 	public static final String LOGTAG = "LockScreenNotes";
 	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
+	public static final int DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT = 15;
 
 	private DBAdapter databaseAdapter;
 	private NoteAdapter noteAdapter;
@@ -55,8 +61,6 @@ public class MainActivity extends NotesActivity implements Observer {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		//Log.i(LOGTAG, "====== Home Screen Notes onCreate() ======");
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,27 +78,14 @@ public class MainActivity extends NotesActivity implements Observer {
 			}
 		});
 
-		new Date();
-
-		//tutorialDontShowAgainCB.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
 		databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
 		databaseAdapter.addObserver(this);
 
-		//Log.i(LOGTAG, "Database opened.");
+		Timber.i("Database opened.");
 
 		noteAdapter = new NoteAdapter(this, R.layout.note_row, new ArrayList<Note>());
 		notesList.setAdapter(noteAdapter);
-		//notesList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-		//	@Override
-		//	public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-		//		Log.i(LOGTAG, "Long click on Note-Item.");
-		//		return false;
-		//	}
-		//});
-
-		PreferenceManager.setDefaultValues(this, R.xml.prefs_general, false);
 
 		setShowNotifications(true);
 		loadNotesFromDB();
@@ -107,7 +98,7 @@ public class MainActivity extends NotesActivity implements Observer {
 				onFABClicked();
 			}
 		});
-		fab.setImageDrawable(FontAwesomeDrawableBuilder.get(this,R.string.fa_icon_plus,48, Color.WHITE));
+		fab.setImageDrawable(FontAwesomeDrawableBuilder.get(this, R.string.fa_icon_plus, 48, Color.WHITE));
 
 		if (notesList.getCount() == 0)
 			tutorialView.animate().alpha(1f).setDuration(2000);
@@ -116,15 +107,12 @@ public class MainActivity extends NotesActivity implements Observer {
 	private void onTutorialCBclicked(boolean isChecked) {
 		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
 		editor.putBoolean(PREFS_HIDE_TUTORIAL, isChecked);
-		//Log.i(LOGTAG, "Changed the 'dont show tutorial again' prefs: " + isChecked);
+		Timber.i("Changed the 'dont show tutorial again' prefs: " + isChecked);
 		editor.apply();
 	}
 
 	private void loadNotesFromDB() {
 		noteAdapter.clear();
-		//Cursor cursor = databaseAdapter.getAllRows();
-
-		//Log.i(LOGTAG, "Refreshing displayed Notes. Found: " + cursor.getCount());
 		ArrayList<Note> list = Note.getAllNotesFromDB(databaseAdapter);
 
 		Collections.sort(list);
@@ -139,7 +127,7 @@ public class MainActivity extends NotesActivity implements Observer {
 		for (int i = 0; i < noteAdapter.getCount(); i++) notes.add(noteAdapter.getItem(i));
 
 		boolean changed = false;
-		//Log.i(LOGTAG, "Saving known Notes. Found: " + notes.size());
+		Timber.i("Saving known Notes. Found: " + notes.size());
 		for (Note note : notes) {
 			long id = note.getDatabaseID();
 			String text = note.getText();
@@ -149,26 +137,58 @@ public class MainActivity extends NotesActivity implements Observer {
 			changed |= databaseAdapter.updateRow(id, text, enabled, timestamp);
 		}
 
-		//Log.i(LOGTAG, "Saving finished. Changed? " + changed);
+		Timber.i("Saving finished. Changed? " + changed);
+	}
+
+	public void requestRecoverNote(Note note) {
+		try {
+			addNewNote(note);
+			Toast.makeText(this, getString(R.string.info_note_recovered, getNoteSnackbarPreview(note)), Toast.LENGTH_LONG).show();
+		} catch (Exception e) {
+			Timber.e(e, "Failed to add note " + note.getTextPreview() + " to the database!");
+			Toast.makeText(this, R.string.error_note_save_failed, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	public void requestDeleteNote(final Note note) {
-		//Log.i(LOGTAG, "Request to delete note: '" + note.getText() + "'");
-		new AlertDialog.Builder(this)
-				.setTitle(R.string.delete_dialog_title)
-				.setMessage(String.format(getString(R.string.delete_dialog_content), note.getTextPreview()))
-				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						deleteNote(note.getDatabaseID());
-					}
-				})
-				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.show();
+		Timber.i("Request to delete note: '" + note.getText() + "'");
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("prefs_quick_delete", true)) {
+			deleteNote(note.getDatabaseID());
+
+			Snackbar snackbar = Snackbar
+					.make(notesList, getString(R.string.info_note_deleted, note.getTextPreview()), Snackbar.LENGTH_LONG);
+			snackbar.setAction(R.string.action_undo, new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					requestRecoverNote(note);
+				}
+			});
+			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+
+			View snackbarView = snackbar.getView();
+			TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+			textView.setMaxLines(2);
+			textView.setMinLines(2);
+			textView.setEllipsize(TextUtils.TruncateAt.END);
+
+			snackbar.show();
+		} else {
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.delete_dialog_title)
+					.setMessage(String.format(getString(R.string.delete_dialog_content), note.getTextPreview()))
+					.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							deleteNote(note.getDatabaseID());
+						}
+					})
+					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					})
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.show();
+		}
 	}
 
 	public void requestEditNote(Note note) {
@@ -180,12 +200,65 @@ public class MainActivity extends NotesActivity implements Observer {
 	}
 
 	private void requestDeleteAll() {
+		if (Note.getAllNotesFromDB(databaseAdapter).isEmpty()) {
+			Toast.makeText(this, R.string.error_no_note_to_delete, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		new AlertDialog.Builder(this)
 				.setTitle(R.string.deleteall_dialog_title)
 				.setMessage(R.string.deleteall_dialog_text)
 				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						for (Note n : Note.getAllNotesFromDB(databaseAdapter)) {
+							deleteNote(n.getDatabaseID());
+						}
+					}
+				})
+				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				})
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.show();
+	}
+
+	private void requestDeleteAllDisabled() {
+		int allCount = 0;
+		int disabledCount = 0;
+		final ArrayList<Note> disabledList = new ArrayList<>();
+		for (int i = 0; i < noteAdapter.getCount(); i++) {
+			Note n = noteAdapter.getItem(i);
+			if (n != null) {
+				allCount++;
+				if (!n.isEnabled()) {
+					disabledList.add(n);
+					disabledCount++;
+				}
+			}
+		}
+		Timber.i("Disabling check. Count: " + disabledCount + " - ListSize: " + disabledList.size());
+
+		if (disabledCount == 0 || disabledList.isEmpty()) {
+			Toast.makeText(this, R.string.error_no_note_to_delete, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		new AlertDialog.Builder(this)
+				.setTitle(R.string.action_delete_all)
+				.setMessage(getString(R.string.deleteall_disabled_dialog_text, disabledCount, allCount))
+				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						//for (int i = 0; i < noteAdapter.getCount(); i++) {
+						//	Note n = noteAdapter.getItem(i);
+						//	Timber.i("Found a note in the adapter!" + n);
+						//	if (n != null && !n.isEnabled()) {
+						//		deleteNote(n.getDatabaseID());
+						//		Timber.i("Disabled deletion request of note with ID " + n.getDatabaseID());
+						//	}
+						//}
+						for (Note n : disabledList) {
 							deleteNote(n.getDatabaseID());
 						}
 					}
@@ -226,7 +299,7 @@ public class MainActivity extends NotesActivity implements Observer {
 			executorService.shutdownNow();
 		}
 
-		//Log.i(LOGTAG, "Mainactivity: onPause() [Show notifications? " + isShowNotifications() + "]");
+		Timber.i("Mainactivity: onPause() [Show notifications? " + isShowNotifications() + "]");
 		if (isShowNotifications())
 			new NotesNotificationManager(this).showNotifications();
 	}
@@ -241,7 +314,7 @@ public class MainActivity extends NotesActivity implements Observer {
 		tutorialDontShowAgainCB.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREFS_HIDE_TUTORIAL, false));
 		setupRelativeDateUpdater();
 
-		//Log.i(LOGTAG, "Mainactivity: onResume()");
+		Timber.i("Mainactivity: onResume()");
 		new NotesNotificationManager(this).hideNotifications();
 	}
 
@@ -251,7 +324,7 @@ public class MainActivity extends NotesActivity implements Observer {
 		tutorialView.setVisibility(View.GONE);
 		nothingToDisplayLB.setVisibility(View.GONE);
 		notesList.setVisibility(View.VISIBLE);
-		//Log.i(LOGTAG, "Checking data for displaying the tutorial now. Empty? " + tut + " Preferences 'HIDE'? " + prefs_hide);
+		Timber.i("Checking data for displaying the tutorial now. Empty? " + tut + " Preferences 'HIDE'? " + prefs_hide);
 		if (tut) {
 			notesList.setVisibility(View.GONE);
 			if (prefs_hide) {
@@ -306,22 +379,33 @@ public class MainActivity extends NotesActivity implements Observer {
 		addNewNote("");
 	}
 
+	public long addNewNote(Note note) {
+		long id = databaseAdapter.insertRow(note.getText(), note.isEnabledSQL(), note.getTimestamp());
+		note.setDatabaseID(id);
+		return id;
+	}
+
 	public void addNewNote(String text) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean enabled = sharedPreferences.getBoolean("prefs_auto_enable_new_notes", true);
 		Note note = new Note(text, enabled, new Date().getTime());
-		long id = databaseAdapter.insertRow(note.getText(), note.isEnabledSQL(), note.getTimestamp());
-		note.setDatabaseID(id);
+		addNewNote(note);
 
 		requestEditNote(note);
 	}
 
+	private String getNoteSnackbarPreview(Note note) {
+		double density = getResources().getDisplayMetrics().density;
+		int words = (int) (DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT * density);
+		return note.getTextPreview(words);
+	}
+
 	@Override
 	public void setShowNotifications(boolean showNotifications) {
-		//boolean b = isShowNotifications();
+		boolean b = isShowNotifications();
 		super.setShowNotifications(showNotifications);
 
-		//Log.i(LOGTAG, "Mainactivity changed its ShowNotification Behavior: " + b + " -> " + isShowNotifications());
+		Timber.i("Mainactivity changed its ShowNotification Behavior: " + b + " -> " + isShowNotifications());
 	}
 
 	@Override
@@ -329,7 +413,7 @@ public class MainActivity extends NotesActivity implements Observer {
 		super.onDestroy();
 		databaseAdapter.close();
 
-		//Log.i(LOGTAG, "Database closed.");
+		Timber.i("Database closed.");
 	}
 
 	@Override
@@ -360,6 +444,10 @@ public class MainActivity extends NotesActivity implements Observer {
 			case R.id.action_disable_all:
 				requestDisableAll();
 				return true;
+
+			case R.id.action_delete_all_disabled:
+				requestDeleteAllDisabled();
+				return true;
 		}
 
 
@@ -368,7 +456,7 @@ public class MainActivity extends NotesActivity implements Observer {
 
 	@Override
 	public void update(Observable observable, Object o) {
-		//Log.i(LOGTAG, "MainActivity is triggered!");
+		Timber.i("MainActivity is triggered!");
 		loadNotesFromDB();
 	}
 }

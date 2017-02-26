@@ -4,6 +4,7 @@ package de.wavegate.tos.lockscreennotes.activity;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -15,8 +16,10 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -153,6 +156,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			setHasOptionsMenu(true);
 
 			bindPreferenceSummaryToValue(findPreference("prefs_homescreen_lines"), R.string.prefs_homescreen_lines_summary);
+			bindPreferenceSummaryToValue(findPreference("prefs_action_bar_icon_scale"));
+
+			Preference resetTutorial = findPreference("prefs_reset_tutorial");
+			resetTutorial.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(preference.getContext()).edit();
+					editor.putBoolean("prefs_hide_tutorial", false).apply();
+					editor.putBoolean("prefs_ignore_tutorial_autosave", false).apply();
+					editor.apply();
+
+					Toast.makeText(preference.getContext(), R.string.prefs_reset_tutorial_success, Toast.LENGTH_LONG).show();
+					return true;
+				}
+			});
 		}
 	}
 

@@ -4,8 +4,6 @@
     FontAwesome free font icons from http://fontawesome.io/
     -->
 
-    <string name="fa_icon_unknown" translatable="false">&#xf059;</string>
-
     <string name="fa_icon_delete" translatable="false">&#xf014;</string>
     <string name="fa_icon_plus" translatable="false">&#xf067;</string>
     <string name="fa_icon_copy" translatable="false">&#xf24d;</string>

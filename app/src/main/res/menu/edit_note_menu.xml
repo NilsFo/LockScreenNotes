@@ -4,11 +4,6 @@
       tools:context="de.wavegate.tos.lockscreennotes.activity.MainActivity">
 
     <item
-        android:id="@+id/action_move_to_bottom"
-        android:title="@string/action_move_to_bottom"
-        app:showAsAction="ifRoom"/>
-
-    <item
         android:id="@+id/action_clear"
         android:title="@string/action_clear"
         app:showAsAction="ifRoom"/>
@@ -23,10 +18,14 @@
         android:title="@string/action_copy_text"
         app:showAsAction="ifRoom"/>
 
-    <!--
+    <item
+        android:id="@+id/action_move_to_bottom"
+        android:title="@string/action_move_to_bottom"
+        app:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/action_cancel_edit"
         android:title="@string/action_cancel_edit"
-        app:showAsAction="never"/> -->
+        app:showAsAction="never"/>
 
 </menu>

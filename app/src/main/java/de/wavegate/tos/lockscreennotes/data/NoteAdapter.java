@@ -26,7 +26,7 @@ import java.util.Locale;
 import de.wavegate.tos.lockscreennotes.activity.MainActivity;
 import de.wavegate.tos.lockscreennotes.R;
 import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
-import de.wavegate.tos.lockscreennotes.view.fragment.SettingsFragment;
+import timber.log.Timber;
 
 /**
  * Created by Nils on 13.08.2016.
@@ -91,7 +91,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 			editText.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					//Log.i(LOGTAG, "Turns out... its a click on the Note.");
+					Timber.i("Turns out... its a click on the Note.");
 					requestEditNoteActivity(getItem(position));
 				}
 			});
@@ -109,7 +109,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 			//});
 			editText.setFocusable(false);
 			editText.setClickable(true);
-			//Log.i(LOGTAG, "Seems that it is fullscreenEditMoode... So all listeners have been added.");
+			Timber.i("Seems that it is fullscreenEditMoode... So all listeners have been added.");
 		}
 
 		enabledBT.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +159,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 	}
 
 	private int getMinLines() {
-		String lines = PreferenceManager.getDefaultSharedPreferences(getContext()).getString(SettingsFragment.HOME_SCREEN_LINES_KEY, String.valueOf(DEFAULT_MIN_LINES));
+		String lines = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("prefs_homescreen_lines", String.valueOf(DEFAULT_MIN_LINES));
 		try {
 			return Integer.parseInt(lines);
 		} catch (NumberFormatException e) {
@@ -169,7 +169,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
 	private boolean requestEditNoteActivity(Note note) {
 		if (!isFullscreenEditMode()) {
-			//Log.i(LOGTAG, "A request was made to edit via fullscreen. But it was not enabled in the prefs_general.");
+			Timber.i("A request was made to edit via fullscreen. But it was not enabled in the prefs_general.");
 			return false;
 		}
 
@@ -225,7 +225,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		try {
 			i = Integer.parseInt(lod);
 		} catch (NumberFormatException e) {
-			//Log.w(LOGTAG, "Warning: Could not interpret this as a number: " + lod);
+			Timber.i("Warning: Could not interpret this as a number: " + lod);
 		}
 
 		switch (i) {
@@ -239,12 +239,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 				return DateFormat.SHORT;
 		}
 
-		//if (lod.equals(res.getString(R.string.prefs_full))) return DateFormat.FULL;
-		//if (lod.equals(res.getString(R.string.prefs_long))) return DateFormat.LONG;
-		//if (lod.equals(res.getString(R.string.prefs_medium))) return DateFormat.MEDIUM;
-		//if (lod.equals(res.getString(R.string.prefs_short))) return DateFormat.SHORT;
-
-		//Log.w(LOGTAG, "Warning: Level of Detail not found, reverting to default. Input: " + lod);
+		Timber.i("Warning: Level of Detail not found, reverting to default. Input: " + lod);
 		return DEFAULT_LEVEL_OF_DETAIL;
 	}
 }

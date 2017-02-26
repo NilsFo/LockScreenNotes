@@ -10,6 +10,12 @@
             android:key="prefs_auto_enable_new_notes"
             android:summary="@string/settings_auto_enable_new_notes_flavor"
             android:title="@string/settings_auto_enable_new_notes_title"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="prefs_quick_delete"
+            android:summary="@string/prefs_quick_delete_flavor"
+            android:title="@string/prefs_quick_delete_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -21,6 +27,13 @@
             android:singleLine="true"
             android:key="prefs_homescreen_lines"
             android:title="@string/prefs_homescreen_lines_title"/>
+
+        <EditTextPreference
+            android:defaultValue="9"
+            android:inputType="number"
+            android:singleLine="true"
+            android:key="prefs_action_bar_icon_scale"
+            android:title="@string/prefs_action_bar_icon_scale"/>
 
         <Preference
             android:key="prefs_reset_tutorial"

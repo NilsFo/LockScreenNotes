@@ -2,16 +2,25 @@ package de.wavegate.tos.lockscreennotes.activity;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.Layout;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,21 +32,26 @@ import de.wavegate.tos.lockscreennotes.data.Note;
 import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
 import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
+import timber.log.Timber;
 
 public class EditNoteActivity extends NotesActivity {
 	public static final String NOTE_ACTIVITY_NOTE_ID = "EditNoteActivity_note_id";
 	public static final long ILLEGAL_NOTE_ID = -1;
-	private Note myNote;
 
+	private Note myNote;
+	private boolean canceled;
 	private DBAdapter databaseAdapter;
 	private EditText noteTF;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		canceled = false;
 		setContentView(R.layout.activity_edit_note);
 		ActionBar bar = getSupportActionBar();
 		if (bar != null) bar.setDisplayHomeAsUpEnabled(true);
+
+		SharedPreferences preferencses = PreferenceManager.getDefaultSharedPreferences(this);
 
 		long id = getIntent().getExtras().getLong(NOTE_ACTIVITY_NOTE_ID, ILLEGAL_NOTE_ID);
 		if (id == ILLEGAL_NOTE_ID) {
@@ -58,12 +72,24 @@ public class EditNoteActivity extends NotesActivity {
 		noteTF = (EditText) findViewById(R.id.enditNoteFullscreenTF);
 		noteTF.setText(myNote.getText());
 
+		if (!preferencses.getBoolean("prefs_ignore_tutorial_autosave", false)) {
+			Timber.i("Displaying the auto-save tutorial now.");
+
+			Snackbar snackbar = Snackbar.make(noteTF, R.string.tutorial_autosave, Snackbar.LENGTH_INDEFINITE);
+			snackbar.setAction(R.string.ok_got_it, new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Timber.i("Will not display this tutorial again.");
+					PreferenceManager.getDefaultSharedPreferences(v.getContext()).edit().putBoolean("prefs_ignore_tutorial_autosave", true).apply();
+				}
+			});
+			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+			snackbar.show();
+		}
+
 		if (savedInstanceState == null) {
 			actionMoveToBottom();
 		}
-		//InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		//imm.showSoftInput(noteTF, InputMethodManager.SHOW_IMPLICIT);
-		requestKeyBoard();
 	}
 
 	private void actionClear() {
@@ -92,8 +118,12 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void requestKeyBoard() {
+		requestKeyBoard(noteTF);
+	}
+
+	public synchronized void requestKeyBoard(View view) {
 		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		imm.showSoftInput(noteTF, InputMethodManager.SHOW_IMPLICIT);
+		imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 	private void actionShare() {
@@ -120,10 +150,10 @@ public class EditNoteActivity extends NotesActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.edit_note_menu, menu);
 
-		menu.findItem(R.id.action_move_to_bottom).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_down));
-		menu.findItem(R.id.action_clear).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_clear));
-		menu.findItem(R.id.action_share).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_share));
-		menu.findItem(R.id.action_copy_note).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this,R.string.fa_icon_copy));
+		menu.findItem(R.id.action_move_to_bottom).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_down));
+		menu.findItem(R.id.action_clear).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_clear));
+		menu.findItem(R.id.action_share).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_share));
+		menu.findItem(R.id.action_copy_note).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_copy));
 
 		return true;
 	}
@@ -131,8 +161,8 @@ public class EditNoteActivity extends NotesActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		//Log.i(LOGTAG, "EditNoteFrame: Paused");
-		saveNote();
+		Timber.i("EditNoteFrame: Paused");
+		if (!canceled) saveNote();
 		databaseAdapter.close();
 
 		if (isShowNotifications())
@@ -152,10 +182,9 @@ public class EditNoteActivity extends NotesActivity {
 		String text = noteTF.getText().toString();
 		boolean changed = !oldText.equals(text);
 
-		//Log.i(LOGTAG, "EditNoteFrame: Saving the note. Has something changed? " + changed);
+		Timber.i("EditNoteFrame: Saving the note. Has something changed? " + changed);
 
 		if (changed) {
-
 			myNote.setText(text);
 			myNote.setTimestamp(new Date());
 
@@ -163,8 +192,28 @@ public class EditNoteActivity extends NotesActivity {
 		}
 	}
 
-	public void cancelEdit(){
-		onBackPressed();
+	public void actionCancelEdit() {
+		new AlertDialog.Builder(this)
+				.setTitle(R.string.action_cancel_edit)
+				.setMessage(R.string.action_cancel_edit_confirm)
+				.setPositiveButton(R.string.action_cancel_edit, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								canceled = true;
+								finish();
+							}
+						});
+					}
+				})
+				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				})
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.show();
 	}
 
 	@Override
@@ -192,9 +241,9 @@ public class EditNoteActivity extends NotesActivity {
 				actionCopyText();
 				return true;
 
-			//case R.id.action_cancel_edit:
-			//	cancelEdit();
-			//	return true;
+			case R.id.action_cancel_edit:
+				actionCancelEdit();
+				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

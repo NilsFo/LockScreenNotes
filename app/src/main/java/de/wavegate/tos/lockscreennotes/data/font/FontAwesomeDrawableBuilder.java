@@ -2,6 +2,7 @@ package de.wavegate.tos.lockscreennotes.data.font;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.text.Layout;
 import android.util.TypedValue;
 
@@ -14,6 +15,8 @@ import timber.log.Timber;
  */
 
 public abstract class FontAwesomeDrawableBuilder {
+
+	public static final int DEFAULT__MENU_ICON_SCALE = 9;
 
 	public static TextDrawable get(Context context, String text, int size, int color) {
 		TextDrawable faIcon = new TextDrawable(context);
@@ -30,7 +33,17 @@ public abstract class FontAwesomeDrawableBuilder {
 		double density = context.getResources().getDisplayMetrics().density;
 		Timber.i("Screen density value: " + density);
 
-		TextDrawable faIcon= get(context, text, (int) (12 * density), Color.WHITE);
+		int itemScale;
+		String prefScale = PreferenceManager.getDefaultSharedPreferences(context).getString("prefs_action_bar_icon_scale", String.valueOf(DEFAULT__MENU_ICON_SCALE));
+		try {
+			itemScale = Integer.parseInt(prefScale);
+		} catch (NumberFormatException e) {
+			Timber.e(e, "Failed to parse the scale from the preferences! Reverting to default. Found in the prefs: " + prefScale);
+			itemScale = DEFAULT__MENU_ICON_SCALE;
+		}
+		itemScale++;
+
+		TextDrawable faIcon = get(context, text, (int) (itemScale * density), Color.WHITE);
 		faIcon.setAlpha(153);
 		return faIcon;
 	}

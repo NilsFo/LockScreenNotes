@@ -28,11 +28,8 @@
     <string name="prefs_medium">Medium</string>
     <string name="prefs_short">Short</string>
     <string name="error_unknown"><![CDATA[<unknown>]]></string>
-    <string name="info">Info</string>
     <string name="prefs_about_title">About</string>
-    <string name="prefs_about_summary">%1$s, %2$s created by Nils Förster</string>
-    <string name="prefs_share_app_title">Share this app</string>
-    <string name="prefs_share_app_summary">Help making this app more popular by telling other people about it.</string>
+    <string name="prefs_about_summary">%1$s, version %2$s created by Nils Förster</string>
     <string name="error_not_in_android_store_yet">Error! This app is not in the android App store yet.</string>
     <string name="error_note_sharing_listener">Error while handling your request. Please try again.</string>
     <string name="success_note_sharing_listener">Your note was created without problems.</string>
@@ -40,8 +37,9 @@
     <string name="action_disable_all">Disable all notes</string>
     <string name="deleteall_dialog_title">Delete all notes</string>
     <string name="deleteall_dialog_text">Are you sure you want to delete all notes currently saved?</string>
+    <string name="deleteall_disabled_dialog_text">Are you sure you want to delete %1$d out of the %2$d notes currently saved?</string>
     <string name="action_clear">Clear</string>
-    <string name="action_move_to_bottom">Move to bottom</string>
+    <string name="action_move_to_bottom">Move cursor to bottom</string>
     <string name="action_share">Share</string>
     <string name="action_copy_text">Copy text</string>
     <string name="action_copy_text_success">Text copied to clipboard.</string>
@@ -74,10 +72,23 @@
     <string name="prefs_time_relative_title">Use relative date and time</string>
     <string name="prefs_time_relative_summary">If enabled dates will be displayed relative to the current time (e.g. \'5 minutes ago\').\nOtherwise absolute dates will be used (e.g. \'May 20, 2017\').</string>
     <string name="prefs_time_locale_default_value" translatable="false">default locale</string>
-    <string name="pref_credits">Credits</string>
+    <string name="pref_credits" translatable="false">Credits</string>
     <string name="prefs_credits_font_awesome" translatable="false"><i>Font awesome</i> Icon Pack by Dave Gandy</string>
-    <string name="prefs_credits_text_drawable"><i>Text Drawable</i> by Wireless Designs, LLC</string>
-    <string name="prefs_credits_timber"><i>Timber</i> by Jake Wharton</string>
+    <string name="prefs_credits_text_drawable" translatable="false"><i>Text Drawable</i> by Wireless Designs, LLC</string>
+    <string name="prefs_credits_timber" translatable="false"><i>Timber</i> by Jake Wharton</string>
     <string name="action_cancel_edit">Cancel edit</string>
+    <string name="action_cancel_edit_confirm">Are you sure you want to cancel editing this note?\n\nAll unsaved changes will be lost.</string>
+    <string name="action_delete_all_disabled">Delete all disabled</string>
+    <string name="prefs_quick_delete_title">Quick delete notes</string>
+    <string name="prefs_quick_delete_flavor">While enabled you will not be asked to confirm that you want to delete an individual a note in a messagebox.</string>
+    <string name="info_note_deleted">Note deleted: %1$s</string>
+    <string name="action_undo">Undo</string>
+    <string name="error_no_note_to_delete">No note to delete found.</string>
+    <string name="error_note_save_failed">Failed to save the note.</string>
+    <string name="info_note_recovered">Note recovered: %1$s</string>
+    <string name="prefs_action_bar_icon_scale">Menu bar icon scale</string>
+    <string name="tutorial_autosave">Changes to notes are autosaved whenever you leave this screen.</string>
+    <string name="ok_got_it">OK, got it!</string>
+    <string name="prefs_credits_icon" translatable="false">Original App Icon by Patrick Quiskamp</string>
 
 </resources>

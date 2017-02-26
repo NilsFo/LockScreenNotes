@@ -11,6 +11,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.Observable;
 
+import timber.log.Timber;
+
 import static de.wavegate.tos.lockscreennotes.activity.MainActivity.LOGTAG;
 
 
@@ -51,7 +53,7 @@ public class DBAdapter extends Observable {
 
 	private static final String DATABASE_CREATE_SQL =
 			"create table " + DATABASE_TABLE
-					+ " (" + KEY_ROWID + " integer primary key auto_increment, "
+					+ " (" + KEY_ROWID + " integer primary key, "
 			/*
 			 * CHANGE 2:
 			 */
@@ -179,11 +181,11 @@ public class DBAdapter extends Observable {
 
 		Cursor oldData = getRow(rowId);
 		long oldTimestamp = oldData.getLong(COL_TIMESTAMP);
-		//Log.i(LOGTAG, "Old data: " + oldData.getString(COL_NOTE_TEXT) + ", " + oldData.getInt(COL_NOTE_ENABLED) + ", " + oldData.getLong(COL_TIMESTAMP));
-		//Log.i(LOGTAG, "New data: " + text + ", " + enabled + ", " + timestamp);
+		Timber.i("Old data: " + oldData.getString(COL_NOTE_TEXT) + ", " + oldData.getInt(COL_NOTE_ENABLED) + ", " + oldData.getLong(COL_TIMESTAMP));
+		Timber.i("New data: " + text + ", " + enabled + ", " + timestamp);
 
 		// Insert it into the database.
-		int i = db.update(DATABASE_TABLE, newValues, where, null);
+		db.update(DATABASE_TABLE, newValues, where, null);
 
 		setChanged();
 		notifyObservers();
@@ -211,8 +213,7 @@ public class DBAdapter extends Observable {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase _db, int oldVersion, int newVersion) {
-			//Log.w(TAG, "Upgrading application's database from version " + oldVersion
-			//		+ " to " + newVersion + ", which will destroy all old data!");
+			Timber.i("Upgrading application's database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data!");
 
 			// Destroy old database:
 			_db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);

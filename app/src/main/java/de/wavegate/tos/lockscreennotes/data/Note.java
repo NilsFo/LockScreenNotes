@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
+import timber.log.Timber;
 
 /**
  * Created by Nils on 13.08.2016.
@@ -61,7 +62,7 @@ public class Note implements Comparable<Note> {
 				int id = cursor.getInt(DBAdapter.COL_ROWID);
 				Note note = Note.getNoteFromDB(id, adapter);
 
-				//Log.i(LOGTAG, "Adding note with ID: " + id);
+				Timber.i("Adding note with ID: " + id);
 				list.add(note);
 			} while (cursor.moveToNext());
 		}

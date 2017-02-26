@@ -38,6 +38,9 @@
             android:summary="https://github.com/JakeWharton/timber"
             android:title="@string/prefs_credits_timber"/>
 
+        <Preference
+            android:title="@string/prefs_credits_icon"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

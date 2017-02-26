@@ -15,11 +15,13 @@ import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
 
+import de.wavegate.tos.lockscreennotes.activity.EditNoteActivity;
 import de.wavegate.tos.lockscreennotes.activity.MainActivity;
 import de.wavegate.tos.lockscreennotes.R;
 import de.wavegate.tos.lockscreennotes.data.Note;
 import de.wavegate.tos.lockscreennotes.receiver.NotificationDismissedReceiver;
 import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
+import timber.log.Timber;
 
 /**
  * Created by Nils on 16.08.2016.
@@ -50,7 +52,7 @@ public class NotesNotificationManager {
 				Note note = Note.getNoteFromDB(id, databaseAdapter);
 
 				if (note != null && note.isEnabled()) {
-					//Log.i(LOGTAG, "NotificatuonManager: Found an enabled note with: " + id);
+					Timber.i("NotificatuonManager: Found an enabled note with: " + id);
 					notesList.add(note);
 				}
 			} while (cursor.moveToNext());
@@ -71,22 +73,21 @@ public class NotesNotificationManager {
 		return notesList.size();
 	}
 
-	@Deprecated
-	public boolean isFamiliarActivityActive() {
-		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
-
-		//Log.i(LOGTAG, "componentName = " + cn);
-		return true;
-	}
+	//@Deprecated
+	//public boolean isFamiliarActivityActive() {
+	//	ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+	//	ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+	//
+	//	Timber.i("componentName = " + cn);
+	//	return true;
+	//}
 
 	public void showNotifications() {
-		isFamiliarActivityActive();
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		//Log.i(LOGTAG, "NotesNotificationManager: Request to show notifications received!");
+		Timber.i("NotesNotificationManager: Request to show notifications received!");
 
 		if (!hasNotifications()) {
-			//Log.i(LOGTAG, "... but it was empty. Nothing to display.");
+			Timber.i("... but it was empty. Nothing to display.");
 			return;
 		}
 
@@ -146,14 +147,14 @@ public class NotesNotificationManager {
 	private PendingIntent getOnDismissIntent(int notificationId) {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
-		//Log.i(LOGTAG,"Creating a dismiss intent. ID: "+notificationId);
+		Timber.i("Creating a dismiss intent. ID: "+notificationId);
 		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
 	}
 
 	private NotificationCompat.Builder getBuilder() {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder.setDefaults(Notification.DEFAULT_ALL);
+		//builder.setDefaults(Notification.DEFAULT_ALL);
 		builder.setSmallIcon(R.drawable.notification_ticker_bar);
 		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
 		builder.setContentTitle(context.getString(R.string.app_name));
@@ -162,16 +163,27 @@ public class NotesNotificationManager {
 		builder.setOngoing(!sharedPreferences.getBoolean("prefs_dismissable_notes", false));
 		builder.setPriority(getNotificationPriority());
 
-		Intent intent = new Intent(context, MainActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		PendingIntent notificationIntent = PendingIntent.getActivity(context, 0, intent, 0);
-		builder.setContentIntent(notificationIntent);
+		builder.setContentIntent(getIntentToMainActivity());
 
 		return builder;
 	}
 
+	private PendingIntent getIntentToMainActivity(){
+		Intent intent = new Intent(context, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		return PendingIntent.getActivity(context, 0, intent, 0);
+	}
+
+	@Deprecated
+	private PendingIntent getIntentToNote(long id){
+		Intent intent = new Intent(context, EditNoteActivity.class);
+		intent.putExtra(EditNoteActivity.NOTE_ACTIVITY_NOTE_ID, id);
+		intent.setFlags(PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+		return PendingIntent.getActivity(context, 0, intent, 0);
+	}
+
 	public void hideNotifications() {
-		//Log.i(LOGTAG, "NotesNotificationManager: Request to hide notifications received!");
+		Timber.i("NotesNotificationManager: Request to hide notifications received!");
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		manager.cancelAll();
 	}

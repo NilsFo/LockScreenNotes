@@ -56,6 +56,6 @@ public class RelativeTimeTextfieldContainer {
 				v.setText(NoteAdapter.formatNoteRelativeTime(context, timestamp));
 			} else deleteList.add(v);
 		}
-		Timber.i("Updating displayed note times. Updated count: " + viewList.size() + " To be deleted: " + deleteList.size());
+		Timber.v("Updating displayed note times. Updated count: " + viewList.size() + " To be deleted: " + deleteList.size());
 	}
 }
