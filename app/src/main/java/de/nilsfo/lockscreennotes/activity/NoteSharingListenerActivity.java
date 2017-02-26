@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.activity;
+package de.nilsfo.lockscreennotes.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,10 +9,10 @@ import android.widget.Toast;
 
 import java.util.Date;
 
-import de.wavegate.tos.lockscreennotes.R;
-import de.wavegate.tos.lockscreennotes.data.Note;
-import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
-import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lsn.R;
+import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
 
 /**

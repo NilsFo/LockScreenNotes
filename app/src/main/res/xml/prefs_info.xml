@@ -20,6 +20,20 @@
         android:title="@string/pref_view_on_github_title"
         />
 
+
+    <PreferenceCategory
+        android:title="@string/action_share">
+        <Preference
+            android:key="pref_share_app"
+            android:title="@string/pref_share_app_summary"
+            />
+
+        <Preference
+            android:key="pref_view_on_play_store"
+            android:title="@string/pref_view_on_play_store"
+            />
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_credits">
 

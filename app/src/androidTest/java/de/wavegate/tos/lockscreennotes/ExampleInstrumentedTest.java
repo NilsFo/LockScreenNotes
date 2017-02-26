@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
 		// Context of the app under test.
 		Context appContext = InstrumentationRegistry.getTargetContext();
 
-		assertEquals("de.wavegate.tos.lockscreennotes", appContext.getPackageName());
+		assertEquals("de.nilsfo.lsn", appContext.getPackageName());
 	}
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lockscreen Notes</string>
+    <string name="app_name">Lock Screen Notes</string>
     <string name="action_settings">Settings</string>
     <string name="last_edited">Last edited: %1$s - %2$s</string>
     <string name="last_edited_single">Last edited: %1$s</string>
@@ -90,5 +90,7 @@
     <string name="tutorial_autosave">Changes to notes are autosaved whenever you leave this screen.</string>
     <string name="ok_got_it">OK, got it!</string>
     <string name="prefs_credits_icon" translatable="false">Original App Icon by Patrick Quiskamp</string>
-
+    <string name="pref_view_on_play_store">View on Google Play</string>
+    <string name="pref_share_app_summary">Share this app</string>
+    <string name="pref_share_app_text">Check out the app %1$s on Google Play: %2$s</string>
 </resources>

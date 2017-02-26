@@ -1,10 +1,10 @@
-package de.wavegate.tos.lockscreennotes.receiver;
+package de.nilsfo.lockscreennotes.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 
 /**
  * Created by Nils on 02.09.2016.

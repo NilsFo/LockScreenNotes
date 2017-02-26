@@ -1,10 +1,10 @@
-package de.wavegate.tos.lockscreennotes.util.listener;
+package de.nilsfo.lockscreennotes.util.listener;
 
 import android.content.Context;
 import android.preference.ListPreference;
 import android.preference.Preference;
 
-import de.wavegate.tos.lockscreennotes.R;
+import de.nilsfo.lsn.R;
 
 /**
  * Created by Nils on 21.02.2017.

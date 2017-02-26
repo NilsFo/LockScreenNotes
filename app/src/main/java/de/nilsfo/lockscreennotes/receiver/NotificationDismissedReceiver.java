@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.receiver;
+package de.nilsfo.lockscreennotes.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,9 +6,9 @@ import android.content.Intent;
 
 import java.util.ArrayList;
 
-import de.wavegate.tos.lockscreennotes.data.Note;
-import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
-import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 
 /**
  * Created by Nils on 17.09.2016.

@@ -1,17 +1,15 @@
-package de.wavegate.tos.lockscreennotes;
+package de.nilsfo.lockscreennotes;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Locale;
-import java.util.Timer;
 
+import de.nilsfo.lsn.BuildConfig;
+import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
-import static de.wavegate.tos.lockscreennotes.activity.MainActivity.LOGTAG;
 
 /**
  * Created by Nils on 19.02.2017.

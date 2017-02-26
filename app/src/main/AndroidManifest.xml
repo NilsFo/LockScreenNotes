@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="de.wavegate.tos.lockscreennotes"
+<manifest package="de.nilsfo.lsn"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -9,23 +9,23 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".LockScreenNotes"
+        android:name="de.nilsfo.lockscreennotes.LockScreenNotes"
 
         android:theme="@style/AppTheme">
         <receiver
-            android:name=".receiver.BootReceiver"
+            android:name="de.nilsfo.lockscreennotes.receiver.BootReceiver"
             android:label="StartMyServiceAtBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <receiver
-            android:name="de.wavegate.tos.lockscreennotes.receiver.NotificationDismissedReceiver"
+            android:name="de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver"
             android:exported="false" >
         </receiver>
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name="de.nilsfo.lockscreennotes.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan">
@@ -37,15 +37,15 @@
         </activity>
         <activity
             android:windowSoftInputMode = "adjustResize"
-            android:name=".activity.EditNoteActivity"
-            android:parentActivityName=".activity.MainActivity">
+            android:name="de.nilsfo.lockscreennotes.activity.EditNoteActivity"
+            android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.wavegate.tos.lockscreennotes.activity.MainActivity"/>
+                android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.NoteSharingListenerActivity"
-            android:parentActivityName=".activity.MainActivity"
+            android:name="de.nilsfo.lockscreennotes.activity.NoteSharingListenerActivity"
+            android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter android:label="@string/share_via_this_app">
                 <action android:name="android.intent.action.SEND"/>
@@ -59,14 +59,14 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.wavegate.tos.lockscreennotes.activity.MainActivity"/>
+                android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.SettingsActivity"
-            android:parentActivityName=".activity.MainActivity">
+            android:name="de.nilsfo.lockscreennotes.activity.SettingsActivity"
+            android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.wavegate.tos.lockscreennotes.activity.MainActivity"/>
+                android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
         </activity>
     </application>
 

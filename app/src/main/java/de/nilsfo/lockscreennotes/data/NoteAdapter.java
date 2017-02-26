@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.data;
+package de.nilsfo.lockscreennotes.data;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -23,9 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import de.wavegate.tos.lockscreennotes.activity.MainActivity;
-import de.wavegate.tos.lockscreennotes.R;
-import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
+import de.nilsfo.lockscreennotes.activity.MainActivity;
+import de.nilsfo.lsn.R;
+import de.nilsfo.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import timber.log.Timber;
 
 /**

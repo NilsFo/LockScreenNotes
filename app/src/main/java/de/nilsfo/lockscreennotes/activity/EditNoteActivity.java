@@ -1,23 +1,16 @@
-package de.wavegate.tos.lockscreennotes.activity;
+package de.nilsfo.lockscreennotes.activity;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.text.Layout;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,11 +20,11 @@ import android.widget.Toast;
 
 import java.util.Date;
 
-import de.wavegate.tos.lockscreennotes.R;
-import de.wavegate.tos.lockscreennotes.data.Note;
-import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
-import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
-import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lsn.R;
+import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
+import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
 
 public class EditNoteActivity extends NotesActivity {

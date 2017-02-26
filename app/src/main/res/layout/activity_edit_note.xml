@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="de.wavegate.tos.lockscreennotes.activity.EditNoteActivity">
+    tools:context="de.nilsfo.lockscreennotes.activity.EditNoteActivity">
 
-    <de.wavegate.tos.lockscreennotes.imported.view.LinedEditText
+    <de.nilsfo.lockscreennotes.imported.view.LinedEditText
         android:id="@+id/enditNoteFullscreenTF"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.data.font;
+package de.nilsfo.lockscreennotes.data.font;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 import android.text.Layout;
 import android.util.TypedValue;
 
-import de.wavegate.tos.lockscreennotes.imported.TextDrawable;
+import de.nilsfo.lockscreennotes.imported.TextDrawable;
 import timber.log.Timber;
 
 

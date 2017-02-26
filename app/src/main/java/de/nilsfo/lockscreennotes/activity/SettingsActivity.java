@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.activity;
+package de.nilsfo.lockscreennotes.activity;
 
 
 import android.annotation.TargetApi;
@@ -11,24 +11,19 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
-import de.wavegate.tos.lockscreennotes.R;
-import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
-import de.wavegate.tos.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
-import timber.log.Timber;
+import de.nilsfo.lsn.R;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -223,6 +218,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			bindPreferenceURLAsAction(findPreference("prefs_credits_font_awesome"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_text_drawable"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_timber"));
+			bindPreferenceURLAsAction(findPreference("pref_view_on_play_store"), Uri.parse(getString(R.string.const_google_play_url)));
+
+			findPreference("pref_share_app").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					String text = getString(R.string.pref_share_app_text, getString(R.string.app_name), getString(R.string.const_google_play_url));
+
+					Intent sendIntent = new Intent();
+					sendIntent.setAction(Intent.ACTION_SEND);
+					sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+					sendIntent.setType("text/plain");
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.action_share)));
+					return true;
+				}
+			});
 		}
 
 	}

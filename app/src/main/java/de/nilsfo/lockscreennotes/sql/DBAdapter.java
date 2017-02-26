@@ -1,7 +1,7 @@
 // ------------------------------------ DBADapter.java ---------------------------------------------
 
 // TODO: Change the package to match your project.
-package de.wavegate.tos.lockscreennotes.sql;
+package de.nilsfo.lockscreennotes.sql;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,9 +11,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.Observable;
 
+import de.nilsfo.lockscreennotes.LockScreenNotes;
 import timber.log.Timber;
 
-import static de.wavegate.tos.lockscreennotes.activity.MainActivity.LOGTAG;
+import static de.nilsfo.lockscreennotes.activity.MainActivity.LOGTAG;
 
 
 // TO USE:
@@ -40,7 +41,7 @@ public class DBAdapter extends Observable {
 	public static final String[] ALL_KEYS = new String[]{KEY_ROWID, KEY_NOTE_TEXT, KEY_NOTE_ENABLED, KEY_TIMESTAMP};
 
 	// DB info: it's name, and the table we are using (just one).
-	public static final String DATABASE_NAME = "de.wavegate.tos.homescreennotes_db";
+	public static final String DATABASE_NAME = LockScreenNotes.LOGTAG+"notes_db";
 	public static final String DATABASE_TABLE = "Notes";
 	// Track DB version if a new version of your app changes the format.
 	public static final int DATABASE_VERSION = 1;

@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.data;
+package de.nilsfo.lockscreennotes.data;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import timber.log.Timber;
 
 /**

@@ -1,11 +1,10 @@
-package de.wavegate.tos.lockscreennotes.activity;
+package de.nilsfo.lockscreennotes.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,8 +21,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -32,16 +29,13 @@ import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import de.wavegate.tos.lockscreennotes.R;
-import de.wavegate.tos.lockscreennotes.activity.EditNoteActivity;
-import de.wavegate.tos.lockscreennotes.activity.NotesActivity;
-import de.wavegate.tos.lockscreennotes.activity.SettingsActivity;
-import de.wavegate.tos.lockscreennotes.data.Note;
-import de.wavegate.tos.lockscreennotes.data.NoteAdapter;
-import de.wavegate.tos.lockscreennotes.data.RelativeTimeTextfieldContainer;
-import de.wavegate.tos.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
-import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
-import de.wavegate.tos.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lsn.R;
+import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.data.NoteAdapter;
+import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
+import de.nilsfo.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
+import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
 
 public class MainActivity extends NotesActivity implements Observer {
@@ -337,7 +331,7 @@ public class MainActivity extends NotesActivity implements Observer {
 
 	private void setupRelativeDateUpdater() {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!sharedPref.getBoolean("prefs_time_relative", false)) {
+		if (!sharedPref.getBoolean("prefs_time_relative", true)) {
 			executorService = null;
 			return;
 		}
@@ -365,7 +359,6 @@ public class MainActivity extends NotesActivity implements Observer {
 					e.printStackTrace();
 					Timber.e(e, "Loop interrupted!");
 				}
-
 			}
 		});
 	}

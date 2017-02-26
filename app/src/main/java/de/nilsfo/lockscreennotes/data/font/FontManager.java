@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.data.font;
+package de.nilsfo.lockscreennotes.data.font;
 
 import android.content.Context;
 import android.graphics.Typeface;

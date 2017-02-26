@@ -1,10 +1,8 @@
-package de.wavegate.tos.lockscreennotes.util;
+package de.nilsfo.lockscreennotes.util;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,13 +12,15 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
 
-import de.wavegate.tos.lockscreennotes.activity.EditNoteActivity;
-import de.wavegate.tos.lockscreennotes.activity.MainActivity;
-import de.wavegate.tos.lockscreennotes.R;
-import de.wavegate.tos.lockscreennotes.data.Note;
-import de.wavegate.tos.lockscreennotes.receiver.NotificationDismissedReceiver;
-import de.wavegate.tos.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.LockScreenNotes;
+import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
+import de.nilsfo.lockscreennotes.activity.MainActivity;
+import de.nilsfo.lsn.R;
+import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
+import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import timber.log.Timber;
 
 /**
@@ -30,7 +30,7 @@ import timber.log.Timber;
 public class NotesNotificationManager {
 
 	public static final String PREFERENCE_LOW_PRIORITY_NOTE = "prefs_low_priority_note";
-	public static final String INTENT_EXTRA_NOTE_ID = "de.wavegate.tos.lockscreennotes.notification_id";
+	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.LOGTAG+"notification_id";
 
 	public static final int DEFAULT_NOTIFICATION_ID = 1;
 	public static final int NOTE_PREVIEW_SIZE = -1;

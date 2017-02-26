@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.imported.view;
+package de.nilsfo.lockscreennotes.imported.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,8 +8,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-import de.wavegate.tos.lockscreennotes.R;
-
+import de.nilsfo.lsn.R;
 /**
  * Created by Nils on 14.08.2016.
  */

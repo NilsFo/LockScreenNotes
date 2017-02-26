@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.activity;
+package de.nilsfo.lockscreennotes.activity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

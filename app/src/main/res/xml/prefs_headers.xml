@@ -3,19 +3,19 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="de.wavegate.tos.lockscreennotes.activity.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general"/>
 
     <header
-        android:fragment="de.wavegate.tos.lockscreennotes.activity.SettingsActivity$NotificationsPreferenceFragment"
+        android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$NotificationsPreferenceFragment"
         android:title="@string/pref_notifications"/>
 
     <header
-        android:fragment="de.wavegate.tos.lockscreennotes.activity.SettingsActivity$DateAndTimePreferenceFragment"
+        android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$DateAndTimePreferenceFragment"
         android:title="@string/pref_date_and_time"/>
 
     <header
-        android:fragment="de.wavegate.tos.lockscreennotes.activity.SettingsActivity$InfoAndAboutPreferenceFragment"
+        android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$InfoAndAboutPreferenceFragment"
         android:title="@string/pref_heder_info"/>
 
 </preference-headers>

@@ -1,4 +1,4 @@
-package de.wavegate.tos.lockscreennotes.data;
+package de.nilsfo.lockscreennotes.data;
 
 import android.content.Context;
 import android.widget.TextView;
