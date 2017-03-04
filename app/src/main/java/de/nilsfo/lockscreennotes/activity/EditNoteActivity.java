@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -77,6 +78,12 @@ public class EditNoteActivity extends NotesActivity {
 				}
 			});
 			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+
+			View snackbarView = snackbar.getView();
+			TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+			textView.setMaxLines(4);
+			textView.setMinLines(2);
+
 			snackbar.show();
 		}
 
