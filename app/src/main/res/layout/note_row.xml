@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/delete"
                 android:focusable="false"
-                app:srcCompat="@android:drawable/ic_menu_delete"
+                app:srcCompat="@drawable/ic_delete_black_36dp"
                 android:layout_width="wrap_content"/>
         </TableRow>
 

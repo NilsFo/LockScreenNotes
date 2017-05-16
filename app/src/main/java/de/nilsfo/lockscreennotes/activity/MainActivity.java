@@ -33,7 +33,6 @@ import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.NoteAdapter;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
-import de.nilsfo.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
@@ -41,7 +40,6 @@ import timber.log.Timber;
 public class MainActivity extends NotesActivity implements Observer {
 
 	public static final int ONE_SECOND_IN_MS = 1000;
-	public static final String LOGTAG = "LockScreenNotes";
 	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
 	public static final int DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT = 15;
 
@@ -92,7 +90,6 @@ public class MainActivity extends NotesActivity implements Observer {
 				onFABClicked();
 			}
 		});
-		fab.setImageDrawable(FontAwesomeDrawableBuilder.get(this, R.string.fa_icon_plus, 48, Color.WHITE));
 
 		if (notesList.getCount() == 0)
 			tutorialView.animate().alpha(1f).setDuration(2000);

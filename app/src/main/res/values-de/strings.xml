@@ -88,4 +88,11 @@
     <string name="pref_share_app_summary">App teilen</string>
     <string name="pref_view_on_play_store">Auf Google Play ansehen</string>
     <string name="pref_share_app_text">Sieh dir die App %1$s auf Google Play an: %2$s</string>
+    <string name="action_dismiss">Schließen</string>
+    <string name="action_to_qr_code">Als QR Code anzeigen</string>
+    <string name="pref_settings_display_priority">Priorität</string>
+    <string name="pref_settings_display_style">Anzeige-Stil</string>
+    <string name="settings_high_priority_note_flavor">Benachrichtigungen werden hoch in der Liste angezeigt.</string>
+    <string name="settings_high_priority_note_title">Hohe Priorität</string>
+    <string name="error_qr_generation_failed">QR-Code konnte nicht erstellt werden!</string>
 </resources>

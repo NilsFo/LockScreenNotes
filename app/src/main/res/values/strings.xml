@@ -93,4 +93,13 @@
     <string name="pref_view_on_play_store">View on Google Play</string>
     <string name="pref_share_app_summary">Share this app</string>
     <string name="pref_share_app_text">Check out the app %1$s on Google Play: %2$s</string>
+    <string name="prefs_credits_debug_db" translatable="false">Android Debug Database by Amit Shekhar</string>
+    <string name="prefs_credits_zxing" translatable="false">ZXing by Google Inc.</string>
+    <string name="action_to_qr_code">Display as QR Code</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="pref_settings_display_style">Display style</string>
+    <string name="pref_settings_display_priority">Priority</string>
+    <string name="settings_high_priority_note_title">High priority notifications</string>
+    <string name="settings_high_priority_note_flavor">Notifications are displayed high on the notifications list.</string>
+    <string name="error_qr_generation_failed">Failed to create the QR code!</string>
 </resources>

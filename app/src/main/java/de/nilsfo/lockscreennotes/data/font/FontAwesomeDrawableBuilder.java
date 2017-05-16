@@ -14,6 +14,7 @@ import timber.log.Timber;
  * Created by Nils on 03.01.2017.
  */
 
+@Deprecated
 public abstract class FontAwesomeDrawableBuilder {
 
 	public static final int DEFAULT__MENU_ICON_SCALE = 9;

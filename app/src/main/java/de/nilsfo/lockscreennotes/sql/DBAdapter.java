@@ -14,9 +14,6 @@ import java.util.Observable;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import timber.log.Timber;
 
-import static de.nilsfo.lockscreennotes.activity.MainActivity.LOGTAG;
-
-
 // TO USE:
 // Change the package (at top) to match your project.
 // Search for "TODO", and make the appropriate changes.
@@ -41,7 +38,7 @@ public class DBAdapter extends Observable {
 	public static final String[] ALL_KEYS = new String[]{KEY_ROWID, KEY_NOTE_TEXT, KEY_NOTE_ENABLED, KEY_TIMESTAMP};
 
 	// DB info: it's name, and the table we are using (just one).
-	public static final String DATABASE_NAME = LockScreenNotes.LOGTAG+"notes_db";
+	public static final String DATABASE_NAME = LockScreenNotes.APP_TAG+"notes_db";
 	public static final String DATABASE_TABLE = "Notes";
 	// Track DB version if a new version of your app changes the format.
 	public static final int DATABASE_VERSION = 1;
@@ -49,8 +46,6 @@ public class DBAdapter extends Observable {
 	/////////////////////////////////////////////////////////////////////
 	//	Constants & Data
 	/////////////////////////////////////////////////////////////////////
-	// For logging:
-	private static final String TAG = LOGTAG;
 
 	private static final String DATABASE_CREATE_SQL =
 			"create table " + DATABASE_TABLE

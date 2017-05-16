@@ -28,12 +28,13 @@
             android:key="prefs_homescreen_lines"
             android:title="@string/prefs_homescreen_lines_title"/>
 
+        <!--
         <EditTextPreference
             android:defaultValue="9"
             android:inputType="number"
             android:singleLine="true"
             android:key="prefs_action_bar_icon_scale"
-            android:title="@string/prefs_action_bar_icon_scale"/>
+            android:title="@string/prefs_action_bar_icon_scale"/> -->
 
         <Preference
             android:key="prefs_reset_tutorial"

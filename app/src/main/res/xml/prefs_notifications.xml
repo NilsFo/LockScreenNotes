@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="prefs_low_priority_note"
-        android:summary="@string/settings_low_priority_note_flavor"
-        android:title="@string/settings_low_priority_note_title"/>
+    <PreferenceCategory
+        android:title="@string/pref_settings_display_style">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefs_dismissable_notes"
+            android:summary="@string/settings_dismissable_notes_flavor"
+            android:title="@string/settings_dismissable_notes_tilte"/>
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="prefs_dismissable_notes"
-        android:summary="@string/settings_dismissable_notes_flavor"
-        android:title="@string/settings_dismissable_notes_tilte"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefs_seperate_notes"
+            android:summary="@string/prefs_seperate_notes_flavor"
+            android:title="@string/prefs_seperate_notes_tilte"/>
+    </PreferenceCategory>
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="prefs_seperate_notes"
-        android:summary="@string/prefs_seperate_notes_flavor"
-        android:title="@string/prefs_seperate_notes_tilte"/>
+    <PreferenceCategory
+        android:title="@string/pref_settings_display_priority">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefs_high_priority_note"
+            android:summary="@string/settings_high_priority_note_flavor"
+            android:disableDependentsState="true"
+            android:title="@string/settings_high_priority_note_title"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefs_low_priority_note"
+            android:summary="@string/settings_low_priority_note_flavor"
+            android:dependency="prefs_high_priority_note"
+            android:title="@string/settings_low_priority_note_title"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

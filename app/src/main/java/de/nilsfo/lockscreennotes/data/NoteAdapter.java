@@ -25,7 +25,6 @@ import java.util.Locale;
 
 import de.nilsfo.lockscreennotes.activity.MainActivity;
 import de.nilsfo.lsn.R;
-import de.nilsfo.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import timber.log.Timber;
 
 /**
@@ -138,8 +137,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 				}
 			}
 		});
-		Drawable drawable = FontAwesomeDrawableBuilder.get(getContext(), R.string.fa_icon_delete, DELETE_BT_SIZE, DELETE_BT_COLOR);
-		deleteBT.setImageDrawable(drawable);
 
 		if (preferences.getBoolean("prefs_time_relative", true) && note != null) {
 			long time = note.getTimestamp();

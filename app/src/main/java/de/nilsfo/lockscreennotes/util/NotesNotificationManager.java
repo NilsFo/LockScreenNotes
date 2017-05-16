@@ -30,7 +30,8 @@ import timber.log.Timber;
 public class NotesNotificationManager {
 
 	public static final String PREFERENCE_LOW_PRIORITY_NOTE = "prefs_low_priority_note";
-	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.LOGTAG+"notification_id";
+	public static final String PREFERENCE_HIGH_PRIORITY_NOTE = "prefs_high_priority_note";
+	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.APP_TAG+"notification_id";
 
 	public static final int DEFAULT_NOTIFICATION_ID = 1;
 	public static final int NOTE_PREVIEW_SIZE = -1;
@@ -189,9 +190,13 @@ public class NotesNotificationManager {
 	}
 
 	private int getNotificationPriority() {
-		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_LOW_PRIORITY_NOTE, true)) {
-			return NotificationCompat.PRIORITY_MIN;
+		int priority =  NotificationCompat.PRIORITY_DEFAULT;
+		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_LOW_PRIORITY_NOTE, false)) {
+			priority= NotificationCompat.PRIORITY_MIN;
 		}
-		return NotificationCompat.PRIORITY_DEFAULT;
+		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_HIGH_PRIORITY_NOTE, false)) {
+			priority= NotificationCompat.PRIORITY_MAX;
+		}
+		return priority;
 	}
 }

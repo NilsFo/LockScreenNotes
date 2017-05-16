@@ -20,7 +20,6 @@
         android:title="@string/pref_view_on_github_title"
         />
 
-
     <PreferenceCategory
         android:title="@string/action_share">
         <Preference
@@ -46,6 +45,16 @@
             android:key="prefs_credits_text_drawable"
             android:summary="https://github.com/devunwired/textdrawable"
             android:title="@string/prefs_credits_text_drawable"/>
+
+        <Preference
+            android:key="prefs_credits_debug_db"
+            android:summary="https://github.com/amitshekhariitbhu/Android-Debug-Database"
+            android:title="@string/prefs_credits_debug_db"/>
+
+        <Preference
+            android:key="prefs_credits_zxing"
+            android:summary="https://github.com/zxing/zxing"
+            android:title="@string/prefs_credits_zxing"/>
 
         <Preference
             android:key="prefs_credits_timber"

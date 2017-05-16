@@ -218,6 +218,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			bindPreferenceURLAsAction(findPreference("prefs_credits_font_awesome"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_text_drawable"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_timber"));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_debug_db"));
 			bindPreferenceURLAsAction(findPreference("pref_view_on_play_store"), Uri.parse(getString(R.string.const_google_play_url)));
 
 			findPreference("pref_share_app").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

@@ -5,6 +5,8 @@ import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -16,20 +18,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
 import java.util.Date;
 
+import de.nilsfo.lockscreennotes.view.QRCodeView;
 import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.data.Note;
-import de.nilsfo.lockscreennotes.data.font.FontAwesomeDrawableBuilder;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
 
 public class EditNoteActivity extends NotesActivity {
+
 	public static final String NOTE_ACTIVITY_NOTE_ID = "EditNoteActivity_note_id";
+	public static final int QR_IMAGE_SIZE = 512;
 	public static final long ILLEGAL_NOTE_ID = -1;
 
 	private Note myNote;
@@ -147,14 +157,7 @@ public class EditNoteActivity extends NotesActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.edit_note_menu, menu);
-
-		menu.findItem(R.id.action_move_to_bottom).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_down));
-		menu.findItem(R.id.action_clear).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_clear));
-		menu.findItem(R.id.action_share).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_share));
-		menu.findItem(R.id.action_copy_note).setIcon(FontAwesomeDrawableBuilder.getOptionsIcon(this, R.string.fa_icon_copy));
-
 		return true;
 	}
 
@@ -216,6 +219,22 @@ public class EditNoteActivity extends NotesActivity {
 				.show();
 	}
 
+	public void actionToQR() {
+		String qrcode = noteTF.getText().toString();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.app_name);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setPositiveButton(R.string.action_dismiss, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		builder.setView(new QRCodeView(this, qrcode, QR_IMAGE_SIZE));
+		builder.show();
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -243,6 +262,10 @@ public class EditNoteActivity extends NotesActivity {
 
 			case R.id.action_cancel_edit:
 				actionCancelEdit();
+				return true;
+
+			case R.id.action_to_qr_code:
+				actionToQR();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

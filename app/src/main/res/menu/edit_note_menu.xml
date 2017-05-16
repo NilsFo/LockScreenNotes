@@ -5,23 +5,32 @@
 
     <item
         android:id="@+id/action_clear"
+        android:icon="@drawable/ic_clear_white_24dp"
         android:title="@string/action_clear"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_share"
         android:title="@string/action_share"
+        android:icon="@drawable/ic_share_white_24dp"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_copy_note"
         android:title="@string/action_copy_text"
+        android:icon="@drawable/ic_content_copy_white_24dp"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_move_to_bottom"
         android:title="@string/action_move_to_bottom"
+        android:icon="@drawable/ic_arrow_downward_white_24dp"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_to_qr_code"
+        android:title="@string/action_to_qr_code"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_cancel_edit"

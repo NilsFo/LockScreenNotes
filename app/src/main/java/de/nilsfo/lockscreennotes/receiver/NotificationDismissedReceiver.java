@@ -16,7 +16,6 @@ import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 
 public class NotificationDismissedReceiver extends BroadcastReceiver {
 
-
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		int notificationId = intent.getExtras().getInt(NotesNotificationManager.INTENT_EXTRA_NOTE_ID);
