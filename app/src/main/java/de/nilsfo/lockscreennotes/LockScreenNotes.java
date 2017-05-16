@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.amitshekhar.DebugDB;
+//import com.amitshekhar.DebugDB;
 
 import java.util.Locale;
 
@@ -32,7 +32,7 @@ public class LockScreenNotes extends Application {
 
 		if (BuildConfig.DEBUG) {
 			Timber.plant(new DebugTree());
-			Timber.i("Debug-DB URL: " + DebugDB.getAddressLog());
+			//Timber.i("Debug-DB URL: " + DebugDB.getAddressLog());
 		} else {
 			Timber.plant(new ReleaseTree());
 		}
