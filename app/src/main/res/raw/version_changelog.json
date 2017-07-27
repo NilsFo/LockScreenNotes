@@ -1,0 +1,10 @@
+{
+  "6":{
+    "version":"1.04",
+    "text":"-Notes displayed as QR codes can now be shared with other apps\n-Added this dialog to keep you informed about changes and new features. You can view this changelog again in the 'about' section in the app settings!\n-The order of all displayed notifications can reversed\n-Minor improvements and bug fixes"
+  },
+  "5":{
+    "version":"1.03",
+    "text":"-Replaced 'fontawesome'-icons with material-design icon\n-Added more icons to the options menu\n-Notes can now be displayed as a QR Code\n-Minor improvements and bug fixes"
+  }
+}

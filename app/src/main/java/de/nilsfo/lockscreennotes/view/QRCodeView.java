@@ -18,6 +18,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.util.ArrayList;
+
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
@@ -28,13 +30,18 @@ import timber.log.Timber;
 public class QRCodeView extends LinearLayout {
 
 	private ProgressBar bar;
+	private Bitmap qrImage;
+	protected ArrayList<QRFinishListener> listeners;
 
 	public QRCodeView(Context context, String textToDisplay, int size) {
 		super(context);
 
+		listeners = new ArrayList<>();
 		Resources resources = getResources();
 		bar = new ProgressBar(getContext());
 		bar.setIndeterminate(true);
+		bar.setMax(size * size);
+		bar.setProgress(0);
 		bar.setPadding((int) resources.getDimension(R.dimen.activity_horizontal_margin), (int) resources.getDimension(R.dimen.activity_vertical_margin), (int) resources.getDimension(R.dimen.activity_horizontal_margin), (int) resources.getDimension(R.dimen.activity_vertical_margin));
 
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -48,6 +55,7 @@ public class QRCodeView extends LinearLayout {
 
 	public void displayQRImage(Bitmap map) {
 		Timber.i("Displaying QR Bitmap!");
+		qrImage = map;
 		removeView(bar);
 
 		Context context = getContext();
@@ -58,11 +66,36 @@ public class QRCodeView extends LinearLayout {
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.gravity = Gravity.CENTER_HORIZONTAL;
 		imageView.setLayoutParams(lp);
-		imageView.setImageBitmap(map);
+		imageView.setImageBitmap(qrImage);
 		addView(imageView);
+
+		for (QRFinishListener listener : listeners) {
+			Timber.i("Informing a listener!");
+			listener.onFinished(qrImage);
+		}
 	}
 
-	private class QRTask extends AsyncTask<Void, Void, Bitmap> {
+	public boolean hasFinishedRenderingQRCode() {
+		return qrImage != null;
+	}
+
+	public Bitmap getQrImage() {
+		return qrImage;
+	}
+
+	public void addListener(QRFinishListener listener) {
+		listeners.add(listener);
+	}
+
+	public boolean removeListener(QRFinishListener listener) {
+		return listeners.remove(listener);
+	}
+
+	public interface QRFinishListener {
+		public void onFinished(Bitmap image);
+	}
+
+	private class QRTask extends AsyncTask<Void, Integer, Bitmap> {
 
 		private String text;
 		private int size;
@@ -79,7 +112,9 @@ public class QRCodeView extends LinearLayout {
 			Bitmap bmp = null;
 
 			try {
+				Timber.i("QR - Preparations");
 				BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, size, size);
+				Timber.i("QR - Encoding finished");
 				int width = bitMatrix.getWidth();
 				int height = bitMatrix.getHeight();
 				bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
@@ -88,6 +123,7 @@ public class QRCodeView extends LinearLayout {
 						bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
 					}
 				}
+				Timber.i("QR - Bitmatp available");
 
 			} catch (WriterException e) {
 				e.printStackTrace();
@@ -106,7 +142,7 @@ public class QRCodeView extends LinearLayout {
 				displayQRImage(map);
 			} else {
 				Timber.w("QR Bitmap creation failed!");
-				Toast.makeText(getContext(), R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+				Toast.makeText(getContext(), R.string.error_qr_generation_failed, Toast.LENGTH_LONG).show();
 			}
 		}
 	}

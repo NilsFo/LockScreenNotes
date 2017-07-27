@@ -12,15 +12,15 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
-import java.util.concurrent.locks.Lock;
+import java.util.Collections;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
-import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 /**
@@ -31,7 +31,8 @@ public class NotesNotificationManager {
 
 	public static final String PREFERENCE_LOW_PRIORITY_NOTE = "prefs_low_priority_note";
 	public static final String PREFERENCE_HIGH_PRIORITY_NOTE = "prefs_high_priority_note";
-	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.APP_TAG+"notification_id";
+	public static final String PREFERENCE_REVERSE_ORDERING = "prefs_reverse_displayed_notifications";
+	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.APP_TAG + "notification_id";
 
 	public static final int DEFAULT_NOTIFICATION_ID = 1;
 	public static final int NOTE_PREVIEW_SIZE = -1;
@@ -42,6 +43,7 @@ public class NotesNotificationManager {
 	public NotesNotificationManager(Context context) {
 		this.context = context;
 
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		notesList = new ArrayList<>();
 		DBAdapter databaseAdapter = new DBAdapter(context);
 		databaseAdapter.open();
@@ -58,8 +60,11 @@ public class NotesNotificationManager {
 				}
 			} while (cursor.moveToNext());
 		}
-
 		databaseAdapter.close();
+
+		if (sharedPreferences.getBoolean(PREFERENCE_REVERSE_ORDERING, false)) {
+			Collections.reverse(notesList);
+		}
 	}
 
 	public boolean hasNotifications() {
@@ -148,7 +153,7 @@ public class NotesNotificationManager {
 	private PendingIntent getOnDismissIntent(int notificationId) {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
-		Timber.i("Creating a dismiss intent. ID: "+notificationId);
+		Timber.i("Creating a dismiss intent. ID: " + notificationId);
 		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
 	}
 
@@ -169,14 +174,14 @@ public class NotesNotificationManager {
 		return builder;
 	}
 
-	private PendingIntent getIntentToMainActivity(){
+	private PendingIntent getIntentToMainActivity() {
 		Intent intent = new Intent(context, MainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		return PendingIntent.getActivity(context, 0, intent, 0);
 	}
 
 	@Deprecated
-	private PendingIntent getIntentToNote(long id){
+	private PendingIntent getIntentToNote(long id) {
 		Intent intent = new Intent(context, EditNoteActivity.class);
 		intent.putExtra(EditNoteActivity.NOTE_ACTIVITY_NOTE_ID, id);
 		intent.setFlags(PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
@@ -190,12 +195,12 @@ public class NotesNotificationManager {
 	}
 
 	private int getNotificationPriority() {
-		int priority =  NotificationCompat.PRIORITY_DEFAULT;
+		int priority = NotificationCompat.PRIORITY_DEFAULT;
 		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_LOW_PRIORITY_NOTE, false)) {
-			priority= NotificationCompat.PRIORITY_MIN;
+			priority = NotificationCompat.PRIORITY_MIN;
 		}
 		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_HIGH_PRIORITY_NOTE, false)) {
-			priority= NotificationCompat.PRIORITY_MAX;
+			priority = NotificationCompat.PRIORITY_MAX;
 		}
 		return priority;
 	}

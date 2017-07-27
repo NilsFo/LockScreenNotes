@@ -6,11 +6,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
@@ -18,22 +19,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 
-import de.nilsfo.lockscreennotes.view.QRCodeView;
-import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.view.QRCodeView;
+import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 public class EditNoteActivity extends NotesActivity {
@@ -221,18 +219,69 @@ public class EditNoteActivity extends NotesActivity {
 
 	public void actionToQR() {
 		String qrcode = noteTF.getText().toString();
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.app_name);
 		builder.setIcon(R.mipmap.ic_launcher);
+
+		final QRCodeView qrCodeView = new QRCodeView(this, qrcode, QR_IMAGE_SIZE);
 		builder.setPositiveButton(R.string.action_dismiss, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 			}
 		});
+		builder.setNeutralButton(R.string.action_share, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (qrCodeView.hasFinishedRenderingQRCode()) {
+					shareQRImage(qrCodeView.getQrImage());
+				} else {
+					Toast.makeText(EditNoteActivity.this, R.string.error_qr_not_rendered, Toast.LENGTH_LONG).show();
+				}
+			}
+		});
 
-		builder.setView(new QRCodeView(this, qrcode, QR_IMAGE_SIZE));
+		builder.setView(qrCodeView);
 		builder.show();
+	}
+
+	private void shareQRImage(Bitmap image) {
+		File imageFile=null;
+		try {
+			File cachePath = new File(getCacheDir(), "images");
+			cachePath.mkdirs();
+			imageFile = new File(cachePath + File.separator + getString(R.string.qr_cache_name)+".png");
+			FileOutputStream stream = new FileOutputStream(imageFile); // overwrites this image every time
+			image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+			stream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Timber.e(e, "Failed to share QR Code!");
+
+			Toast.makeText(this, R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		if (imageFile == null || !imageFile.exists()) {
+			Toast.makeText(this, R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		//File imagePath = new File(getCacheDir(), "images");
+		//File newFile = new File(imagePath, "image.png");
+		Timber.i("Shared QR-Imagefile info: " + imageFile);
+		Uri contentUri = FileProvider.getUriForFile(this, "de.nilsfo.lockscreennotes.LockScreenNotes.fileprovider", imageFile);
+
+		if (contentUri != null) {
+			Intent shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+			shareIntent.setDataAndType(contentUri, getContentResolver().getType(contentUri));
+			shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+			startActivity(Intent.createChooser(shareIntent, getString(R.string.share_using)));
+		}else{
+			Toast.makeText(this, R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+		}
 	}
 
 	@Override

@@ -2,18 +2,16 @@ package de.nilsfo.lockscreennotes;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-//import com.amitshekhar.DebugDB;
-
 import java.util.Locale;
 
-import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lsn.BuildConfig;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
+
+//import com.amitshekhar.DebugDB;
 
 /**
  * Created by Nils on 19.02.2017.
@@ -24,7 +22,6 @@ public class LockScreenNotes extends Application {
 	public static final String APP_TAG = "de.tos.lsn.";
 	public static final String LOG_TAG = APP_TAG + "log.";
 	public static final String PREFS_TAG = APP_TAG + "prefs_";
-	public static final String PREFS_LAST_KNOWN_VERSION = PREFS_TAG + "last_known_version";
 
 	@Override
 	public void onCreate() {
@@ -52,21 +49,6 @@ public class LockScreenNotes extends Application {
 		PreferenceManager.setDefaultValues(this, R.xml.prefs_time, false);
 
 		Timber.i("Started the app. Locale used: " + locale.getISO3Country() + " - " + locale.getCountry() + " - " + locale.getDisplayLanguage() + " - " + locale.getDisplayCountry());
-
-		int lastVer = prefs.getInt(PREFS_LAST_KNOWN_VERSION, 0);
-		int currentVer = 0;
-		try {
-			currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-		} catch (
-				PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
-		}
-		if (lastVer != 0 && lastVer != currentVer) {
-			VersionManager.onVersionChange(this, lastVer, currentVer);
-		}
-
-		prefs.edit().putInt(PREFS_LAST_KNOWN_VERSION, currentVer).apply();
-		Timber.i("Application started. App version: " + currentVer);
 	}
 
 	public static boolean isDebugBuild() {

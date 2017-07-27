@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import de.nilsfo.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
@@ -201,6 +202,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			addPreferencesFromResource(R.xml.prefs_info);
 			setHasOptionsMenu(true);
 
+			int versionCode = 0;
 			String versionName = getString(R.string.error_unknown);
 			String appName = getString(R.string.app_name);
 
@@ -208,11 +210,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			try {
 				PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
 				versionName = info.versionName;
+				versionCode = info.versionCode;
 			} catch (PackageManager.NameNotFoundException e) {
 				e.printStackTrace();
 			}
 
-			findPreference("pref_about").setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
+			Preference aboutPreference = findPreference("pref_about");
+			aboutPreference.setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
+			final int finalVersionCode = versionCode;
+			aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					VersionManager.displayVersionUpdateNews(preference.getContext(), finalVersionCode);
+					return true;
+				}
+			});
 
 			bindPreferenceURLAsAction(findPreference("pref_view_on_github"), Uri.parse(getString(R.string.const_github_url)));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_font_awesome"));

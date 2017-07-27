@@ -76,7 +76,7 @@
     <string name="pref_date_and_time">Zeit &amp; Datum</string>
     <string name="pref_header_general">Allgemein</string>
     <string name="pref_heder_info">Über</string>
-    <string name="pref_notifications">Erinnerungen</string>
+    <string name="pref_notifications">Benachrichtigungen</string>
     <string name="prefs_about_summary">%1$s, %2$s erstellt von Nils Förster</string>
     <string name="prefs_quick_delete_flavor">Wenn eingeschaltet werden Sie nicht noch mal gefragt, ob Sie sich sicher sind, ob Sie eine einzelne Notiz löschen wollen.</string>
     <string name="prefs_quick_delete_title">Notizen schnell löschen</string>
@@ -95,4 +95,12 @@
     <string name="settings_high_priority_note_flavor">Benachrichtigungen werden hoch in der Liste angezeigt.</string>
     <string name="settings_high_priority_note_title">Hohe Priorität</string>
     <string name="error_qr_generation_failed">QR-Code konnte nicht erstellt werden!</string>
+    <string name="action_feedback">Bewerten &amp; Feedback</string>
+    <string name="action_full_changelog">Vollständiger Changelog</string>
+    <string name="error_no_update_highlight">Kein Highlight-Feature gefunden.</string>
+    <string name="error_qr_not_rendered">Der QR Code wurde noch nicht erstellt!</string>
+    <string name="info_changelog_version">Änderungen in Version %1$s</string>
+    <string name="thanks_for_using_this_app">Danke dass Sie Sperrbildschirm Notizen benutzen!</string>
+    <string name="update_news">Änderungs-Hinweise</string>
+    <string name="prefs_reverse_displayed_notifications_tilte">Umgekehrte Reihenfolge</string>
 </resources>

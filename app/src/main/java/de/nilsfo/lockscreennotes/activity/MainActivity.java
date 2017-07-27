@@ -3,7 +3,7 @@ package de.nilsfo.lockscreennotes.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -29,19 +29,23 @@ import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.NoteAdapter;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.VersionManager;
+import de.nilsfo.lsn.R;
 import timber.log.Timber;
+
+import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
 
 public class MainActivity extends NotesActivity implements Observer {
 
 	public static final int ONE_SECOND_IN_MS = 1000;
 	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
 	public static final int DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT = 15;
+	public static final String PREFS_LAST_KNOWN_VERSION = PREFS_TAG + "last_known_version";
 
 	private DBAdapter databaseAdapter;
 	private NoteAdapter noteAdapter;
@@ -91,8 +95,25 @@ public class MainActivity extends NotesActivity implements Observer {
 			}
 		});
 
-		if (notesList.getCount() == 0)
-			tutorialView.animate().alpha(1f).setDuration(2000);
+		if (notesList.getCount() == 0){
+			tutorialView.animate().alpha(1f).setDuration(2000);}
+
+		//Version change check & changelog
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		int lastVer = prefs.getInt(PREFS_LAST_KNOWN_VERSION, 0);
+		int currentVer = 0;
+		try {
+			currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+		} catch (
+				PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		if (lastVer != 0 && lastVer != currentVer) {
+			VersionManager.onVersionChange(this, lastVer, currentVer);
+		}
+
+		prefs.edit().putInt(PREFS_LAST_KNOWN_VERSION, currentVer).apply();
+		Timber.i("Application started. App version: " + currentVer);
 	}
 
 	private void onTutorialCBclicked(boolean isChecked) {
