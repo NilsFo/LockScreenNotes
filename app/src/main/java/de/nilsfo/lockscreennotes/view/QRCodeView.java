@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.os.AsyncTaskCompat;
 import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -101,6 +100,10 @@ public class QRCodeView extends LinearLayout {
 		private int size;
 
 		public QRTask(String text, int size) {
+			if (text.equals("")){
+				text=" ";
+			}
+
 			this.text = text;
 			this.size = size;
 		}

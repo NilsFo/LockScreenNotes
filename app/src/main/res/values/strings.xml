@@ -111,4 +111,9 @@
     <string name="info_changelog_version">Changes in Version %1$s</string>
     <string name="action_full_changelog">Full changelog</string>
     <string name="prefs_reverse_displayed_notifications_tilte">Reverse order</string>
+    <string name="action_open_weblinks">Open weblinks</string>
+    <string name="error_no_weblings">No weblings found.</string>
+    <string name="info_choose_url">Select URL(s):</string>
+    <string name="action_browse_all">Browse all</string>
+    <string name="action_browse_selected">Browse selected</string>
 </resources>

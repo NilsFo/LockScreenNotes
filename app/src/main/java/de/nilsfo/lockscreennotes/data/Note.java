@@ -3,6 +3,7 @@ package de.nilsfo.lockscreennotes.data;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.format.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +85,11 @@ public class Note implements Comparable<Note> {
 		}
 
 		return text;
+	}
+
+	@Override
+	public String toString() {
+		return "Note. ID: " + getDatabaseID() + ", Content: '" + getTextPreview(15) + "', timestamp: " + DateUtils.getRelativeTimeSpanString(getTimestamp(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL);
 	}
 
 	public String getTextPreview() {

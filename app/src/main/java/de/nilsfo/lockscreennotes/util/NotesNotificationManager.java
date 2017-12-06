@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
@@ -62,6 +63,8 @@ public class NotesNotificationManager {
 		}
 		databaseAdapter.close();
 
+		Timber.i("Notes to display: " + Arrays.toString(notesList.toArray()));
+		Collections.sort(notesList);
 		if (sharedPreferences.getBoolean(PREFERENCE_REVERSE_ORDERING, false)) {
 			Collections.reverse(notesList);
 		}

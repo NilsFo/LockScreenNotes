@@ -103,4 +103,9 @@
     <string name="thanks_for_using_this_app">Danke dass Sie Sperrbildschirm Notizen benutzen!</string>
     <string name="update_news">Änderungs-Hinweise</string>
     <string name="prefs_reverse_displayed_notifications_tilte">Umgekehrte Reihenfolge</string>
+    <string name="action_open_weblinks">Links öffnen</string>
+    <string name="action_browse_selected">Auswahl öffnen</string>
+    <string name="action_browse_all">Alle öffnen</string>
+    <string name="info_choose_url">URL(s) auswählen:</string>
+    <string name="error_no_weblings">Keine Links gefunden.</string>
 </resources>

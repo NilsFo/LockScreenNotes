@@ -14,6 +14,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +26,10 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
@@ -35,6 +39,10 @@ import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 public class EditNoteActivity extends NotesActivity {
+
+	//public static final String URL_REGEX = "(?:(?:https?|ftp|file):\\/\\/|www\\.|ftp\.)(?:\\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\\)|[-A-Z0-9+&@#\\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\\/%=~_|$])";
+	//private static final String URL_REGEX = "((?:https\\:\\/\\/)|(?:http\\:\\/\\/)|(?:www\\.))?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(?:\\??)[a-zA-Z0-9\\-\\._\\?\\,\\'\\/\\\\\\+&%\\$#\\=~]+)";
+	private static final String URL_REGEX = "(https?:\\/\\/)?([\\da-z\\.-]+\\.[a-z\\.]{2,6}|[\\d\\.]+)([\\/:?=&#]{1}[\\da-z\\.-]+)*[\\/\\?]?";
 
 	public static final String NOTE_ACTIVITY_NOTE_ID = "EditNoteActivity_note_id";
 	public static final int QR_IMAGE_SIZE = 512;
@@ -245,12 +253,124 @@ public class EditNoteActivity extends NotesActivity {
 		builder.show();
 	}
 
+	public ArrayList<String> getURLsInNote() {
+		Matcher m = applyRegexToNote(URL_REGEX);
+		if (m == null) {
+			return null;
+		}
+
+		ArrayList<String> list = new ArrayList<>();
+		while (m.find()) {
+			String match = m.group();
+			Timber.i("Found a match: " + m.group());
+
+			boolean add = true;
+			for (String s : list) {
+				if (s.equals(match)) {
+					add=false;
+				}
+			}
+
+			if (add){
+				list.add(match);
+			}
+		}
+
+		return list;
+	}
+
+	public void actionOpenWeblinks() {
+		final ArrayList<String> list = getURLsInNote();
+		if (list == null) {
+			return;
+		}
+
+		if (list.isEmpty()) {
+			Toast.makeText(this, R.string.error_no_weblings, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		if (list.size() == 1) {
+			browseURL(list.get(0));
+			return;
+		}
+
+		boolean[] sel = new boolean[list.size()];
+		String[] urls = new String[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			urls[i] = list.get(i);
+			sel[i] = false;
+		}
+		AlertDialog.Builder b = new AlertDialog.Builder(this);
+		b.setTitle(R.string.info_choose_url);
+		b.setIcon(R.mipmap.ic_launcher);
+		b.setMultiChoiceItems(urls, sel, new DialogInterface.OnMultiChoiceClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
+				Timber.v("URLs selected: " + sel);
+			}
+		});
+		b.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		b.setPositiveButton(R.string.action_browse_selected, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
+				Timber.i("URLs to browse selected: " + sel);
+				for (int i = 0; i < list.size(); i++) {
+					if (sel.get(i)) {
+						String url = list.get(i);
+						browseURL(url);
+						Timber.i("Browsing URL '" + url + "'. " + (i + 1) + "/" + list.size());
+					}
+				}
+			}
+		});
+		b.setNeutralButton(R.string.action_browse_all, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				for (String s : list) {
+					browseURL(s);
+				}
+			}
+		});
+
+		b.show();
+	}
+
+	private void browseURL(String url) {
+		if (!url.toLowerCase().startsWith("http://") && !url.toLowerCase().startsWith("https://")) {
+			url = "http://" + url;
+		}
+
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(url));
+		startActivity(i);
+	}
+
+	private Matcher applyRegexToNote(String regex) {
+		String text = String.valueOf(noteTF.getText());
+		Timber.i("Applying Regex: " + regex);
+		Timber.i("Text to apply it to: " + text);
+
+		if (text == null || text.trim().equals("")) return null;
+
+		Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		return p.matcher(text);
+	}
+
 	private void shareQRImage(Bitmap image) {
-		File imageFile=null;
+		File imageFile = null;
 		try {
 			File cachePath = new File(getCacheDir(), "images");
 			cachePath.mkdirs();
-			imageFile = new File(cachePath + File.separator + getString(R.string.qr_cache_name)+".png");
+			imageFile = new File(cachePath + File.separator + getString(R.string.qr_cache_name) + ".png");
 			FileOutputStream stream = new FileOutputStream(imageFile); // overwrites this image every time
 			image.compress(Bitmap.CompressFormat.PNG, 100, stream);
 			stream.close();
@@ -258,12 +378,12 @@ public class EditNoteActivity extends NotesActivity {
 			e.printStackTrace();
 			Timber.e(e, "Failed to share QR Code!");
 
-			Toast.makeText(this, R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_qr_generation_failed, Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		if (imageFile == null || !imageFile.exists()) {
-			Toast.makeText(this, R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_qr_generation_failed, Toast.LENGTH_LONG).show();
 			return;
 		}
 
@@ -279,8 +399,8 @@ public class EditNoteActivity extends NotesActivity {
 			shareIntent.setDataAndType(contentUri, getContentResolver().getType(contentUri));
 			shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
 			startActivity(Intent.createChooser(shareIntent, getString(R.string.share_using)));
-		}else{
-			Toast.makeText(this, R.string.error_qr_generation_failed,Toast.LENGTH_LONG).show();
+		} else {
+			Toast.makeText(this, R.string.error_qr_generation_failed, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -315,6 +435,10 @@ public class EditNoteActivity extends NotesActivity {
 
 			case R.id.action_to_qr_code:
 				actionToQR();
+				return true;
+
+			case R.id.action_open_weblinks:
+				actionOpenWeblinks();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
