@@ -24,6 +24,17 @@
             android:exported="false" >
         </receiver>
 
+        <!--
+        TODO: This is an attempt at a desktop widget. Reuse this code if you ever want to pursue this idea again.
+        <receiver android:name="de.nilsfo.lockscreennotes.receiver.widget.GeneralWidget" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/general_appwidget_info" />
+        </receiver>
+        -->
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="de.nilsfo.lockscreennotes.LockScreenNotes.fileprovider"
@@ -64,7 +75,6 @@
 
                 <data android:mimeType="text/*"/>
                 <!-- <data android:mimeType="text/plain" -->
-                />
             </intent-filter>
 
             <meta-data

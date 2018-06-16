@@ -116,4 +116,6 @@
     <string name="info_choose_url">Select URL(s):</string>
     <string name="action_browse_all">Browse all</string>
     <string name="action_browse_selected">Browse selected</string>
+    <string name="action_toggle_visibillity">Toggle visibillity</string>
+    <string name="action_add">Add new</string>
 </resources>

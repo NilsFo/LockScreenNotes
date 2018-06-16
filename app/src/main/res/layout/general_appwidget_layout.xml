@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/widgetLaunch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_launcher"/>
+
+        <ImageButton
+            android:id="@+id/widgetAdd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/action_add"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_add_white_48dp"/>
+
+        <ImageButton
+            android:id="@+id/widgetToggleVisibility"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/action_toggle_visibillity"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_notifications_white_48dp"/>
+
+        <ImageButton
+            android:id="@+id/widgetDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/delete"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_delete_white_48dp"/>
+
+    </LinearLayout>
+</FrameLayout>

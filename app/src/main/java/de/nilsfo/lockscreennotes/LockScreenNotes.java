@@ -27,7 +27,7 @@ public class LockScreenNotes extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		if (BuildConfig.DEBUG) {
+		if (isDebugBuild()) {
 			Timber.plant(new DebugTree());
 			//Timber.i("Debug-DB URL: " + DebugDB.getAddressLog());
 		} else {

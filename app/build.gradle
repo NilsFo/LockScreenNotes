@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "de.nilsfo.lsn"
         minSdkVersion 17
@@ -20,16 +20,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
-    compile 'com.jakewharton.timber:timber:4.5.1'
-    compile 'com.google.zxing:core:3.2.0'
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha5'
-    debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
+    implementation 'com.android.support:appcompat-v7:24.1.1'
+    implementation 'com.android.support:design:24.2.1'
+    implementation 'com.jakewharton.timber:timber:4.7.0'
+    implementation 'com.google.zxing:core:3.2.0'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.0'
     //compile group: 'org.json', name: 'json', version: '20090211'
 }
