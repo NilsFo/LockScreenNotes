@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import timber.log.Timber;
 
 /**
  * Created by Nils on 17.09.2016.
@@ -19,6 +20,7 @@ public class NotificationDismissedReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		int notificationId = intent.getExtras().getInt(NotesNotificationManager.INTENT_EXTRA_NOTE_ID);
+		Timber.i("Registered an event: Dismiss a notification! ID: " + notificationId);
 
 		//Toast.makeText(context,"Dismiss event listened: "+notificationId,Toast.LENGTH_LONG).show();
 		DBAdapter databaseAdapter = new DBAdapter(context);
@@ -27,8 +29,10 @@ public class NotificationDismissedReceiver extends BroadcastReceiver {
 		ArrayList<Note> notes = new ArrayList<>();
 		if (notificationId == NotesNotificationManager.INTENT_EXTRA_NOTE_ID_NONE) {
 			notes = Note.getAllNotesFromDB(databaseAdapter);
+			Timber.i("That was no known ID, so just hide them all.");
 		} else {
 			notes.add(Note.getNoteFromDB(notificationId, databaseAdapter));
+			Timber.i("Found the right note with matching ID in the database.");
 		}
 
 		for (Note n : notes) {
@@ -37,5 +41,10 @@ public class NotificationDismissedReceiver extends BroadcastReceiver {
 		}
 
 		databaseAdapter.close();
+
+		Timber.i("Updating notifications...");
+		NotesNotificationManager manager = new NotesNotificationManager(context);
+		manager.hideNotifications();
+		manager.showNotifications();
 	}
 }

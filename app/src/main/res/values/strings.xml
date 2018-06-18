@@ -5,6 +5,7 @@
     <string name="last_edited">Last edited: %1$s - %2$s</string>
     <string name="last_edited_single">Last edited: %1$s</string>
     <string name="note_position">#%1$s</string>
+    <string name="note_notification_index">#%1$s:</string>
     <string name="delete">Delete</string>
     <string name="position">Position</string>
     <string name="timestamp">Timestamp</string>
@@ -12,10 +13,10 @@
     <string name="delete_dialog_title">Delete note</string>
     <string name="delete_dialog_content">Are you sure you want to delete this note?\n\n<i>%1$s</i></string>
     <string name="notification_ticker">Lockscreen note has been created.</string>
-    <string name="notification_multiple_notes">%1$s notes!</string>
+    <string name="notification_multiple_notes">%1$s notes</string>
     <string name="pref_settings_general">General</string>
     <string name="settings_low_priority_note_title">Subtle notifications</string>
-    <string name="settings_low_priority_note_flavor">Hides the notifications from the notification bar and only displays them when pulling down the <i>notification pull down bar</i>.</string>
+    <string name="settings_low_priority_note_flavor">Hides the notifications from the notification bar and only displays them when pulling down the <i>notification pull down bar</i>.\nDepending on your system, the device needs to be unlocked for notifications to be displayed this way.</string>
     <string name="advanced">Advanced</string>
     <string name="share_via_this_app">Create a new note</string>
     <string name="prefs_homescreen_lines_title">Minimum note lines</string>
@@ -48,9 +49,9 @@
     <string name="action_clear_confirm">Are you sure you want to clear this note\'s text?</string>
     <string name="pref_view_on_github_title">View this App on GitHub</string>
     <string name="settings_dismissable_notes_tilte">Dismissable notifications</string>
-    <string name="settings_dismissable_notes_flavor">While enabled you can dismiss the notifications in the lockscreen.\nDismissing a notification automatically disables the corresponding note.</string>
+    <string name="settings_dismissable_notes_flavor">While enabled you can dismiss the notifications in the lock screen by swiping horizontaly.\nDismissing a notification automatically disables the corresponding note.</string>
     <string name="prefs_seperate_notes_tilte">Separate notifications</string>
-    <string name="prefs_seperate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.</string>
+    <string name="prefs_seperate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.\nDepending on your device, too many notifications may be automatically grouped together by the system.</string>
     <string name="error_invalid_value">Could not handle that value. Resetting to default.</string>
     <string name="pref_view_on_github_summary">This app is free and open source. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
@@ -118,4 +119,8 @@
     <string name="action_browse_selected">Browse selected</string>
     <string name="action_toggle_visibillity">Toggle visibillity</string>
     <string name="action_add">Add new</string>
+    <string name="action_dismiss_all">Dismiss all</string>
+    <string name="action_mark_disabled">Mark disabled</string>
+    <string name="action_mark_disabled_all">Mark all disabled</string>
+
 </resources>

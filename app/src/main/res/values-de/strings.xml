@@ -38,13 +38,13 @@
     <string name="prefs_homescreen_lines_title">Minimale Zeilen</string>
     <string name="prefs_long">Lang</string>
     <string name="prefs_medium">Mittel</string>
-    <string name="prefs_seperate_notes_flavor">Wenn eingeschaltet, wird für jede Notiz die Sie erstellt haben eine eigene Benachrichtigung im Sperrbildschirm erstellt. Andernfalls werden alle Notizen in einer einzelnen Benachrichtigung vereint.</string>
+    <string name="prefs_seperate_notes_flavor">Wenn eingeschaltet, wird für jede Notiz die Sie erstellt haben eine eigene Benachrichtigung im Sperrbildschirm erstellt. Andernfalls werden alle Notizen in einer einzelnen Benachrichtigung vereint.\nJe nach Gerät können zu viele Benachrichtigungen vom System automatisch gruppiert werden.</string>
     <string name="prefs_seperate_notes_tilte">Separate Notizen</string>
     <string name="prefs_short">Kurz</string>
     <string name="prefs_time_detail">Detailgrad: Zeit</string>
     <string name="settings_dismissable_notes_flavor">Wenn eingeschaltet, können Sie die Benachrichtigungen verwerfen.</string>
     <string name="settings_dismissable_notes_tilte">Verwerfbare Benachrichtigungen</string>
-    <string name="settings_low_priority_note_flavor">Versteckt die Benachrichtigungen von der Benachrichtigungsanzeige solange, bis Sie diese erweitern.</string>
+    <string name="settings_low_priority_note_flavor">Versteckt die Benachrichtigungen von der Benachrichtigungsanzeige solange, bis Sie diese erweitern.\nJe nach Gerät, muss dieses erst entriegelt werden damit die Benachrichtigungen angezeigt werden.</string>
     <string name="settings_low_priority_note_title">Subtile Benachrichtigungen</string>
     <string name="share_using">Notiz teilen via</string>
     <string name="share_via_this_app">Neue Notiz anlegen</string>
@@ -108,4 +108,9 @@
     <string name="action_browse_all">Alle öffnen</string>
     <string name="info_choose_url">URL(s) auswählen:</string>
     <string name="error_no_weblings">Keine Links gefunden.</string>
+    <string name="action_toggle_visibillity">Sichtbarkeit umschalten</string>
+    <string name="action_add">Hinzufügen</string>
+    <string name="action_mark_disabled">Deaktivieren</string>
+    <string name="action_mark_disabled_all">Alle deaktivieren</string>
+    <string name="action_dismiss_all">Alle deaktivieren</string>
 </resources>

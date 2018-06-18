@@ -2,6 +2,8 @@ package de.nilsfo.lockscreennotes;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -49,6 +51,14 @@ public class LockScreenNotes extends Application {
 		PreferenceManager.setDefaultValues(this, R.xml.prefs_time, false);
 
 		Timber.i("Started the app. Locale used: " + locale.getISO3Country() + " - " + locale.getCountry() + " - " + locale.getDisplayLanguage() + " - " + locale.getDisplayCountry());
+		int currentVer = -1;
+		try {
+			currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+			Timber.e(e);
+		}
+		Timber.i("App Version: " + currentVer + ". Device Android-Version Code: " + Build.VERSION.SDK_INT);
 	}
 
 	public static boolean isDebugBuild() {

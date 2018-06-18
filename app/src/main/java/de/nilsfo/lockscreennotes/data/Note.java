@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
 
 /**
@@ -98,6 +99,10 @@ public class Note implements Comparable<Note> {
 
 	public long getDatabaseID() {
 		return databaseID;
+	}
+
+	public int getNotificationID(){
+		return (int) (getDatabaseID()%Integer.MAX_VALUE)+ NotesNotificationManager.NOTES_NOTIFICATION_ID_OFFSET;
 	}
 
 	public void setDatabaseID(long databaseID) {
