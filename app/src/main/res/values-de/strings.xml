@@ -22,13 +22,12 @@
     <string name="error_unknown"><![CDATA[<unbekannt>]]></string>
     <string name="error_invalid_value">Konnte nicht mit diesem Wert umgehen. Wird zurückgesetzt.</string>
     <string name="home_screen_lines_too_small">Die angegebene Zahl der Linien ist zu klein.</string>
-    <string name="last_edited">Zuletzt bearbeitet: %1$s - %2$s</string>
     <string name="note_position">#%1$s</string>
     <string name="notification_multiple_notes">%1$s Notizen!</string>
     <string name="notification_ticker">Sperrbildschirm-Notiz wurde erstellt</string>
     <string name="position">Position</string>
     <string name="pref_settings_general">Allgemein</string>
-    <string name="pref_view_on_github_summary">Diese App ist gratis und open source. Sie können sich den Quellcode online anschauen (und dazu beitragen) wenn Sie hier tippen.</string>
+    <string name="pref_view_on_github_summary">Diese App ist gratis, open source und enthällt keine Werbung. Daran wird sich in Zukunft auch nichts ändern. Sie können sich den Quellcode online anschauen (und dazu beitragen) wenn Sie hier tippen.</string>
     <string name="pref_view_on_github_title">Die App auf GitHub ansehen</string>
     <string name="prefs_about_title">Über</string>
     <string name="prefs_currently_selected">Derzeitig ausgewählt: %1$s</string>

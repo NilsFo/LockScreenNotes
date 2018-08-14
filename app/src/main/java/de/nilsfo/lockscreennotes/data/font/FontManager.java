@@ -10,6 +10,7 @@ import android.widget.TextView;
  * Created by Nils on 30.11.2016.
  */
 
+@Deprecated
 public class FontManager {
 
 	public static final String ROOT = "fonts/";

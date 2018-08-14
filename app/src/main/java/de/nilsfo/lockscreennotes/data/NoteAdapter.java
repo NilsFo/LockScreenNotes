@@ -4,12 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +16,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import de.nilsfo.lockscreennotes.activity.MainActivity;
+import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
@@ -34,7 +30,6 @@ import timber.log.Timber;
 public class NoteAdapter extends ArrayAdapter<Note> {
 
 	public static final String PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY = "prefs_allow_edit_note_activity";
-	private static final int DEFAULT_LEVEL_OF_DETAIL = DateFormat.MEDIUM;
 	private static final int DEFAULT_MIN_LINES = 5;
 	public static final int DELETE_BT_SIZE = 36;
 	public static final int DELETE_BT_COLOR = Color.GRAY;
@@ -138,12 +133,14 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 			}
 		});
 
-		if (preferences.getBoolean("prefs_time_relative", true) && note != null) {
-			long time = note.getTimestamp();
-			timestampTF.setText(formatNoteRelativeTime(getContext(), note.getTimestamp()));
+		TimeUtils utils = new TimeUtils(getContext());
+
+		long time = note.getTimestamp();
+		if (utils.isRelativeTimePrefered()) {
+			timestampTF.setText(getContext().getString(R.string.last_edited,utils.formatRelative(time)));
 			RelativeTimeTextfieldContainer.getContainer().add(timestampTF, time);
 		} else
-			timestampTF.setText(getContext().getString(R.string.last_edited, getNoteDateAsString(note), getNoteTimeAsString(note)));
+			timestampTF.setText(getContext().getString(R.string.last_edited, utils.formatAbsolute(time)));
 		enabledBT.setImageResource(getEnabledIcon(note != null && note.isEnabled()));
 		positionTF.setText(String.format(getContext().getString(R.string.note_position), String.valueOf(position + 1)));
 		deleteBT.setBackground(view.getBackground());
@@ -151,9 +148,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		return view;
 	}
 
-	public static String formatNoteRelativeTime(Context context, long timestamp) {
-		return context.getString(R.string.last_edited_single, DateUtils.getRelativeTimeSpanString(timestamp, new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL).toString());
-	}
+
 
 	private int getMinLines() {
 		String lines = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("prefs_homescreen_lines", String.valueOf(DEFAULT_MIN_LINES));
@@ -197,46 +192,4 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		return android.R.color.holo_red_dark;
 	}
 
-	private String getNoteTimeAsString(Note note) {
-		Date date = note.getTimestampAsDate();
-		Locale locale = Locale.getDefault();
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		String lod = preferences.getString("prefs_time_detail", getContext().getString(R.string.error_unknown));
-
-		DateFormat f = DateFormat.getTimeInstance(getLoDviaPreference(lod), locale);
-		return f.format(date);
-	}
-
-	private String getNoteDateAsString(Note note) {
-		Date date = note.getTimestampAsDate();
-		Locale locale = Locale.getDefault();
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		String lod = preferences.getString("prefs_date_detail", getContext().getString(R.string.error_unknown));
-
-		DateFormat f = DateFormat.getDateInstance(getLoDviaPreference(lod), locale);
-		return f.format(date);
-	}
-
-	private int getLoDviaPreference(String lod) {
-		int i = -1;
-		try {
-			i = Integer.parseInt(lod);
-		} catch (NumberFormatException e) {
-			Timber.i("Warning: Could not interpret this as a number: " + lod);
-		}
-
-		switch (i) {
-			case 0:
-				return DateFormat.FULL;
-			case 1:
-				return DateFormat.LONG;
-			case 2:
-				return DateFormat.MEDIUM;
-			case 3:
-				return DateFormat.SHORT;
-		}
-
-		Timber.i("Warning: Level of Detail not found, reverting to default. Input: " + lod);
-		return DEFAULT_LEVEL_OF_DETAIL;
-	}
 }

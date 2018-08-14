@@ -1,5 +1,6 @@
 package de.nilsfo.lockscreennotes.activity;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,9 +9,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +25,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Observable;
@@ -32,8 +42,11 @@ import java.util.concurrent.Executors;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.NoteAdapter;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
+import de.nilsfo.lockscreennotes.io.FileManager;
+import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
@@ -42,10 +55,13 @@ import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
 
 public class MainActivity extends NotesActivity implements Observer {
 
+	public static final int IMPORT_NOTE_PEWVIEW_SIZE = 35;
 	public static final int ONE_SECOND_IN_MS = 1000;
 	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
 	public static final int DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT = 15;
 	public static final String PREFS_LAST_KNOWN_VERSION = PREFS_TAG + "last_known_version";
+
+	public static final int PERMISSIONS_REQUEST_CODE_STORAGE = 1;
 
 	private DBAdapter databaseAdapter;
 	private NoteAdapter noteAdapter;
@@ -95,22 +111,21 @@ public class MainActivity extends NotesActivity implements Observer {
 			}
 		});
 
-		if (notesList.getCount() == 0){
-			tutorialView.animate().alpha(1f).setDuration(2000);}
+		if (notesList.getCount() == 0) {
+			tutorialView.animate().alpha(1f).setDuration(2000);
+		}
 
 		//Version change check & changelog
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		int lastVer = prefs.getInt(PREFS_LAST_KNOWN_VERSION, 0);
-		int currentVer = 0;
-		try {
-			currentVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-		} catch (
-				PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
-		}
-		if (lastVer != 0 && lastVer != currentVer) {
+		int currentVer = VersionManager.getCurrentVersion(this);
+		if (lastVer != 0 && lastVer != currentVer && currentVer != VersionManager.CURRENT_VERSION_UNKNOWN) {
 			VersionManager.onVersionChange(this, lastVer, currentVer);
 		}
+
+		FileManager fm = new FileManager(this);
+		//fm.notifyDirectoryChange(fm.getInternalDir().getAbsolutePath());
+		fm.notifyMediaScanner(fm.getInternalDir());
 
 		prefs.edit().putInt(PREFS_LAST_KNOWN_VERSION, currentVer).apply();
 		Timber.i("Application started. App version: " + currentVer);
@@ -296,6 +311,258 @@ public class MainActivity extends NotesActivity implements Observer {
 		noteAdapter.notifyDataSetChanged();
 	}
 
+	private void requestBackupMenu() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE_STORAGE);
+			return;
+		}
+
+		BackupManager bcm = new BackupManager(this);
+		String backupCount = "-";
+		String lastBackup = "-";
+		if (bcm.hasBackupsMade()) {
+			backupCount = String.valueOf(bcm.findBackupFiles().size());
+			long l = bcm.getLastestBackupFile().lastModified();
+			lastBackup = new TimeUtils(this).formatDateAccordingToPreferences(l);
+		}
+
+		FileManager manager = new FileManager(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_backup);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setMessage(getString(R.string.action_backup_info, manager.getNoteBackupDir().getAbsolutePath(), backupCount, lastBackup));
+		builder.setPositiveButton(R.string.action_create_backup, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				requestBackupExport();
+			}
+		});
+		builder.setNeutralButton(R.string.action_import_backup, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				requestBackupImportMenu();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.show();
+	}
+
+	public void requestBackupExport() {
+		BackupManager backupManager = new BackupManager(this);
+		File backupFile;
+		try {
+			backupFile = backupManager.completeBackup();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();
+			return;
+		} catch (IOException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		Timber.i("Everything saved! -> " + backupFile.getAbsolutePath());
+		Toast.makeText(this, R.string.action_export_success, Toast.LENGTH_LONG).show();
+	}
+
+	public void requestBackupImportMenu() {
+		BackupManager manager = new BackupManager(this);
+		File f = manager.getLastestBackupFile();
+
+		if (f == null) {
+			Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
+			return;
+		}
+		try {
+			requestBackupImportMenuConfirmFile(f);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		}
+	}
+
+	public void requestBackupImportMenuConfirmFile(final File file) throws IOException, JSONException {
+		BackupManager manager = new BackupManager(this);
+		BackupManager.BackupMetaData metaData = manager.getMetaData(file);
+
+		String versionWarning = "";
+		if (VersionManager.getCurrentVersion(this) != metaData.getVersion()) {
+			versionWarning = getString(R.string.warning_backup_version_difference);
+		}
+		String time = new TimeUtils(this).formatDateAccordingToPreferences(metaData.getTimestamp());
+		String msg = getString(R.string.action_backup_import_confirm, file.getName(), time, metaData.getCount(), versionWarning);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_import_backup);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setMessage(msg.trim());
+		builder.setPositiveButton(R.string.action_import_this, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				requestBackupImportMenuConfirmData(file);
+			}
+		});
+		builder.setNeutralButton(R.string.action_import_another, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				requestBackupImportChoose();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.show();
+	}
+
+	public void requestBackupImportMenuConfirmData(File source) {
+		BackupManager manager = new BackupManager(this);
+		final ArrayList<Note> list;
+		try {
+			list = manager.readBackupFile(source);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
+		} catch (JSONException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		Timber.i("Found " + list.size() + " notes in file: " + Arrays.toString(list.toArray()));
+		int currentNoteCount = databaseAdapter.getAllRows().getCount();
+		if (currentNoteCount == 0) {
+			addNewNote(list);
+			return;
+		}
+
+		String summary = "";
+		for (Note n : list) {
+			summary = "-" + n.getTextPreview(IMPORT_NOTE_PEWVIEW_SIZE) + "\n" + summary;
+		}
+		summary = summary.trim();
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_import_choose);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setMessage(getString(R.string.action_backup_import_replace_confirm, String.valueOf(currentNoteCount), String.valueOf(list.size()), summary));
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.setPositiveButton(R.string.action_replace, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				databaseAdapter.deleteAll();
+				addNewNote(list);
+			}
+		});
+		builder.setNeutralButton(R.string.action_merge, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				addNewNote(list);
+			}
+		});
+		builder.show();
+	}
+
+	public void requestBackupImportChoose() {
+		BackupManager manager = new BackupManager(this);
+		ArrayList<File> list = manager.findBackupFiles();
+		switch (list.size()) {
+			case 0:
+				Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
+				return;
+			case 1:
+				Toast.makeText(this, R.string.error_only_one_backup, Toast.LENGTH_LONG).show();
+				try {
+					requestBackupImportMenuConfirmFile(list.get(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+					Timber.e(e);
+				}
+				return;
+		}
+
+		ArrayList<String> filenames = new ArrayList<>();
+		for (File f : list) {
+			filenames.add(f.getName());
+		}
+		Collections.sort(filenames);
+		Collections.reverse(filenames);
+		final CharSequence[] sequences = new CharSequence[filenames.size()];
+		for (int i = 0; i < filenames.size(); i++) {
+			sequences[i] = filenames.get(i);
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_import_choose);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setSingleChoiceItems(sequences, 0, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
+				Timber.v("File(s) selection updated: " + sel);
+			}
+		});
+		builder.setPositiveButton(R.string.action_select, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
+				CharSequence sequence = null;
+				for (int i = 0; i < sequences.length; i++) {
+					if (sel.get(i)) {
+						sequence = sequences[i];
+					}
+				}
+				Timber.i("On accept: " + sequence);
+				File file = new File(new FileManager(MainActivity.this).getNoteBackupDir(), sequence.toString());
+				Timber.i("Assumed backup File: " + file.getAbsolutePath() + " - Exists: " + file.exists());
+
+				if (!file.exists()) {
+					Timber.e("Failed to set up a selected file! This file does not exist: " + file.getAbsolutePath());
+					Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					return;
+				}
+
+				try {
+					requestBackupImportMenuConfirmFile(file);
+				} catch (Exception e) {
+					e.printStackTrace();
+					Timber.e(e);
+					Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.show();
+	}
+
 	private void deleteNote(long id) {
 		databaseAdapter.deleteRow(id);    //we can request changes to the database here, and this object listens to changes and updates
 	}
@@ -383,11 +650,11 @@ public class MainActivity extends NotesActivity implements Observer {
 
 	private void onFABClicked() {
 		saveNotesToDB();
-		addNewNote();
+		actionAddNewNote();
 	}
 
-	public void addNewNote() {
-		addNewNote("");
+	public void actionAddNewNote() {
+		actionAddNewNote("");
 	}
 
 	public long addNewNote(Note note) {
@@ -396,7 +663,13 @@ public class MainActivity extends NotesActivity implements Observer {
 		return id;
 	}
 
-	public void addNewNote(String text) {
+	public void addNewNote(Collection<Note> notes) {
+		for (Note n : notes) {
+			addNewNote(n);
+		}
+	}
+
+	public void actionAddNewNote(String text) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean enabled = sharedPreferences.getBoolean("prefs_auto_enable_new_notes", true);
 		Note note = new Note(text, enabled, new Date().getTime());
@@ -451,16 +724,16 @@ public class MainActivity extends NotesActivity implements Observer {
 			case R.id.action_delete_all:
 				requestDeleteAll();
 				return true;
-
 			case R.id.action_disable_all:
 				requestDisableAll();
 				return true;
-
 			case R.id.action_delete_all_disabled:
 				requestDeleteAllDisabled();
 				return true;
+			case R.id.action_backup:
+				requestBackupMenu();
+				return true;
 		}
-
 
 		return super.onOptionsItemSelected(item);
 	}

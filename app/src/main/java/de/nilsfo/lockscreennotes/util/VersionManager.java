@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +21,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 
 import de.nilsfo.lsn.R;
@@ -30,6 +34,11 @@ import timber.log.Timber;
  */
 
 public abstract class VersionManager {
+
+	public static final String VERSION_RELEASE_DATE_PATTERN = "dd.MM.yyyy";
+	public static final int CURRENT_VERSION_UNKNOWN = -1;
+
+	private static JSONObject chanceLog;
 
 	public static void onVersionChange(Context context, int oldVersion, int newVersion) {
 		Timber.i("App version changed! " + oldVersion + " -> " + newVersion);
@@ -44,37 +53,53 @@ public abstract class VersionManager {
 	}
 
 	public static void displayVersionUpdateNews(final Context context, final int version) {
-		InputStream inputStream = context.getResources().openRawResource(R.raw.version_changelog);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-		String str = "";
-		StringBuilder builder = new StringBuilder();
+		JSONObject versionList;
 		try {
-			while ((str = reader.readLine()) != null) {
-				builder.append(str);
-			}
-		} catch (IOException e) {
+			versionList = getChanceLog(context);
+		} catch (IOException | JSONException e) {
 			e.printStackTrace();
 			Timber.e(e);
-			//TODO handle error
+			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
 		}
 
+		SimpleDateFormat jasonDatePattern = new SimpleDateFormat(VERSION_RELEASE_DATE_PATTERN);
 		Timber.i("Looking for version changelog for entry: " + version);
-		Timber.i("Read changelog JSON: " + builder.toString());
+		Timber.i("Read changelog JSON: " + versionList.toString());
+
 		String versionName = null, changelog = null, wholeChangelog = null;
 		try {
-			JSONObject versionList = new JSONObject(builder.toString());
 			if (versionList.has(String.valueOf(version))) {
 				JSONObject currentVersion = versionList.getJSONObject(String.valueOf(version));
+				Timber.i("Reading Version file for "+currentVersion+" ("+version+")");
 				versionName = currentVersion.getString("version");
 				changelog = currentVersion.getString("text");
 			}
 
-			builder = new StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			Iterator<String> it = versionList.keys();
+			TimeUtils utils = new TimeUtils(context);
 			while (it.hasNext()) {
 				JSONObject currentVersion = versionList.getJSONObject(it.next());
 				builder.append(currentVersion.getString("version"));
+
+				String dateText = null;
+				if (currentVersion.has("date")) {
+					dateText = currentVersion.getString("date");
+				} else {
+					dateText = jasonDatePattern.format(new Date(0));
+					//dateText=context.getString(R.string.error_unknown);
+				}
+
+				try {
+					Date d = jasonDatePattern.parse(dateText);
+					builder.append(" (");
+					builder.append(utils.formatDateAccordingToPreferences(d));
+					builder.append(")");
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+
 				builder.append("\n");
 				builder.append(currentVersion.getString("text"));
 				builder.append("\n\n");
@@ -83,13 +108,56 @@ public abstract class VersionManager {
 		} catch (JSONException e) {
 			e.printStackTrace();
 			Timber.e(e);
-			//TODO handle error
+			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
 		}
 
 		Timber.i("Version info found: " + versionName + " -> " + changelog.replace("\n", "") + " everything: " + wholeChangelog.replace("\n", ""));
 		AlertDialog dialog = buildChangelogDialog(context, context.getString(R.string.info_changelog_version, versionName), changelog, true, wholeChangelog);
 		dialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		dialog.show();
+	}
+
+	public static JSONObject getChanceLog(Context context) throws IOException, JSONException {
+		if (chanceLog != null) {
+			return chanceLog;
+		}
+
+		InputStream inputStream = context.getResources().openRawResource(R.raw.version_changelog);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+		String str = "";
+		StringBuilder builder = new StringBuilder();
+		while ((str = reader.readLine()) != null) {
+			builder.append(str);
+		}
+
+		return new JSONObject(builder.toString());
+	}
+
+	public static int getCurrentVersion(Context context) {
+		try {
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+			Timber.e(e);
+		}
+		return CURRENT_VERSION_UNKNOWN;
+	}
+
+	public static Date getCurrentVersionDate(Context context) throws IllegalStateException, IOException, JSONException, ParseException {
+		int version = getCurrentVersion(context);
+		if (version == CURRENT_VERSION_UNKNOWN)
+			throw new IllegalStateException("Current version unknown.");
+
+		JSONObject versionList = getChanceLog(context);
+		String s = versionList.getJSONObject(String.valueOf(version)).getString("date");
+		SimpleDateFormat sdf = new SimpleDateFormat(VERSION_RELEASE_DATE_PATTERN);
+		Date d = sdf.parse(s);
+
+		Timber.i("Formating the update counter string. Read JSON date: " + s + ". Expected pattern: " + VERSION_RELEASE_DATE_PATTERN + " -> " + d.getTime());
+
+		return d;
 	}
 
 	private static AlertDialog buildChangelogDialog(final Context context, final String title, final String text, boolean showAllButton, final String allText) {
@@ -148,6 +216,7 @@ public abstract class VersionManager {
 				try {
 					context.startActivity(goToMarket);
 				} catch (ActivityNotFoundException e) {
+					Timber.e(e);
 					context.startActivity(new Intent(Intent.ACTION_VIEW,
 							Uri.parse("http://play.google.com/store/apps/details?id=" + packageName)));
 				}

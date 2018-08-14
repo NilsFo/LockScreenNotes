@@ -1,16 +1,25 @@
 {
+  "0":{
+    "date":"11.08.2018",
+    "version":"1.06",
+    "text":"-[Android 7+] Added support for Android 7 notification styles. Try it out by using grouped notifications and expand one at a time.\nAdded a 'disable note' button for notifications\n-Added an external update feed, in case you don't want to get update news from Google Play. See the 'About' section in the settings for details.\n-Added a counter that counts the days since the last app update\n-Updated texts in various languages"
+  },
+
   "7":{
+    "date":"06.12.2017",
     "version":"1.05",
     "text":"-Arrangement of notes in the notification and app now match correctly\n-Weblinks and URLs within notes can now be browsed from within this app\n-Updated notification bar icon\n-Fixed a crash when trying to generate QR codes from empty notes"
   },
 
   "6":{
+    "date":"27.07.2017",
     "version":"1.04",
     "text":"-Notes displayed as QR codes can now be shared with other apps\n-Added this dialog to keep you informed about changes and new features. You can view this changelog again in the 'about' section in the app settings!\n-The order of all displayed notifications can reversed\n-Minor improvements and bug fixes"
   },
 
   "5":{
+    "date":"17.05.2017",
     "version":"1.03",
-    "text":"-Replaced 'fontawesome'-icons with material-design icon\n-Added more icons to the options menu\n-Notes can now be displayed as a QR Code\n-Minor improvements and bug fixes"
+    "text":"-Replaced 'fontawesome'-icons with material-design icons\n-Added more icons to the options menu\n-Notes can now be displayed as a QR Code\n-Minor improvements and bug fixes"
   }
 }

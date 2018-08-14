@@ -144,8 +144,8 @@ public class NotesNotificationManager {
 
 		builder.setContentText(text);
 		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigtext));
-		builder.setDeleteIntent(getOnDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
-		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), getOnDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
+		builder.setDeleteIntent(createOnDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
+		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
 
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -202,8 +202,8 @@ public class NotesNotificationManager {
 			builder.setWhen(n.getTimestamp());
 
 			int id = n.getNotificationID();
-			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), getOnDismissIntent(id - NOTES_NOTIFICATION_ID_OFFSET));
-			builder.setDeleteIntent(getOnDismissIntent((int) n.getDatabaseID()));
+			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnDismissIntent(id - NOTES_NOTIFICATION_ID_OFFSET));
+			builder.setDeleteIntent(createOnDismissIntent((int) n.getDatabaseID()));
 			map.put(id, builder);
 		}
 		return map;
@@ -228,7 +228,7 @@ public class NotesNotificationManager {
 			builder.setContentText(note.getTextPreview());
 			builder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.getText()));
 			builder.setWhen(note.getTimestamp());
-			builder.setDeleteIntent(getOnDismissIntent((int) note.getDatabaseID()));
+			builder.setDeleteIntent(createOnDismissIntent((int) note.getDatabaseID()));
 			builder.setSortKey(noteIndex);
 
 			//NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -236,7 +236,7 @@ public class NotesNotificationManager {
 			//inboxStyle.addLine(noteText);
 			//builder.setStyle(inboxStyle);
 
-			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), getOnDismissIntent((int) note.getDatabaseID()));
+			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnDismissIntent((int) note.getDatabaseID()));
 			manager.notify(note.getNotificationID(), builder.build());
 		}
 
@@ -254,7 +254,7 @@ public class NotesNotificationManager {
 		manager.notify(DEFAULT_NOTIFICATION_ID, builder.build());
 	}
 
-	private PendingIntent getOnDismissIntent(int notificationId) {
+	private PendingIntent createOnDismissIntent(int notificationId) {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
 		Timber.i("Creating a dismiss intent. ID: " + notificationId);

@@ -34,6 +34,20 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/pref_updates">
+        <Preference
+            android:key="pref_github_releases_feed"
+            android:summary="@string/pref_github_releases_summary"
+            android:title="@string/pref_github_releases_title"
+            />
+        <Preference
+            android:key="pref_update_day_counter"
+            android:summary="@string/error_internal_error"
+            android:title="@string/pref_update_day_counter_title"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/pref_credits">
 
         <Preference

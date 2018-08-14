@@ -2,6 +2,8 @@ package de.nilsfo.lockscreennotes.activity;
 
 
 import android.annotation.TargetApi;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,33 +21,43 @@ import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.List;
 
-import de.nilsfo.lockscreennotes.util.VersionManager;
-import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
+import de.nilsfo.lsn.R;
+import timber.log.Timber;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
 	public static final SettingsBindPreferenceSummaryToValueListener defaultListener = new SettingsBindPreferenceSummaryToValueListener();
 
 	private boolean showNotifications;
+	public static final int LAST_UPDATE_DATE_UNKNOWN = -1;
 
 	private static boolean isXLargeTablet(Context context) {
 		return (context.getResources().getConfiguration().screenLayout
 				& Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
 	}
 
-	public static void bindPreferenceURLAsAction(Preference preference, final Uri uri) {
+	public static void bindPreferenceURLAsAction(Preference preference, final Uri uri, final boolean chooser) {
 		preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+				if (chooser)
+					browserIntent = Intent.createChooser(browserIntent, preference.getContext().getString(R.string.share_via));
+
 				preference.getContext().startActivity(browserIntent);
 				return true;
 			}
 		});
+	}
+
+	public static void bindPreferenceURLAsAction(Preference preference, final Uri uri) {
+		bindPreferenceURLAsAction(preference, uri, false);
 	}
 
 	public static void bindPreferenceURLAsAction(Preference preference) {
@@ -143,6 +155,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	private static int getUpdateDays(Context context) {
+		Date now = new Date();
+		Date lastUpdate = null;
+		try {
+			lastUpdate = VersionManager.getCurrentVersionDate(context);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Timber.e(e);
+			return LAST_UPDATE_DATE_UNKNOWN;
+		}
+
+		long diffTime = now.getTime() - lastUpdate.getTime();
+		long diffDays = diffTime / (1000 * 60 * 60 * 24);
+		return (int) diffDays;
+	}
+
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class GeneralPreferenceFragment extends PreferenceFragment {
 		@Override
@@ -215,13 +243,30 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				e.printStackTrace();
 			}
 
-			Preference aboutPreference = findPreference("pref_about");
-			aboutPreference.setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
 			final int finalVersionCode = versionCode;
-			aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			Preference.OnPreferenceClickListener displayVersionUpdateNewsAction = new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					VersionManager.displayVersionUpdateNews(preference.getContext(), finalVersionCode);
+					return true;
+				}
+			};
+
+			Preference aboutPreference = findPreference("pref_about");
+			aboutPreference.setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
+			aboutPreference.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
+
+			Preference externalFeedPreference = findPreference("pref_github_releases_feed");
+			externalFeedPreference.setSummary(getString(R.string.pref_github_releases_summary) + "\n" + getString(R.string.const_github_update_feed_url));
+			//bindPreferenceURLAsAction(externalFeedPreference, Uri.parse(getString(R.string.const_github_url)), true);
+			externalFeedPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					ClipboardManager clipboard = (ClipboardManager) preference.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+					ClipData clip = ClipData.newPlainText(getString(R.string.app_name), getString(R.string.const_github_update_feed_url));
+					clipboard.setPrimaryClip(clip);
+					Toast.makeText(preference.getContext(), R.string.action_github_url_success, Toast.LENGTH_LONG).show();
+
 					return true;
 				}
 			});
@@ -246,8 +291,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 					return true;
 				}
 			});
+
+			Preference updateDayCounter = findPreference("pref_update_day_counter");
+			int lastUpdateDays = getUpdateDays(getActivity());
+			if (lastUpdateDays == LAST_UPDATE_DATE_UNKNOWN) {
+				Timber.w("Failed to get the last date this app was updated! Doing nothing, as this will result in the text that an error occured!");
+			} else {
+				updateDayCounter.setSummary(getString(R.string.pref_update_day_counter_summary, String.valueOf(lastUpdateDays)));
+			}
+			updateDayCounter.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
 		}
-
 	}
-
 }

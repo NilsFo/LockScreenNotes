@@ -2,8 +2,8 @@
     <string name="app_name">Lock Screen Notes</string>
     <string translatable="false" name="qr_cache_name">lock_screen_notes_qr</string>
     <string name="action_settings">Settings</string>
-    <string name="last_edited">Last edited: %1$s - %2$s</string>
-    <string name="last_edited_single">Last edited: %1$s</string>
+    <string name="concat_dash">%1$s - %2$s</string>
+    <string name="last_edited">Last edited: %1$s</string>
     <string name="note_position">#%1$s</string>
     <string name="note_notification_index">#%1$s:</string>
     <string name="delete">Delete</string>
@@ -46,6 +46,7 @@
     <string name="action_copy_text">Copy text</string>
     <string name="action_copy_text_success">Text copied to clipboard.</string>
     <string name="share_using">Share note via</string>
+    <string name="share_via">Share via</string>
     <string name="action_clear_confirm">Are you sure you want to clear this note\'s text?</string>
     <string name="pref_view_on_github_title">View this App on GitHub</string>
     <string name="settings_dismissable_notes_tilte">Dismissable notifications</string>
@@ -53,7 +54,7 @@
     <string name="prefs_seperate_notes_tilte">Separate notifications</string>
     <string name="prefs_seperate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.\nDepending on your device, too many notifications may be automatically grouped together by the system.</string>
     <string name="error_invalid_value">Could not handle that value. Resetting to default.</string>
-    <string name="pref_view_on_github_summary">This app is free and open source. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
+    <string name="pref_view_on_github_summary">This app is free, open source and does not contain apps. This will not change in the future. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
     <string name="settings_auto_enable_new_notes_flavor">When you add a new note it will automatically be enabled.</string>
     <string name="tutorial_welcome">Let\'s get started!</string>
@@ -122,5 +123,29 @@
     <string name="action_dismiss_all">Dismiss all</string>
     <string name="action_mark_disabled">Mark disabled</string>
     <string name="action_mark_disabled_all">Mark all disabled</string>
-
+    <string name="action_backup">Backup &amp; Restore</string>
+    <string name="action_create_backup">Create backup</string>
+    <string name="action_import_backup">Import backup</string>
+    <string name="action_import">Import</string>
+    <string name="action_backup_info">You can backup your notes to save them for later or import them on a different device.\nThe backup will not include your preferences.\n\nBackups are stored here:\n%1$s\n\nBackups made: %2$s\nLast: %3$s</string>
+    <string name="error_action_export">Failed to collect data and store it on your device!</string>
+    <string name="action_export_success">Backup has been created.</string>
+    <string name="pref_updates">Updates</string>
+    <string name="pref_github_releases_title">External update feed</string>
+    <string name="pref_github_releases_summary">You can subscribe to this external feed and get notified about updates to this app.</string>
+    <string name="pref_update_day_counter_title">Last update</string>
+    <string name="pref_update_day_counter_summary">Last update was %1$s day(s) ago.</string>
+    <string name="action_github_url_success">Feed URL copied to clipboard.</string>
+    <string name="error_no_backup">No backup file found on this device.</string>
+    <string name="action_import_another">Import another</string>
+    <string name="action_backup_import_confirm">Do you want to confirm data from this file:\n%1$s\n\nTimestamp: %2$s\nNotes included: %3$s\n\n%4$s</string>
+    <string name="warning_backup_version_difference">The backup was created with another version. This might result in compatibility problems.</string>
+    <string name="action_import_this">Import this</string>
+    <string name="error_only_one_backup">There was only one backup made.</string>
+    <string name="action_import_choose">Choose a file to import</string>
+    <string name="action_select">Select</string>
+    <string name="error_invalid_file_format">Error: Invalid file format.</string>
+    <string name="action_backup_import_replace_confirm">Do you want to merge or replace all notes (%1$s) with these (%2$s)?\n\n%3$s</string>
+    <string name="action_replace">Replace</string>
+    <string name="action_merge">Merge</string>
 </resources>

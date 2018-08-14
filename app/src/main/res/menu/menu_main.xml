@@ -19,6 +19,11 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/action_backup"
+        android:title="@string/action_backup"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         app:showAsAction="never"/>

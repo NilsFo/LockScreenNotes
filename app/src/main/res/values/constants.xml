@@ -2,5 +2,6 @@
     
     <string name="const_github_url" translatable="false">https://github.com/NilsFo/LockScreenNotes</string>
     <string name="const_google_play_url" translatable="false">https://play.google.com/store/apps/details?id=de.nilsfo.lsn</string>
+    <string name="const_github_update_feed_url" translatable="false">https://github.com/NilsFo/LockScreenNotes/releases.atom</string>
 
 </resources>

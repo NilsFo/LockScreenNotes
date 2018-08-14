@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import de.nilsfo.lockscreennotes.util.TimeUtils;
+import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 /**
@@ -53,7 +55,7 @@ public class RelativeTimeTextfieldContainer {
 		for (TextView v : viewList) {
 			long timestamp = timestampMap.get(v);
 			if (v.isShown()) {
-				v.setText(NoteAdapter.formatNoteRelativeTime(context, timestamp));
+				v.setText(context.getString(R.string.last_edited,new TimeUtils(context).formatRelative(timestamp)));
 			} else deleteList.add(v);
 		}
 		Timber.v("Updating displayed note times. Updated count: " + viewList.size() + " To be deleted: " + deleteList.size());
