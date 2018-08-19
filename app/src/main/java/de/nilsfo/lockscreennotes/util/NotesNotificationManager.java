@@ -229,7 +229,7 @@ public class NotesNotificationManager {
 			builder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.getText()));
 			builder.setWhen(note.getTimestamp());
 			builder.setDeleteIntent(createOnDismissIntent((int) note.getDatabaseID()));
-			builder.setSortKey(noteIndex);
+			//builder.setSortKey(noteIndex);
 
 			//NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 			//inboxStyle.setBigContentTitle(noteIndex);

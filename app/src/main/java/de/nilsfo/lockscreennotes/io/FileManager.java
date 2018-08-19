@@ -2,6 +2,7 @@ package de.nilsfo.lockscreennotes.io;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
@@ -10,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -163,7 +165,7 @@ public class FileManager {
 			works = true;
 		}
 
-		Timber.e("Filee? " + f.exists() + " - " + f.isDirectory());
+		Timber.i("File? " + f.exists() + " - " + f.isDirectory());
 
 		if (createNoMedia) works &= createNoMediaFile(f);
 		notifyMediaScanner(f);
@@ -228,6 +230,30 @@ public class FileManager {
 			builder.append(line);
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * Copy & Paste by https://stackoverflow.com/questions/7856959/android-file-chooser
+	 */
+	public String getPath(Uri uri) throws URISyntaxException {
+		if ("content".equalsIgnoreCase(uri.getScheme())) {
+			String[] projection = {"_data"};
+			Cursor cursor = null;
+
+			try {
+				cursor = context.getContentResolver().query(uri, projection, null, null, null);
+				int column_index = cursor.getColumnIndexOrThrow("_data");
+				if (cursor.moveToFirst()) {
+					return cursor.getString(column_index);
+				}
+			} catch (Exception e) {
+				// Eat it
+			}
+		} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+			return uri.getPath();
+		}
+
+		return null;
 	}
 
 	//public void notifyMediaScanner(File file) {

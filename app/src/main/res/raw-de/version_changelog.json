@@ -1,15 +1,24 @@
 {
+  "8":{
+    "date":"19.08.2018",
+    "version":"1.06",
+    "text":"-[Android 7+] Android 7 Benachrichtigungs-Stil wird nun unterstützt.\n-Notizen können nun über die Benachrichtigungen deaktiviert werden\n-Externen Aktualisierungs-Feed hinzugefügt, für den Fall, dass Sie Ihre Aktualisierungen nicht über Google Play beziehen möchten. Details in dem 'Über' Bereich in den Einstellungen.\n-Ein Zähler zeigt an wie lange das letzte Update her ist\n-System Einstellungen für Benachrichtigungen nun über die App verfügbar\n-Backups können nun über das Hauptmenü erstellt und importiert werden\n-Sprachdateien aktualisiert"
+  },
+
   "7":{
+    "date":"06.12.2017",
     "version":"1.05",
     "text":"-Reihenfolge der Notizen stimmt mit der der App überein\n-Weblinks und URLs in einer Notiz können nun von der App aus geöffnet werden\n-Verbesserungen an den Icons\n-App stürzt nicht mehr ab wenn QR-Codes von leeren Notizen erstellt werden"
   },
 
   "6":{
+    "date":"27.07.2017",
     "version":"1.04",
     "text":"-Als QR-Code dargestellte Notizen können nun mit anderen Apps geteilt werden\n-Diesen Dialog hinzugefügt um über Updates & Verbesserungen zu informieren. Dieser Changelog kann in der 'Über'-Sektion der Einstellungen erneut angesehen werden\n-Die Reihenfolge in der Erinnerungen angezeigt werden kann nun umgekehrt werden\nIn den Einstellungen: Die Kategorie 'Benachrichtigungen' heißt nun 'Erinnerungen'\n-Kleinere Verbesserungen und Fehlerbehebungen"
   },
 
   "5":{
+    "date":"17.05.2017",
     "version":"1.03",
     "text":"-'fontawesome'-Icons ersetzt mit Material-Design-Icons\n-Mehr Icons im Options-Menü\n-Notizen können nun als QR Code angezeigt werden\n-Kleinere Verbesserungen und Fehlerbehebungen"
   }

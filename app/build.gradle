@@ -7,8 +7,8 @@ android {
         applicationId "de.nilsfo.lsn"
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 7
-        versionName "1.0.5"
+        versionCode 8
+        versionName "1.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

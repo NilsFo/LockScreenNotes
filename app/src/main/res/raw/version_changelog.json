@@ -1,8 +1,8 @@
 {
-  "0":{
-    "date":"11.08.2018",
+  "8":{
+    "date":"19.08.2018",
     "version":"1.06",
-    "text":"-[Android 7+] Added support for Android 7 notification styles. Try it out by using grouped notifications and expand one at a time.\nAdded a 'disable note' button for notifications\n-Added an external update feed, in case you don't want to get update news from Google Play. See the 'About' section in the settings for details.\n-Added a counter that counts the days since the last app update\n-Updated texts in various languages"
+    "text":"-[Android 7+] Added support for Android 7 notification styles. Try it out by using grouped notifications and expand one at a time.\nAdded a 'disable note' button for notifications\n-Added an external update feed, in case you don't want to get update news from Google Play. See the 'About' section in the settings for details.\n-Added a counter that counts the days since the last app update\n-System notification settings available from within the app\n-Backups can be made and restored from within the main screen\n-Updated localization files"
   },
 
   "7":{

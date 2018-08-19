@@ -19,6 +19,11 @@
             android:defaultValue="false"
             android:key="prefs_reverse_displayed_notifications"
             android:title="@string/prefs_reverse_displayed_notifications_tilte"/>
+
+        <Preference
+            android:key="prefs_system_notifications"
+            android:title="@string/prefs_system_notifications_tilte"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,7 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,6 +54,8 @@ import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
+import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
+import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_PERMISSION_STORAGE;
 
 public class MainActivity extends NotesActivity implements Observer {
 
@@ -60,8 +64,6 @@ public class MainActivity extends NotesActivity implements Observer {
 	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
 	public static final int DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT = 15;
 	public static final String PREFS_LAST_KNOWN_VERSION = PREFS_TAG + "last_known_version";
-
-	public static final int PERMISSIONS_REQUEST_CODE_STORAGE = 1;
 
 	private DBAdapter databaseAdapter;
 	private NoteAdapter noteAdapter;
@@ -313,7 +315,7 @@ public class MainActivity extends NotesActivity implements Observer {
 
 	private void requestBackupMenu() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE_STORAGE);
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
 			return;
 		}
 
@@ -381,6 +383,7 @@ public class MainActivity extends NotesActivity implements Observer {
 
 		if (f == null) {
 			Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
+			requestBackupImportExternal();
 			return;
 		}
 		try {
@@ -414,7 +417,7 @@ public class MainActivity extends NotesActivity implements Observer {
 				requestBackupImportMenuConfirmData(file);
 			}
 		});
-		builder.setNeutralButton(R.string.action_import_another, new DialogInterface.OnClickListener() {
+		builder.setNeutralButton(R.string.action_different_file, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
@@ -492,15 +495,11 @@ public class MainActivity extends NotesActivity implements Observer {
 		switch (list.size()) {
 			case 0:
 				Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
+				requestBackupImportExternal();
 				return;
 			case 1:
 				Toast.makeText(this, R.string.error_only_one_backup, Toast.LENGTH_LONG).show();
-				try {
-					requestBackupImportMenuConfirmFile(list.get(0));
-				} catch (Exception e) {
-					e.printStackTrace();
-					Timber.e(e);
-				}
+				requestBackupImportExternal();
 				return;
 		}
 
@@ -554,6 +553,12 @@ public class MainActivity extends NotesActivity implements Observer {
 				}
 			}
 		});
+		builder.setNeutralButton(R.string.action_external_file, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				requestBackupImportExternal();
+			}
+		});
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -561,6 +566,19 @@ public class MainActivity extends NotesActivity implements Observer {
 			}
 		});
 		builder.show();
+	}
+
+	private void requestBackupImportExternal() {
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+		try {
+			startActivityForResult(
+					Intent.createChooser(intent, getString(R.string.action_import_choose)), REQUEST_CODE_INTENT_EXTERNAL_SEARCH);
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(this, R.string.error_no_file_manager, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	private void deleteNote(long id) {
@@ -736,6 +754,37 @@ public class MainActivity extends NotesActivity implements Observer {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Timber.i("Got an Activity result intent! Code: " + requestCode + " Data: " + data);
+		switch (requestCode) {
+			case REQUEST_CODE_INTENT_EXTERNAL_SEARCH:
+				if (resultCode == RESULT_OK) {
+					Timber.i("Haha, it was an file searcher result, all along!");
+					Uri uri = data.getData();
+					Timber.i("File Uri: " + uri.toString());
+					String path = null;
+					try {
+						path = new FileManager(this).getPath(uri);
+						Timber.i("File Path: " + path);
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+						Timber.e(e);
+						return;
+					}
+					try {
+						requestBackupImportMenuConfirmFile(new File(path));
+					} catch (Exception e) {
+						e.printStackTrace();
+						Timber.e(e);
+						Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
+					}
+				}
+				break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override

@@ -25,6 +25,9 @@ public class LockScreenNotes extends Application {
 	public static final String LOG_TAG = APP_TAG + "log.";
 	public static final String PREFS_TAG = APP_TAG + "prefs_";
 
+	public static final int REQUEST_CODE_PERMISSION_STORAGE = 1;
+	public static final int REQUEST_CODE_INTENT_EXTERNAL_SEARCH = 2;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();

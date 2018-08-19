@@ -17,6 +17,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -205,6 +206,29 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_notifications);
 			setHasOptionsMenu(true);
+
+			findPreference("prefs_system_notifications").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					Context context = preference.getContext();
+					Intent intent = new Intent();
+					if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+						intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+						intent.putExtra("android.provider.extra.APP_PACKAGE", context.getPackageName());
+					} else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+						intent.putExtra("app_package", context.getPackageName());
+						intent.putExtra("app_uid", context.getApplicationInfo().uid);
+					} else {
+						intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+						intent.addCategory(Intent.CATEGORY_DEFAULT);
+						intent.setData(Uri.parse("package:" + context.getPackageName()));
+					}
+
+					context.startActivity(intent);
+					return true;
+				}
+			});
 		}
 	}
 
