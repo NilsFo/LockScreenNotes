@@ -21,12 +21,17 @@ import timber.log.Timber;
 
 public class LockScreenNotes extends Application {
 
+	/**
+	 * DO NOT EDIT BECAUSE OF LEGACY SUPPORT!
+	 * The DB ID is dependant on this App tag, so it should not be changed!
+	 */
 	public static final String APP_TAG = "de.tos.lsn.";
 	public static final String LOG_TAG = APP_TAG + "log.";
 	public static final String PREFS_TAG = APP_TAG + "prefs_";
 
 	public static final int REQUEST_CODE_PERMISSION_STORAGE = 1;
 	public static final int REQUEST_CODE_INTENT_EXTERNAL_SEARCH = 2;
+	public static final int REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM = 3;
 
 	@Override
 	public void onCreate() {
@@ -44,7 +49,6 @@ public class LockScreenNotes extends Application {
 		if (prefs.getString("prefs_time_locale_default_value", getString(R.string.error_unknown)).equals(getString(R.string.prefs_time_locale_default_value))) {
 			String iso = locale.getISO3Country();
 			Timber.i("Turns out the user wants the default time locale to be the current locale: " + iso);
-
 			prefs.edit().putString("prefs_time_locale_default_value", iso).apply();
 		}
 

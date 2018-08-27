@@ -44,7 +44,7 @@ public class NotificationDismissedReceiver extends BroadcastReceiver {
 
 		Timber.i("Updating notifications...");
 		NotesNotificationManager manager = new NotesNotificationManager(context);
-		manager.hideNotifications();
-		manager.showNotifications();
+		manager.hideAllNotifications();
+		manager.showNoteNotifications();
 	}
 }

@@ -213,7 +213,8 @@ public class FileManager {
 			Timber.w("Wanted to scan an (empty) directory. Scan interrupted.");
 			return;
 		}
-		MediaScannerConnection.scanFile(context, new String[]{file.getAbsolutePath()}, null, null);
+
+		MediaScannerConnection.scanFile(context.getApplicationContext(), new String[]{file.getAbsolutePath()}, null, null);
 	}
 
 	public boolean isEmptyDirectory(File file) {

@@ -1,7 +1,10 @@
 package de.nilsfo.lockscreennotes.io.backups;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +27,8 @@ import timber.log.Timber;
 import static de.nilsfo.lockscreennotes.io.backups.NoteJSONUtils.VERSION_NOT_AVAILABLE;
 
 public class BackupManager {
+
+	public static final int AUTO_DELETE_MAX_FILE_COUNT = 10;
 
 	private Context context;
 	private FileManager manager;
@@ -98,11 +103,14 @@ public class BackupManager {
 
 	public ArrayList<Note> readBackupFile(File file) throws IOException, JSONException {
 		JSONObject data = new JSONObject(FileManager.readFile(file));
-		ArrayList<Note> list = new ArrayList<>();
-		BackupMetaData metaData = new BackupMetaData(data,context);
+		BackupMetaData metaData = new BackupMetaData(data, context);
 
 		JSONArray notes = data.getJSONArray("notes");
-		return NoteJSONUtils.toNotes(notes,metaData.version, VersionManager.getCurrentVersion(context));
+		return NoteJSONUtils.toNotes(notes, metaData.version, VersionManager.getCurrentVersion(context));
+	}
+
+	public boolean hasExternalStoragePermission() {
+		return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 	}
 
 	public class BackupMetaData {

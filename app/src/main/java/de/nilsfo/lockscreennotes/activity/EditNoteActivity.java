@@ -175,14 +175,14 @@ public class EditNoteActivity extends NotesActivity {
 		databaseAdapter.close();
 
 		if (isShowNotifications())
-			new NotesNotificationManager(this).showNotifications();
+			new NotesNotificationManager(this).showNoteNotifications();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		databaseAdapter.open();
-		new NotesNotificationManager(this).hideNotifications();
+		new NotesNotificationManager(this).hideAllNotifications();
 		setShowNotifications(true);
 	}
 

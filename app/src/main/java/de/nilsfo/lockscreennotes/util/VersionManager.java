@@ -4,9 +4,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
+import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
@@ -38,10 +41,12 @@ public abstract class VersionManager {
 	public static final String VERSION_RELEASE_DATE_PATTERN = "dd.MM.yyyy";
 	public static final int CURRENT_VERSION_UNKNOWN = -1;
 
-	private static JSONObject chanceLog;
+	private static JSONObject changeLog;
 
 	public static void onVersionChange(Context context, int oldVersion, int newVersion) {
 		Timber.i("App version changed! " + oldVersion + " -> " + newVersion);
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 		switch (newVersion) {
 			default:
@@ -50,6 +55,12 @@ public abstract class VersionManager {
 		}
 
 		displayVersionUpdateNews(context, newVersion);
+
+		LSNAlarmManager alarmManager = new LSNAlarmManager(context);
+		if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
+			alarmManager.cancelNextAutoBackup();
+			alarmManager.scheduleNextAutoBackup();
+		}
 	}
 
 	public static void displayVersionUpdateNews(final Context context, final int version) {
@@ -71,7 +82,7 @@ public abstract class VersionManager {
 		try {
 			if (versionList.has(String.valueOf(version))) {
 				JSONObject currentVersion = versionList.getJSONObject(String.valueOf(version));
-				Timber.i("Reading Version file for "+currentVersion+" ("+version+")");
+				Timber.i("Reading Version file for " + currentVersion + " (" + version + ")");
 				versionName = currentVersion.getString("version");
 				changelog = currentVersion.getString("text");
 			}
@@ -119,8 +130,8 @@ public abstract class VersionManager {
 	}
 
 	public static JSONObject getChanceLog(Context context) throws IOException, JSONException {
-		if (chanceLog != null) {
-			return chanceLog;
+		if (changeLog != null) {
+			return changeLog;
 		}
 
 		InputStream inputStream = context.getResources().openRawResource(R.raw.version_changelog);
@@ -132,7 +143,8 @@ public abstract class VersionManager {
 			builder.append(str);
 		}
 
-		return new JSONObject(builder.toString());
+		changeLog = new JSONObject(builder.toString());
+		return getChanceLog(context);
 	}
 
 	public static int getCurrentVersion(Context context) {

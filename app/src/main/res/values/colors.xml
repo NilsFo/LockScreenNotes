@@ -6,6 +6,7 @@
     <color name="colorAccent">#536DFE</color>
     <color name="edit_note_line">#83DAF7</color>
 
+    <color name="colorNotificationLight">@color/colorPrimary</color>
     <!--
     <item name="colorPrimaryDark" tools:targetApi="23">@color/colorPrimary</item>
     <item name="windowLightStatusBar" tools:targetApi="23">true</item>

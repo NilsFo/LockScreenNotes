@@ -25,11 +25,15 @@ import android.widget.Toast;
 import java.util.Date;
 import java.util.List;
 
+import de.nilsfo.lockscreennotes.io.FileManager;
+import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
+
+import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX_FILE_COUNT;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -48,8 +52,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
-				if (chooser)
+				if (chooser) {
 					browserIntent = Intent.createChooser(browserIntent, preference.getContext().getString(R.string.share_via));
+				}
 
 				preference.getContext().startActivity(browserIntent);
 				return true;
@@ -79,10 +84,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 
 		preference.setOnPreferenceChangeListener(listener);
-		listener.onPreferenceChange(preference,
-				PreferenceManager
-						.getDefaultSharedPreferences(preference.getContext())
-						.getString(preference.getKey(), preference.getContext().getString(R.string.error_unknown)));
+		listener.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), preference.getContext().getString(R.string.error_unknown)));
 	}
 
 	@Override
@@ -96,13 +98,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	protected void onPause() {
 		super.onPause();
 		if (isShowNotifications())
-			new NotesNotificationManager(this).showNotifications();
+			new NotesNotificationManager(this).showNoteNotifications();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		new NotesNotificationManager(this).hideNotifications();
+		new NotesNotificationManager(this).hideAllNotifications();
 		setShowNotifications(true);
 	}
 
@@ -144,6 +146,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				|| GeneralPreferenceFragment.class.getName().equals(fragmentName)
 				|| NotificationsPreferenceFragment.class.getName().equals(fragmentName)
 				|| DateAndTimePreferenceFragment.class.getName().equals(fragmentName)
+				|| AutoBackupPreferenceFragment.class.getName().equals(fragmentName)
 				|| InfoAndAboutPreferenceFragment.class.getName().equals(fragmentName);
 	}
 
@@ -229,6 +232,54 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 					return true;
 				}
 			});
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class AutoBackupPreferenceFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.prefs_auto_backup);
+			setHasOptionsMenu(true);
+
+			FileManager manager = new FileManager(getActivity());
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+			findPreference("pref_auto_backup_info").setSummary(getString(R.string.pref_auto_backup_info_summary, manager.getNoteBackupDir()));
+			findPreference("pref_auto_backups_delete_old").setSummary(getString(R.string.pref_auto_backups_delete_old_summary, String.valueOf(AUTO_DELETE_MAX_FILE_COUNT)));
+
+			findPreference("pref_auto_backups_enabled").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object o) {
+					boolean b = Boolean.valueOf(o.toString());
+					Timber.i("'auto backups' new value: " + b);
+
+					LSNAlarmManager manager = new LSNAlarmManager(preference.getContext());
+					manager.cancelNextAutoBackup();
+					if (b) {
+						manager.scheduleNextAutoBackup();
+					}
+
+					return true;
+				}
+			});
+
+			Preference schedulePreference = findPreference("pref_auto_backups_schedule_days");
+			schedulePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object o) {
+					String s = o.toString();
+					Timber.i("Schedule of days changed. New value: " + s);
+					preference.setSummary(preference.getContext().getString(R.string.pref_auto_backups_schedule_days_summary, s));
+
+					LSNAlarmManager manager = new LSNAlarmManager(preference.getContext());
+					manager.cancelNextAutoBackup();
+					manager.scheduleNextAutoBackup();
+					return true;
+				}
+			});
+			schedulePreference.setSummary(getActivity().getString(R.string.pref_auto_backups_schedule_days_summary, preferences.getString("pref_auto_backups_schedule_days", "3")));
 		}
 	}
 

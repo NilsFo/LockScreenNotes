@@ -12,7 +12,7 @@
     <string name="enabled">Enabled</string>
     <string name="delete_dialog_title">Delete note</string>
     <string name="delete_dialog_content">Are you sure you want to delete this note?\n\n<i>%1$s</i></string>
-    <string name="notification_ticker">Lockscreen note has been created.</string>
+    <string name="notes_notification_ticker">Lockscreen note has been created.</string>
     <string name="notification_multiple_notes">%1$s notes</string>
     <string name="pref_settings_general">General</string>
     <string name="settings_low_priority_note_title">Subtle notifications</string>
@@ -130,7 +130,7 @@
     <string name="action_backup_info">You can backup your notes to save them for later or import them on a different device.\nThe backup will not include your preferences.\n\nBackups are stored here:\n%1$s\n\nBackups made: %2$s\nLast: %3$s</string>
     <string name="error_action_export">Failed to collect data and store it on your device!</string>
     <string name="action_export_success">Backup has been created.</string>
-    <string name="pref_updates" translatable="false">Updates</string>
+    <string name="pref_updates">Updates</string>
     <string name="pref_github_releases_title">External update feed</string>
     <string name="pref_github_releases_summary">You can subscribe to this external feed and get notified about updates to this app.</string>
     <string name="pref_update_day_counter_title">Last update</string>
@@ -151,4 +151,29 @@
     <string name="error_no_file_manager">No file manager installed on the device.</string>
     <string name="action_external_file">External file</string>
     <string name="prefs_system_notifications_tilte">View system notification settings</string>
+    <string name="info_channel_notes_low_name">Style: Subtle</string>
+    <string name="info_channel_notes_medium_name">Style: Default</string>
+    <string name="info_channel_notes_high_name">Style: High priority</string>
+    <string name="info_channel_notes_description">This channel is the main way to display your notes.</string>
+    <string name="info_channel_groups_notes">Note reminders</string>
+    <string name="action_info">Information</string>
+    <string name="pref_auto_backup_info_summary">You can create and restore notes from backups. Use the menu in the main screen to do this.  Backups are stored in this location: %1$s  The app needs access to the external storage in order to create backups.</string>
+    <string name="pref_auto_backup">Automatic Backups</string>
+    <string name="pref_backup">Backups</string>
+    <string name="pref_auto_backups_enabled_title">Create backups automatically</string>
+    <string name="pref_auto_backups_enabled_summary">Backups are made periodically at 2:00 AM (may differ depending on your device\'s power saving policy).</string>
+    <string name="pref_auto_backups_schedule_days_title">Backup schedule</string>
+    <string name="pref_auto_backups_schedule_days_summary">Schedule backups every %1$s day(s).</string>
+    <string name="pref_auto_backups_notification_enabled_title">Show notification</string>
+    <string name="pref_auto_backups_notification_enabled_summary">Displays a notification when an automatic backup is made.\nFailure to create backups are displayed as notifications regardless of this setting.</string>
+    <string name="pref_auto_backups_delete_old_title">Delete old backups</string>
+    <string name="pref_auto_backups_delete_old_summary">Automatically deletes old backups, so you never have more than %1$s files.</string>
+    <string name="info_channel_groups_misc">Miscellaneous</string>
+    <string name="info_channel_auto_backup_name">Automatic backups</string>
+    <string name="info_channel_auto_backup_description">All notifications that relate to automatic backups.</string>
+    <string name="notification_auto_backup_success">Automatic backup created</string>
+    <string name="notification_auto_backup_failed">Automatic backup failed</string>
+    <string name="error_no_external_storage">Failed to obtain permissions to access the external storage.</string>
+    <string name="error_no_old_backup_files_deleted">But failed to delete old backup files!</string>
+    <string name="notification_auto_backup_file_count">Total backups: %1$s.</string>
 </resources>

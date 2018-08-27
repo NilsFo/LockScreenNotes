@@ -64,8 +64,8 @@ public class NoteSharingListenerActivity extends Activity {
 		databaseAdapter.close();
 
 		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
-		notesNotificationManager.hideNotifications();
-		notesNotificationManager.showNotifications();
+		notesNotificationManager.hideAllNotifications();
+		notesNotificationManager.showNoteNotifications();
 
 		Toast.makeText(this, R.string.success_note_sharing_listener, Toast.LENGTH_LONG).show();
 	}

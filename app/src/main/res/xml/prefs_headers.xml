@@ -13,6 +13,11 @@
         android:title="@string/pref_notifications"/>
 
     <header
+        android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$AutoBackupPreferenceFragment"
+        android:icon="@drawable/baseline_save_alt_black_24"
+        android:title="@string/pref_backup"/>
+
+    <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$DateAndTimePreferenceFragment"
         android:icon="@drawable/ic_access_time_black_24dp"
         android:title="@string/pref_date_and_time"/>

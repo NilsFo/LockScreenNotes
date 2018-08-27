@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="de.nilsfo.lsn"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="de.nilsfo.lsn">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
+        android:name="de.nilsfo.lockscreennotes.LockScreenNotes"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name="de.nilsfo.lockscreennotes.LockScreenNotes"
 
         android:theme="@style/AppTheme">
         <receiver
@@ -23,7 +23,11 @@
         </receiver>
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver"
-            android:exported="false" >
+            android:exported="false">
+        </receiver>
+        <receiver
+            android:name="de.nilsfo.lockscreennotes.receiver.LSNAutoBackupReceiver"
+            android:exported="false">
         </receiver>
 
         <!--
@@ -44,7 +48,7 @@
             android:exported="false">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths" />
+                android:resource="@xml/filepaths"/>
         </provider>
 
         <activity
@@ -59,8 +63,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:windowSoftInputMode = "adjustResize"
             android:name="de.nilsfo.lockscreennotes.activity.EditNoteActivity"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

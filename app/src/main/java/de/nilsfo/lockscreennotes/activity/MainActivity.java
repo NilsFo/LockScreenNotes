@@ -4,14 +4,12 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -314,12 +312,12 @@ public class MainActivity extends NotesActivity implements Observer {
 	}
 
 	private void requestBackupMenu() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+		BackupManager bcm = new BackupManager(this);
+		if (!bcm.hasExternalStoragePermission()) {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
 			return;
 		}
 
-		BackupManager bcm = new BackupManager(this);
 		String backupCount = "-";
 		String lastBackup = "-";
 		if (bcm.hasBackupsMade()) {
@@ -598,7 +596,7 @@ public class MainActivity extends NotesActivity implements Observer {
 
 		Timber.i("Mainactivity: onPause() [Show notifications? " + isShowNotifications() + "]");
 		if (isShowNotifications())
-			new NotesNotificationManager(this).showNotifications();
+			new NotesNotificationManager(this).showNoteNotifications();
 	}
 
 	@Override
@@ -612,7 +610,7 @@ public class MainActivity extends NotesActivity implements Observer {
 		setupRelativeDateUpdater();
 
 		Timber.i("Mainactivity: onResume()");
-		new NotesNotificationManager(this).hideNotifications();
+		new NotesNotificationManager(this).hideAllNotifications();
 	}
 
 	private void updateTutorialView() {
