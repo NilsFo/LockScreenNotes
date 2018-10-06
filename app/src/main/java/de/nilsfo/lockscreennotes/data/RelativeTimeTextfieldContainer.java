@@ -22,15 +22,15 @@ public class RelativeTimeTextfieldContainer {
 	private LinkedList<TextView> deleteList;
 	private HashMap<TextView, Long> timestampMap;
 
-	public static RelativeTimeTextfieldContainer getContainer() {
-		if (container == null) container = new RelativeTimeTextfieldContainer();
-		return container;
-	}
-
 	private RelativeTimeTextfieldContainer() {
 		viewList = new ArrayList<TextView>();
 		timestampMap = new HashMap<>();
 		deleteList = new LinkedList<TextView>();
+	}
+
+	public static RelativeTimeTextfieldContainer getContainer() {
+		if (container == null) container = new RelativeTimeTextfieldContainer();
+		return container;
 	}
 
 	public void clear() {
@@ -55,7 +55,7 @@ public class RelativeTimeTextfieldContainer {
 		for (TextView v : viewList) {
 			long timestamp = timestampMap.get(v);
 			if (v.isShown()) {
-				v.setText(context.getString(R.string.last_edited,new TimeUtils(context).formatRelative(timestamp)));
+				v.setText(context.getString(R.string.last_edited, new TimeUtils(context).formatRelative(timestamp)));
 			} else deleteList.add(v);
 		}
 		Timber.v("Updating displayed note times. Updated count: " + viewList.size() + " To be deleted: " + deleteList.size());

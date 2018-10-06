@@ -28,9 +28,9 @@ import timber.log.Timber;
 
 public class QRCodeView extends LinearLayout {
 
+	protected ArrayList<QRFinishListener> listeners;
 	private ProgressBar bar;
 	private Bitmap qrImage;
-	protected ArrayList<QRFinishListener> listeners;
 
 	public QRCodeView(Context context, String textToDisplay, int size) {
 		super(context);
@@ -100,8 +100,8 @@ public class QRCodeView extends LinearLayout {
 		private int size;
 
 		public QRTask(String text, int size) {
-			if (text.equals("")){
-				text=" ";
+			if (text.equals("")) {
+				text = " ";
 			}
 
 			this.text = text;

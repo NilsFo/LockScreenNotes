@@ -9,10 +9,10 @@ import android.widget.Toast;
 
 import java.util.Date;
 
-import de.nilsfo.lsn.R;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 /**

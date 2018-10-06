@@ -1,6 +1,5 @@
 package de.nilsfo.lockscreennotes.activity;
 
-
 import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.ClipboardManager;

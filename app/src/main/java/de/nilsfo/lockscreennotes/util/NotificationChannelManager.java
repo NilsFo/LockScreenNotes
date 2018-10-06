@@ -15,7 +15,6 @@ import static de.nilsfo.lockscreennotes.LockScreenNotes.APP_TAG;
 
 public class NotificationChannelManager {
 
-
 	public static final String CHANNEL_TAG = APP_TAG + "notification_channel.";
 	public static final String CHANNEL_GROUPS_TAG = CHANNEL_TAG + "groups.";
 

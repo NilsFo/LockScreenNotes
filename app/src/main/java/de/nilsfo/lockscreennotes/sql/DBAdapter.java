@@ -38,7 +38,7 @@ public class DBAdapter extends Observable {
 	public static final String[] ALL_KEYS = new String[]{KEY_ROWID, KEY_NOTE_TEXT, KEY_NOTE_ENABLED, KEY_TIMESTAMP};
 
 	// DB info: it's name, and the table we are using (just one).
-	public static final String DATABASE_NAME = LockScreenNotes.APP_TAG+"notes_db";
+	public static final String DATABASE_NAME = LockScreenNotes.APP_TAG + "notes_db";
 	public static final String DATABASE_TABLE = "Notes";
 	// Track DB version if a new version of your app changes the format.
 	public static final int DATABASE_VERSION = 1;
@@ -50,9 +50,9 @@ public class DBAdapter extends Observable {
 	private static final String DATABASE_CREATE_SQL =
 			"create table " + DATABASE_TABLE
 					+ " (" + KEY_ROWID + " integer primary key, "
-			/*
-			 * CHANGE 2:
-			 */
+					/*
+					 * CHANGE 2:
+					 */
 					// TODO: Place your fields here!
 					// + KEY_{...} + " {type} not null"
 					//	- Key is the column name you created above.

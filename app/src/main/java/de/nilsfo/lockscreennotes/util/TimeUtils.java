@@ -19,18 +19,18 @@ public class TimeUtils {
 	private Context context;
 
 	public TimeUtils(Context context) {
-		this.context=context;
+		this.context = context;
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
-	public String formatDateAccordingToPreferences(Date date){
+	public String formatDateAccordingToPreferences(Date date) {
 		return formatDateAccordingToPreferences(date.getTime());
 	}
 
-	public String formatDateAccordingToPreferences(long time){
-		if (isRelativeTimePrefered()){
+	public String formatDateAccordingToPreferences(long time) {
+		if (isRelativeTimePrefered()) {
 			return formatRelative(time);
-		}else{
+		} else {
 			return formatAbsolute(time);
 		}
 	}
@@ -43,11 +43,11 @@ public class TimeUtils {
 		return DateUtils.getRelativeTimeSpanString(timestamp, new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL).toString();
 	}
 
-	public String formatAbsolute(long time){
-		return context.getString(R.string.concat_dash,formatDateAbsolute(time),formatTimeAbsolute(time));
+	public String formatAbsolute(long time) {
+		return context.getString(R.string.concat_dash, formatDateAbsolute(time), formatTimeAbsolute(time));
 	}
 
-	public String formatAbsolute(Date date){
+	public String formatAbsolute(Date date) {
 		return formatAbsolute(date.getTime());
 	}
 
@@ -98,7 +98,7 @@ public class TimeUtils {
 		return DEFAULT_LEVEL_OF_DETAIL;
 	}
 
-	public boolean isRelativeTimePrefered(){
+	public boolean isRelativeTimePrefered() {
 		return preferences.getBoolean("prefs_time_relative", true);
 	}
 

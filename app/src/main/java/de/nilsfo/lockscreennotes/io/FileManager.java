@@ -33,6 +33,15 @@ public class FileManager {
 		this.context = context;
 	}
 
+	public static String readFile(File file) throws IOException {
+		StringBuilder builder = new StringBuilder();
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		for (String line; (line = br.readLine()) != null; ) {
+			builder.append(line);
+		}
+		return builder.toString();
+	}
+
 	public File getExternalDir() {
 		File f = Environment.getExternalStorageDirectory();
 		//TODO does this parent file thing work?
@@ -93,38 +102,6 @@ public class FileManager {
 		String date = sdf.format(new Date());
 		return FILENAME_BACKUP_BASE_NAME + date + FILENAME_BACKUP_EXTENSION;
 	}
-
-	/*
-	public File getNameGeneratorCache() {
-		File f = new File(getCacheDir(), DIR_NAME_GENERATOR_SOURCES);
-
-		if (!f.exists()) {
-			boolean works = f.mkdirs();
-			works |= createNoMediaFile(f);
-
-			if (!works) {
-				Timber.i("Errors regarding the cache dir. Either it could not have been created, or it had problems with its NOMEDIA file.");
-			}
-		}
-		return f;
-	}
-
-	public File getCampaignBackupDir() {
-		File f = new File(getOriginDir(), CAMPAIGN_BACKUP_DIR_NAME);
-		if (!f.exists()) f.mkdirs();
-		createNoMediaFile(f);
-
-		return f;
-	}
-
-	public File getNameGeneratorSources() {
-		File f = new File(getOriginDir(), DIR_NAME_GENERATOR_SOURCES);
-		if (!f.exists()) f.mkdirs();
-		createNoMediaFile(f);
-
-		return f;
-	}
-	*/
 
 	public void browseFolder(File file) {
 		/*
@@ -222,15 +199,6 @@ public class FileManager {
 
 		File[] files = file.listFiles();
 		return files == null || file.length() > 0;
-	}
-
-	public static String readFile(File file) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		for (String line; (line = br.readLine()) != null; ) {
-			builder.append(line);
-		}
-		return builder.toString();
 	}
 
 	/**

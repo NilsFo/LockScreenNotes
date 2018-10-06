@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.widget.EditText;
 
 import de.nilsfo.lsn.R;
+
 /**
  * Created by Nils on 14.08.2016.
  */

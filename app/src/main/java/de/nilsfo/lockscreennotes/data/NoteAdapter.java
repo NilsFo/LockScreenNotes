@@ -30,9 +30,9 @@ import timber.log.Timber;
 public class NoteAdapter extends ArrayAdapter<Note> {
 
 	public static final String PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY = "prefs_allow_edit_note_activity";
-	private static final int DEFAULT_MIN_LINES = 5;
 	public static final int DELETE_BT_SIZE = 36;
 	public static final int DELETE_BT_COLOR = Color.GRAY;
+	private static final int DEFAULT_MIN_LINES = 5;
 
 	public NoteAdapter(Context context, int resource, List<Note> objects) {
 		super(context, resource, objects);
@@ -137,7 +137,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
 		long time = note.getTimestamp();
 		if (utils.isRelativeTimePrefered()) {
-			timestampTF.setText(getContext().getString(R.string.last_edited,utils.formatRelative(time)));
+			timestampTF.setText(getContext().getString(R.string.last_edited, utils.formatRelative(time)));
 			RelativeTimeTextfieldContainer.getContainer().add(timestampTF, time);
 		} else
 			timestampTF.setText(getContext().getString(R.string.last_edited, utils.formatAbsolute(time)));
@@ -147,7 +147,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
 		return view;
 	}
-
 
 
 	private int getMinLines() {

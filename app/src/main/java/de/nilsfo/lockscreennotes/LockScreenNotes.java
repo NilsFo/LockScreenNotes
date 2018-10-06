@@ -33,6 +33,10 @@ public class LockScreenNotes extends Application {
 	public static final int REQUEST_CODE_INTENT_EXTERNAL_SEARCH = 2;
 	public static final int REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM = 3;
 
+	public static boolean isDebugBuild() {
+		return BuildConfig.DEBUG;
+	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -60,10 +64,6 @@ public class LockScreenNotes extends Application {
 		Timber.i("Started the app. Locale used: " + locale.getISO3Country() + " - " + locale.getCountry() + " - " + locale.getDisplayLanguage() + " - " + locale.getDisplayCountry());
 		int currentVer = VersionManager.getCurrentVersion(this);
 		Timber.i("App Version: " + currentVer + ". Device Android-Version Code: " + Build.VERSION.SDK_INT);
-	}
-
-	public static boolean isDebugBuild() {
-		return BuildConfig.DEBUG;
 	}
 
 	@Override

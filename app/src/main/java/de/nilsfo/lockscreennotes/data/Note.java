@@ -101,12 +101,12 @@ public class Note implements Comparable<Note> {
 		return databaseID;
 	}
 
-	public int getNotificationID(){
-		return (int) (getDatabaseID()%Integer.MAX_VALUE)+ NotesNotificationManager.NOTES_NOTIFICATION_ID_OFFSET;
-	}
-
 	public void setDatabaseID(long databaseID) {
 		this.databaseID = databaseID;
+	}
+
+	public int getNotificationID() {
+		return (int) (getDatabaseID() % Integer.MAX_VALUE) + NotesNotificationManager.NOTES_NOTIFICATION_ID_OFFSET;
 	}
 
 	public Date getTimestampAsDate() {
@@ -117,12 +117,12 @@ public class Note implements Comparable<Note> {
 		return timestamp;
 	}
 
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-
 	public void setTimestamp(Date timestamp) {
 		setTimestamp(timestamp.getTime());
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public String getText() {
