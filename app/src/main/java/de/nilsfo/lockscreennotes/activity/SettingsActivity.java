@@ -38,9 +38,8 @@ import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
 	public static final SettingsBindPreferenceSummaryToValueListener defaultListener = new SettingsBindPreferenceSummaryToValueListener();
-
-	private boolean showNotifications;
 	public static final int LAST_UPDATE_DATE_UNKNOWN = -1;
+	private boolean showNotifications;
 
 	private static boolean isXLargeTablet(Context context) {
 		return (context.getResources().getConfiguration().screenLayout
@@ -85,6 +84,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 		preference.setOnPreferenceChangeListener(listener);
 		listener.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), preference.getContext().getString(R.string.error_unknown)));
+	}
+
+	private static int getUpdateDays(Context context) {
+		Date now = new Date();
+		Date lastUpdate = null;
+		try {
+			lastUpdate = VersionManager.getCurrentVersionDate(context);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Timber.e(e);
+			return LAST_UPDATE_DATE_UNKNOWN;
+		}
+
+		long diffTime = now.getTime() - lastUpdate.getTime();
+		long diffDays = diffTime / (1000 * 60 * 60 * 24);
+		return (int) diffDays;
 	}
 
 	@Override
@@ -159,22 +174,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	private static int getUpdateDays(Context context) {
-		Date now = new Date();
-		Date lastUpdate = null;
-		try {
-			lastUpdate = VersionManager.getCurrentVersionDate(context);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Timber.e(e);
-			return LAST_UPDATE_DATE_UNKNOWN;
-		}
-
-		long diffTime = now.getTime() - lastUpdate.getTime();
-		long diffDays = diffTime / (1000 * 60 * 60 * 24);
-		return (int) diffDays;
-	}
-
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class GeneralPreferenceFragment extends PreferenceFragment {
 		@Override
@@ -237,6 +236,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class AutoBackupPreferenceFragment extends PreferenceFragment {
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -248,19 +248,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 			findPreference("pref_auto_backup_info").setSummary(getString(R.string.pref_auto_backup_info_summary, manager.getNoteBackupDir()));
 			findPreference("pref_auto_backups_delete_old").setSummary(getString(R.string.pref_auto_backups_delete_old_summary, String.valueOf(AUTO_DELETE_MAX_FILE_COUNT)));
-
 			findPreference("pref_auto_backups_enabled").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object o) {
 					boolean b = Boolean.valueOf(o.toString());
 					Timber.i("'auto backups' new value: " + b);
-
-					LSNAlarmManager manager = new LSNAlarmManager(preference.getContext());
-					manager.cancelNextAutoBackup();
-					if (b) {
-						manager.scheduleNextAutoBackup();
-					}
-
 					return true;
 				}
 			});
@@ -273,13 +265,31 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 					Timber.i("Schedule of days changed. New value: " + s);
 					preference.setSummary(preference.getContext().getString(R.string.pref_auto_backups_schedule_days_summary, s));
 
-					LSNAlarmManager manager = new LSNAlarmManager(preference.getContext());
-					manager.cancelNextAutoBackup();
-					manager.scheduleNextAutoBackup();
 					return true;
 				}
 			});
 			schedulePreference.setSummary(getActivity().getString(R.string.pref_auto_backups_schedule_days_summary, preferences.getString("pref_auto_backups_schedule_days", "3")));
+		}
+
+		@Override
+		public void onPause() {
+			super.onPause();
+			Timber.i("Stopping the Backup preference activity. Let's see if a alarm will be scheduled...");
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+			LSNAlarmManager manager = new LSNAlarmManager(getActivity());
+			if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
+				//if (scheduleChanged) {
+				Timber.i("Changes detected. Requesting a new backup timer!");
+				manager.cancelNextAutoBackup();
+				manager.scheduleNextAutoBackup();
+				//} else {
+				//	Timber.i("Backups are enabled, but the schedule didn't change. So no new schedule is requested.");
+				//}
+			} else {
+				manager.cancelNextAutoBackup();
+				Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
+			}
 		}
 	}
 
