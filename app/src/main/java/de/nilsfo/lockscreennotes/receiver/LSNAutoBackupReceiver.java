@@ -7,12 +7,16 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
+import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
@@ -81,7 +85,12 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 					}
 
 					if (showNotification) {
-						notificationManager.displayNotificationAutomaticBackup(true, f.getAbsolutePath());
+						LSNAlarmManager alarmManager = new LSNAlarmManager(context);
+						Date d = new Date(new Date().getTime()+alarmManager.getTimeUntilNextNewAutoBackup());
+						String formatedDate = new TimeUtils(context).formatDateAbsolute(d, DateFormat.FULL);
+
+						String text =context.getString(R.string.notification_auto_backup_next,formatedDate);
+						notificationManager.displayNotificationAutomaticBackup(true, text);
 					}
 
 				} else {

@@ -21,17 +21,23 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver"
             android:exported="false">
         </receiver>
+        <receiver
+            android:name="de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver"
+            android:exported="false">
+        </receiver>
+
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.LSNAutoBackupReceiver"
             android:exported="false">
         </receiver>
 
         <!--
-        TODO: This is an attempt at a desktop widget. Reuse this code if you ever want to pursue this idea again.
+        TODO: This is an attempt at a "desktop" widget. Reuse this code if you ever want to pursue this idea again.
         <receiver android:name="de.nilsfo.lockscreennotes.receiver.widget.GeneralWidget" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -44,8 +50,8 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="de.nilsfo.lockscreennotes.LockScreenNotes.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths"/>
@@ -64,8 +70,8 @@
         </activity>
         <activity
             android:name="de.nilsfo.lockscreennotes.activity.EditNoteActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity">
+            android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
@@ -93,6 +99,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name="de.nilsfo.lockscreennotes.activity.NotificationDeleteRecieverDialogActivity"
+            android:theme="@android:style/Theme.NoDisplay">
         </activity>
     </application>
 

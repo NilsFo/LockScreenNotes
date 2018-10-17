@@ -33,7 +33,7 @@
     <string name="prefs_currently_selected">Derzeitig ausgewählt: %1$s</string>
     <string name="prefs_date_detail_title">Detailgrad: Datum</string>
     <string name="prefs_full">Vollständig</string>
-    <string name="prefs_homescreen_lines_summary">Die minimale Anzahl an Zeilen welche eine Notiz im Hauptmenü haben muss.\nDerzeit ausgewählt: %1$s</string>
+    <string name="prefs_homescreen_lines_summary">Die minimale Anzahl an Zeilen welche eine Notiz im Hauptmenü haben muss. Minimum hängt von der Auflösung des Geräts ab.\nDerzeit ausgewählt: %1$s</string>
     <string name="prefs_homescreen_lines_title">Minimale Zeilen</string>
     <string name="prefs_long">Lang</string>
     <string name="prefs_medium">Mittel</string>

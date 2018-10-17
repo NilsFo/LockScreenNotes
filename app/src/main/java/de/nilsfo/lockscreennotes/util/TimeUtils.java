@@ -47,6 +47,10 @@ public class TimeUtils {
 		return context.getString(R.string.concat_dash, formatDateAbsolute(time), formatTimeAbsolute(time));
 	}
 
+	public String formatAbsolute(Date time, int levelOfDetailTime, int levelOfDetailDate) {
+		return context.getString(R.string.concat_dash, formatDateAbsolute(time, levelOfDetailTime), formatTimeAbsolute(time, levelOfDetailDate));
+	}
+
 	public String formatAbsolute(Date date) {
 		return formatAbsolute(date.getTime());
 	}
@@ -59,20 +63,22 @@ public class TimeUtils {
 		return formatTimeAbsolute(new Date(time));
 	}
 
-	public String formatTimeAbsolute(Date date) {
-		Locale locale = Locale.getDefault();
-		String lod = preferences.getString("prefs_time_detail", context.getString(R.string.error_unknown));
+	public String formatTimeAbsolute(Date date, int levelOfDetail) {
+		return DateFormat.getTimeInstance(levelOfDetail, getLocale()).format(date);
+	}
 
-		DateFormat f = DateFormat.getTimeInstance(getLoDviaPreference(lod), locale);
-		return f.format(date);
+	public String formatTimeAbsolute(Date date) {
+		String lod = preferences.getString("prefs_time_detail", context.getString(R.string.error_unknown));
+		return formatTimeAbsolute(date, getLoDviaPreference(lod));
+	}
+
+	public String formatDateAbsolute(Date date, int levelOfDetail) {
+		return DateFormat.getDateInstance(levelOfDetail, getLocale()).format(date);
 	}
 
 	public String formatDateAbsolute(Date date) {
-		Locale locale = Locale.getDefault();
 		String lod = preferences.getString("prefs_date_detail", context.getString(R.string.error_unknown));
-
-		DateFormat f = DateFormat.getDateInstance(getLoDviaPreference(lod), locale);
-		return f.format(date);
+		return formatDateAbsolute(date, getLoDviaPreference(lod));
 	}
 
 	public int getLoDviaPreference(String lod) {
@@ -100,6 +106,10 @@ public class TimeUtils {
 
 	public boolean isRelativeTimePrefered() {
 		return preferences.getBoolean("prefs_time_relative", true);
+	}
+
+	private Locale getLocale() {
+		return context.getResources().getConfiguration().locale;
 	}
 
 }

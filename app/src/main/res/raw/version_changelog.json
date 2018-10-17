@@ -1,4 +1,10 @@
 {
+  "9":{
+    "date":"19.08.2018",
+    "version":"1.07",
+    "text":"-Backups can now be scheduled automatically (via the settings menu)\n-Updated some descriptions in the settings menu\n-Targeting a later Android version to comply with new PlayStore policies\n-Updated localization files"
+  },
+
   "8":{
     "date":"19.08.2018",
     "version":"1.06",

@@ -22,6 +22,7 @@ import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
+import de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver;
 import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lsn.R;
@@ -38,21 +39,21 @@ public class NotesNotificationManager {
 	public static final String KEY_NOTIFICATION_GROUP_NOTES = LockScreenNotes.APP_TAG + "key_notification_group";
 
 	public static final int NOTIFICATION_STATIC_ID_AUTOMATIC_BACKUP = 1;
-
 	public static final String PREFERENCE_LOW_PRIORITY_NOTE = "prefs_low_priority_note";
 	public static final String PREFERENCE_HIGH_PRIORITY_NOTE = "prefs_high_priority_note";
 	public static final String PREFERENCE_REVERSE_ORDERING = "prefs_reverse_displayed_notifications";
 	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.APP_TAG + "notification_id";
+	@Deprecated
+	public static final String INTENT_EXTRA_DELETE = LockScreenNotes.APP_TAG + "delete_mode";
 
 	/**
 	 * Hint: All notes notification IDs start at this offset!
 	 */
 	public static final int NOTES_NOTIFICATION_ID_OFFSET = 100;
-	public static final int DEFAULT_NOTIFICATION_ID = 100;
 
+	public static final int DEFAULT_NOTIFICATION_ID = 100;
 	public static final int NOTE_PREVIEW_SIZE = -1;
 	public static final int INTENT_EXTRA_NOTE_ID_NONE = -1;
-
 	private Context context;
 	private ArrayList<Note> notesList;
 	private NotificationChannelManager channelManager;
@@ -145,6 +146,7 @@ public class NotesNotificationManager {
 		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigtext));
 		builder.setDeleteIntent(createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
+		//builder.addAction(R.drawable.ic_delete_black_36dp, context.getString(R.string.delete), createOnNoteDeleteIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
 
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -202,6 +204,7 @@ public class NotesNotificationManager {
 
 			int id = n.getNotificationID();
 			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent(id - NOTES_NOTIFICATION_ID_OFFSET));
+			//builder.addAction(R.drawable.ic_delete_black_36dp, context.getString(R.string.delete), createOnNoteDeleteIntent(id - NOTES_NOTIFICATION_ID_OFFSET));
 			builder.setDeleteIntent(createOnNoteDismissIntent((int) n.getDatabaseID()));
 			map.put(id, builder);
 		}
@@ -236,6 +239,7 @@ public class NotesNotificationManager {
 			//builder.setStyle(inboxStyle);
 
 			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent((int) note.getDatabaseID()));
+			//builder.addAction(R.drawable.ic_delete_black_36dp, context.getString(R.string.delete), createOnNoteDeleteIntent((int) note.getDatabaseID()));
 			manager.notify(note.getNotificationID(), builder.build());
 		}
 
@@ -261,6 +265,14 @@ public class NotesNotificationManager {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
 		Timber.i("Creating a dismiss intent. ID: " + notificationId);
+		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
+	}
+
+	@Deprecated
+	private PendingIntent createOnNoteDeleteIntent(int notificationId) {
+		Intent intent = new Intent(context, NotificationDeleteReceiver.class);
+		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
+		Timber.i("Creating a delete intent. ID: " + notificationId);
 		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
 	}
 
@@ -303,18 +315,18 @@ public class NotesNotificationManager {
 		return PendingIntent.getActivity(context, 0, intent, 0);
 	}
 
-	public void displayNotificationAutomaticBackup(boolean success, String extraText) {
+	public void displayNotificationAutomaticBackup(boolean success, String contentText) {
 		BackupManager backupManager = new BackupManager(context);
 		int backupFileCount = backupManager.findBackupFiles().size();
 
 		String title;
-		String contentText;
+		String extraText;
 		if (success) {
 			title = context.getString(R.string.notification_auto_backup_success);
-			contentText = context.getString(R.string.notification_auto_backup_file_count, String.valueOf(backupFileCount));
+			extraText = context.getString(R.string.notification_auto_backup_next_detail, contentText, String.valueOf(backupFileCount));
 		} else {
 			title = context.getString(R.string.notification_auto_backup_failed);
-			contentText = extraText;
+			extraText = contentText;
 		}
 
 		NotificationCompat.Builder builder = getGenericNotificationBuilder(title, false, NotificationCompat.PRIORITY_DEFAULT, CHANNEL_ID_AUTO_BACKUP_CHANNEL);

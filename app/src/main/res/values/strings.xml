@@ -12,6 +12,7 @@
     <string name="enabled">Enabled</string>
     <string name="delete_dialog_title">Delete note</string>
     <string name="delete_dialog_content">Are you sure you want to delete this note?\n\n<i>%1$s</i></string>
+    <string name="delete_dialog_content_multiple">Are you sure you want to delete those %1$s notes?</string>
     <string name="notes_notification_ticker">Lockscreen note has been created.</string>
     <string name="notification_multiple_notes">%1$s notes</string>
     <string name="pref_settings_general">General</string>
@@ -20,7 +21,7 @@
     <string name="advanced">Advanced</string>
     <string name="share_via_this_app">Create a new note</string>
     <string name="prefs_homescreen_lines_title">Minimum note lines</string>
-    <string name="prefs_homescreen_lines_summary">In the main screen, the minimum amount of lines a note must have.\nCurrently selected: %1$s</string>
+    <string name="prefs_homescreen_lines_summary">In the main screen, the minimum amount of lines a note must have. Minimum lines differ by device resolution.\nCurrently selected: %1$s</string>
     <string name="home_screen_lines_too_small">Given line size is too small. Changed back to default.</string>
     <string name="prefs_date_detail_title">Level of detail: Dates</string>
     <string name="prefs_currently_selected">Currently selected: %1$s</string>
@@ -175,5 +176,6 @@
     <string name="notification_auto_backup_failed">Automatic backup failed</string>
     <string name="error_no_external_storage">Failed to obtain permissions to access the external storage.</string>
     <string name="error_no_old_backup_files_deleted">But failed to delete old backup files!</string>
-    <string name="notification_auto_backup_file_count">Total backups: %1$s.</string>
+    <string name="notification_auto_backup_next_detail">%1$s.\nTotal backups: %2$s.</string>
+    <string name="notification_auto_backup_next">Next backup: %1$s.</string>
 </resources>

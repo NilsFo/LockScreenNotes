@@ -54,8 +54,9 @@ public class LinedEditText extends EditText {
 		int line_height = getLineHeight();
 		int count = height / line_height;
 
-		if (getLineCount() > count)
+		if (getLineCount() > count) {
 			count = getLineCount();//for long text with scrolling
+		}
 
 		Rect r = mRect;
 		Paint paint = mPaint;

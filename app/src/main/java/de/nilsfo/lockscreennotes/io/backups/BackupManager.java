@@ -28,7 +28,7 @@ import static de.nilsfo.lockscreennotes.io.backups.NoteJSONUtils.VERSION_NOT_AVA
 
 public class BackupManager {
 
-	public static final int AUTO_DELETE_MAX_FILE_COUNT = 10;
+	public static final int AUTO_DELETE_MAX_FILE_COUNT = 20;
 
 	private Context context;
 	private FileManager manager;
