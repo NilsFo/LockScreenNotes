@@ -12,6 +12,7 @@ import java.util.Arrays;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
 import timber.log.Timber;
 
+@Deprecated
 public class GeneralWidget extends AppWidgetProvider {
 
 	@Override

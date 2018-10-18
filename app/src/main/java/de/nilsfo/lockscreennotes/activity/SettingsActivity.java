@@ -184,19 +184,23 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			bindPreferenceSummaryToValue(findPreference("prefs_homescreen_lines"), R.string.prefs_homescreen_lines_summary);
 			bindPreferenceSummaryToValue(findPreference("prefs_action_bar_icon_scale"));
 
-			Preference resetTutorial = findPreference("prefs_reset_tutorial");
+			final Preference resetTutorial = findPreference("prefs_reset_tutorial");
 			resetTutorial.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
-					SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(preference.getContext()).edit();
-					editor.putBoolean("prefs_hide_tutorial", false).apply();
-					editor.putBoolean("prefs_ignore_tutorial_autosave", false).apply();
-					editor.apply();
-
-					Toast.makeText(preference.getContext(), R.string.prefs_reset_tutorial_success, Toast.LENGTH_LONG).show();
+					Context context = preference.getContext();
+					resetTutorial(context);
+					Toast.makeText(context, R.string.prefs_reset_tutorial_success, Toast.LENGTH_LONG).show();
 					return true;
 				}
 			});
+		}
+
+		private void resetTutorial(Context context) {
+			SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+			editor.putBoolean("prefs_hide_tutorial", false);
+			editor.putBoolean("prefs_ignore_tutorial_autosave", false);
+			editor.apply();
 		}
 	}
 

@@ -32,6 +32,8 @@ public class LockScreenNotes extends Application {
 	public static final int REQUEST_CODE_PERMISSION_STORAGE = 1;
 	public static final int REQUEST_CODE_INTENT_EXTERNAL_SEARCH = 2;
 	public static final int REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM = 3;
+	public static final int REQUEST_CODE_INTENT_OPEN_APP = 4;
+	public static final int REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE = 5;
 
 	public static boolean isDebugBuild() {
 		return BuildConfig.DEBUG;
@@ -60,6 +62,7 @@ public class LockScreenNotes extends Application {
 		PreferenceManager.setDefaultValues(this, R.xml.prefs_notifications, false);
 		PreferenceManager.setDefaultValues(this, R.xml.prefs_info, false);
 		PreferenceManager.setDefaultValues(this, R.xml.prefs_time, false);
+		PreferenceManager.setDefaultValues(this, R.xml.prefs_auto_backup, false);
 
 		Timber.i("Started the app. Locale used: " + locale.getISO3Country() + " - " + locale.getCountry() + " - " + locale.getDisplayLanguage() + " - " + locale.getDisplayCountry());
 		int currentVer = VersionManager.getCurrentVersion(this);

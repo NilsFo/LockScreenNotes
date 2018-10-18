@@ -222,7 +222,8 @@ public class MainActivity extends NotesActivity implements Observer {
 		setShowNotifications(false);
 
 		Intent intent = new Intent(this, EditNoteActivity.class);
-		intent.putExtra(EditNoteActivity.NOTE_ACTIVITY_NOTE_ID, note.getDatabaseID());
+		intent.putExtra(EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID, note.getDatabaseID());
+		intent.putExtra(EditNoteActivity.EXTRA_ACTIVITY_STANDALONE, false);
 		startActivity(intent);
 	}
 
@@ -232,23 +233,23 @@ public class MainActivity extends NotesActivity implements Observer {
 			return;
 		}
 
-		new AlertDialog.Builder(this)
-				.setTitle(R.string.deleteall_dialog_title)
-				.setMessage(R.string.deleteall_dialog_text)
-				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						for (Note n : Note.getAllNotesFromDB(databaseAdapter)) {
-							deleteNote(n.getDatabaseID());
-						}
-					}
-				})
-				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.show();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.deleteall_dialog_title);
+		builder.setMessage(R.string.deleteall_dialog_text);
+		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				for (Note n : Note.getAllNotesFromDB(databaseAdapter)) {
+					deleteNote(n.getDatabaseID());
+				}
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.setIcon(R.drawable.baseline_warning_black_48);
+		builder.show();
 	}
 
 	private void requestDeleteAllDisabled() {
@@ -272,31 +273,23 @@ public class MainActivity extends NotesActivity implements Observer {
 			return;
 		}
 
-		new AlertDialog.Builder(this)
-				.setTitle(R.string.action_delete_all)
-				.setMessage(getString(R.string.deleteall_disabled_dialog_text, disabledCount, allCount))
-				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						//for (int i = 0; i < noteAdapter.getCount(); i++) {
-						//	Note n = noteAdapter.getItem(i);
-						//	Timber.i("Found a note in the adapter!" + n);
-						//	if (n != null && !n.isEnabled()) {
-						//		deleteNote(n.getDatabaseID());
-						//		Timber.i("Disabled deletion request of note with ID " + n.getDatabaseID());
-						//	}
-						//}
-						for (Note n : disabledList) {
-							deleteNote(n.getDatabaseID());
-						}
-					}
-				})
-				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.show();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_delete_all);
+		builder.setMessage(getString(R.string.deleteall_disabled_dialog_text, disabledCount, allCount));
+		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				for (Note n : disabledList) {
+					deleteNote(n.getDatabaseID());
+				}
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.setIcon(R.drawable.baseline_warning_black_48);
+		builder.show();
 	}
 
 	private void requestDisableAll() {
@@ -595,8 +588,9 @@ public class MainActivity extends NotesActivity implements Observer {
 		}
 
 		Timber.i("Mainactivity: onPause() [Show notifications? " + isShowNotifications() + "]");
-		if (isShowNotifications())
+		if (isShowNotifications()) {
 			new NotesNotificationManager(this).showNoteNotifications();
+		}
 	}
 
 	@Override

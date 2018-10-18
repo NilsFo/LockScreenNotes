@@ -77,7 +77,8 @@ public class NotificationChannelManager {
 			notificationManager.createNotificationChannel(channelNotesMedium);
 			notificationManager.createNotificationChannel(channelNotesHigh);
 
-			//Other channels
+			//Miscellaneous channel group:
+			//Automatic backups channel:
 			NotificationChannel channelAutoBackups = new NotificationChannel(CHANNEL_ID_AUTO_BACKUP_CHANNEL, context.getString(R.string.info_channel_auto_backup_name), NotificationManager.IMPORTANCE_LOW);
 			channelAutoBackups.setImportance(NotificationManager.IMPORTANCE_LOW);
 			channelAutoBackups.setDescription(context.getString(R.string.info_channel_auto_backup_description));

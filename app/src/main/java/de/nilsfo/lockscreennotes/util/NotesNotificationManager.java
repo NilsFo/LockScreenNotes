@@ -19,7 +19,9 @@ import java.util.Date;
 import java.util.HashMap;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
+import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
+import de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseURLActivity;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver;
@@ -28,6 +30,8 @@ import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
+import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
+import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
 import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
 
 /**
@@ -43,6 +47,10 @@ public class NotesNotificationManager {
 	public static final String PREFERENCE_HIGH_PRIORITY_NOTE = "prefs_high_priority_note";
 	public static final String PREFERENCE_REVERSE_ORDERING = "prefs_reverse_displayed_notifications";
 	public static final String INTENT_EXTRA_NOTE_ID = LockScreenNotes.APP_TAG + "notification_id";
+
+	public static final int REQUEST_CODE_INTENT_OPEN_APP_DYNAMIC_BASE = LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP * 10000;
+	public static final int REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE_DYNAMIC_BASE = LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE * 10000;
+
 	@Deprecated
 	public static final String INTENT_EXTRA_DELETE = LockScreenNotes.APP_TAG + "delete_mode";
 
@@ -117,9 +125,6 @@ public class NotesNotificationManager {
 		String text = "";
 		String bigtext = "";
 		if (hasOnlyOneNoteNotification()) {
-			//Note note = notesList.get(0);
-			//text = note.getTextPreview(NOTE_PREVIEW_SIZE);
-			//bigtext = note.getText();
 			displayMultipleNoteNotifications();
 			return;
 		} else {
@@ -132,6 +137,8 @@ public class NotesNotificationManager {
 				displayAndroid7SummaryNoteNotifications();
 				return;
 			}
+
+			//Version 6 or lower: Summarized, single notification that displays all notes in a single notification!
 
 			text = String.format(context.getString(R.string.notification_multiple_notes), String.valueOf(getNoteNotificationCount()));
 			builder.setNumber(getNoteNotificationCount());
@@ -146,7 +153,6 @@ public class NotesNotificationManager {
 		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigtext));
 		builder.setDeleteIntent(createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
-		//builder.addAction(R.drawable.ic_delete_black_36dp, context.getString(R.string.delete), createOnNoteDeleteIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
 
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -203,9 +209,7 @@ public class NotesNotificationManager {
 			builder.setWhen(n.getTimestamp());
 
 			int id = n.getNotificationID();
-			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent(id - NOTES_NOTIFICATION_ID_OFFSET));
-			//builder.addAction(R.drawable.ic_delete_black_36dp, context.getString(R.string.delete), createOnNoteDeleteIntent(id - NOTES_NOTIFICATION_ID_OFFSET));
-			builder.setDeleteIntent(createOnNoteDismissIntent((int) n.getDatabaseID()));
+			applyActionsToIndividualNote(builder, n);
 			map.put(id, builder);
 		}
 		return map;
@@ -230,16 +234,8 @@ public class NotesNotificationManager {
 			builder.setContentText(note.getTextPreview());
 			builder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.getText()));
 			builder.setWhen(note.getTimestamp());
-			builder.setDeleteIntent(createOnNoteDismissIntent((int) note.getDatabaseID()));
-			//builder.setSortKey(noteIndex);
 
-			//NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-			//inboxStyle.setBigContentTitle(noteIndex);
-			//inboxStyle.addLine(noteText);
-			//builder.setStyle(inboxStyle);
-
-			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent((int) note.getDatabaseID()));
-			//builder.addAction(R.drawable.ic_delete_black_36dp, context.getString(R.string.delete), createOnNoteDeleteIntent((int) note.getDatabaseID()));
+			applyActionsToIndividualNote(builder, note);
 			manager.notify(note.getNotificationID(), builder.build());
 		}
 
@@ -248,8 +244,6 @@ public class NotesNotificationManager {
 		builder.setGroupSummary(true);
 		builder.setShowWhen(false);
 		builder.setContentText(context.getString(R.string.app_name));
-		//builder.setContentTitle(notificationTitle);
-		//builder.setContentInfo(notificationTitle);
 		if (!hasOnlyOneNoteNotification()) {
 			builder.setSubText(context.getString(R.string.notification_multiple_notes, String.valueOf(notesList.size())));
 		}
@@ -261,11 +255,37 @@ public class NotesNotificationManager {
 		manager.notify(DEFAULT_NOTIFICATION_ID, notification);
 	}
 
+	private void applyActionsToIndividualNote(NotificationCompat.Builder builder, Note note) {
+		builder.setDeleteIntent(createOnNoteDismissIntent((int) note.getDatabaseID()));
+		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent((int) note.getDatabaseID()));
+
+		URLUtils utils = new URLUtils(context);
+		String text = note.getText();
+		boolean includeBrowse = false;
+		if (utils.containsSingleURL(text)) {
+			includeBrowse = true;
+			builder.addAction(R.drawable.baseline_open_in_browser_black_24, context.getString(R.string.action_browse), createOnNoteBrowseURLIntent((int) note.getDatabaseID()));
+		}
+		builder.setContentIntent(getIntentToNote(note));
+
+		Timber.i("Setting up notification actions for note ID " + note.getDatabaseID() + " (" + note.getTextPreview() + "): OnClick: true. Disable: true. Browse: " + includeBrowse);
+	}
+
 	private PendingIntent createOnNoteDismissIntent(int notificationId) {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
 		Timber.i("Creating a dismiss intent. ID: " + notificationId);
-		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
+		return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+
+	private PendingIntent createOnNoteBrowseURLIntent(int notificationId) {
+		Intent intent = new Intent(context, NotificationBrowseURLActivity.class);
+		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		Timber.i("Creating a URL intent. ID: " + notificationId);
+		return PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	@Deprecated
@@ -273,7 +293,7 @@ public class NotesNotificationManager {
 		Intent intent = new Intent(context, NotificationDeleteReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
 		Timber.i("Creating a delete intent. ID: " + notificationId);
-		return PendingIntent.getBroadcast(context, notificationId, intent, 0);
+		return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	private NotificationCompat.Builder getNotesBuilder() {
@@ -312,7 +332,22 @@ public class NotesNotificationManager {
 	private PendingIntent getIntentToMainActivity() {
 		Intent intent = new Intent(context, MainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		return PendingIntent.getActivity(context, 0, intent, 0);
+		return PendingIntent.getActivity(context, REQUEST_CODE_INTENT_OPEN_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+
+	private PendingIntent getIntentToNote(Note note) {
+		Intent intent = new Intent(context, EditNoteActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.putExtra(EXTRA_NOTE_ACTIVITY_NOTE_ID, note.getDatabaseID());
+		intent.putExtra(EditNoteActivity.EXTRA_ACTIVITY_STANDALONE, true);
+
+		int requestCode = (int) (REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE_DYNAMIC_BASE + note.getDatabaseID());
+		//return TaskStackBuilder.create(context)
+		//		// add all of DetailsActivity's parents to the stack,
+		//		// followed by DetailsActivity itself
+		//		.addNextIntentWithParentStack(intent)
+		//		.getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	public void displayNotificationAutomaticBackup(boolean success, String contentText) {

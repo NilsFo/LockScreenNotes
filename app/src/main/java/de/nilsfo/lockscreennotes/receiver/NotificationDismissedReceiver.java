@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;

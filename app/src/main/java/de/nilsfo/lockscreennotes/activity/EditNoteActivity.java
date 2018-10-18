@@ -28,26 +28,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.URLUtils;
 import de.nilsfo.lockscreennotes.view.QRCodeView;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
+
 public class EditNoteActivity extends NotesActivity {
 
-	public static final String NOTE_ACTIVITY_NOTE_ID = "EditNoteActivity_note_id";
+	public static final String EXTRA_NOTE_ACTIVITY_NOTE_ID = LockScreenNotes.APP_TAG + "EditNoteActivity_note_id";
+	public static final String EXTRA_ACTIVITY_STANDALONE = LockScreenNotes.APP_TAG + "standalone";
+
 	public static final int QR_IMAGE_SIZE = 512;
 	public static final long ILLEGAL_NOTE_ID = -1;
-	//public static final String URL_REGEX = "(?:(?:https?|ftp|file):\\/\\/|www\\.|ftp\.)(?:\\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\\)|[-A-Z0-9+&@#\\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\\/%=~_|$])";
-	//private static final String URL_REGEX = "((?:https\\:\\/\\/)|(?:http\\:\\/\\/)|(?:www\\.))?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(?:\\??)[a-zA-Z0-9\\-\\._\\?\\,\\'\\/\\\\\\+&%\\$#\\=~]+)";
-	private static final String URL_REGEX = "(https?:\\/\\/)?([\\da-z\\.-]+\\.[a-z\\.]{2,6}|[\\d\\.]+)([\\/:?=&#]{1}[\\da-z\\.-]+)*[\\/\\?]?";
 	private Note myNote;
 	private boolean canceled;
+	private boolean standalone;
 	private DBAdapter databaseAdapter;
 	private EditText noteTF;
 
@@ -56,22 +57,35 @@ public class EditNoteActivity extends NotesActivity {
 		super.onCreate(savedInstanceState);
 		canceled = false;
 		setContentView(R.layout.activity_edit_note);
+		Bundle extras = getIntent().getExtras();
 		ActionBar bar = getSupportActionBar();
-		if (bar != null) bar.setDisplayHomeAsUpEnabled(true);
-
 		SharedPreferences preferencses = PreferenceManager.getDefaultSharedPreferences(this);
 
-		long id = getIntent().getExtras().getLong(NOTE_ACTIVITY_NOTE_ID, ILLEGAL_NOTE_ID);
-		if (id == ILLEGAL_NOTE_ID) {
+		if (extras == null) {
 			handleIllegalNote();
 			return;
+		}
+		long id = extras.getLong(EXTRA_NOTE_ACTIVITY_NOTE_ID, ILLEGAL_NOTE_ID);
+		standalone = extras.getBoolean(EXTRA_ACTIVITY_STANDALONE);
+
+		Timber.i("Requested EditNote Activity with note ID: " + id + ". Standalone call: " + standalone);
+		if (id == ILLEGAL_NOTE_ID) {
+			Timber.w("EditNote Activity argument was 'IllegalNoteID'!");
+			handleIllegalNote();
+			return;
+		}
+
+		if (bar != null && !standalone) {
+			bar.setDisplayHomeAsUpEnabled(true);
 		}
 
 		databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
 
-		myNote = Note.getNoteFromDB(id, databaseAdapter);
-		if (myNote == null) {
+		try {
+			myNote = Note.getNoteFromDB(id, databaseAdapter);
+		} catch (Exception e) {
+			Timber.w(e, "Failed to edit note ID: " + id + ". It is not in the DB.");
 			handleIllegalNote();
 			return;
 		}
@@ -79,6 +93,7 @@ public class EditNoteActivity extends NotesActivity {
 		setShowNotifications(true);
 		noteTF = (EditText) findViewById(R.id.enditNoteFullscreenTF);
 		noteTF.setText(myNote.getText());
+		Timber.i("Recieved this text from the DB: " + myNote.getText());
 
 		if (!preferencses.getBoolean("prefs_ignore_tutorial_autosave", false)) {
 			Timber.i("Displaying the auto-save tutorial now.");
@@ -107,22 +122,22 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void actionClear() {
-		new AlertDialog.Builder(this)
-				.setTitle(R.string.action_clear)
-				.setMessage(R.string.action_clear_confirm)
-				.setPositiveButton(R.string.action_clear, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						noteTF.setText("");
-						actionMoveToBottom();
-					}
-				})
-				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.show();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_clear);
+		builder.setMessage(R.string.action_clear_confirm);
+		builder.setPositiveButton(R.string.action_clear, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				noteTF.setText("");
+				actionMoveToBottom();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.setIcon(R.drawable.baseline_warning_black_48);
+		builder.show();
 	}
 
 	private void actionMoveToBottom() {
@@ -137,7 +152,11 @@ public class EditNoteActivity extends NotesActivity {
 
 	public synchronized void requestKeyBoard(View view) {
 		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+		if (imm != null) {
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+		} else {
+			Toast.makeText(this, R.string.error_keyboard_unavailable, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	private void actionShare() {
@@ -154,7 +173,12 @@ public class EditNoteActivity extends NotesActivity {
 
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		ClipData clip = ClipData.newPlainText(getString(R.string.app_name), text);
-		clipboard.setPrimaryClip(clip);
+		if (clipboard != null) {
+			clipboard.setPrimaryClip(clip);
+		} else {
+			Toast.makeText(this, R.string.error_clipboard_unavailable, Toast.LENGTH_LONG).show();
+			return;
+		}
 
 		Toast.makeText(this, R.string.action_copy_text_success, Toast.LENGTH_LONG).show();
 	}
@@ -172,8 +196,9 @@ public class EditNoteActivity extends NotesActivity {
 		if (!canceled) saveNote();
 		databaseAdapter.close();
 
-		if (isShowNotifications())
+		if (isShowNotifications()) {
 			new NotesNotificationManager(this).showNoteNotifications();
+		}
 	}
 
 	@Override
@@ -200,27 +225,28 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	public void actionCancelEdit() {
-		new AlertDialog.Builder(this)
-				.setTitle(R.string.action_cancel_edit)
-				.setMessage(R.string.action_cancel_edit_confirm)
-				.setPositiveButton(R.string.action_cancel_edit, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								canceled = true;
-								finish();
-							}
-						});
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_cancel_edit);
+		builder.setMessage(R.string.action_cancel_edit_confirm);
+		builder.setPositiveButton(R.string.action_cancel_edit, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						setShowNotifications(standalone);
+						canceled = true;
+						finish();
 					}
-				})
-				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.show();
+				});
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.setIcon(R.drawable.baseline_warning_black_48);
+		builder.show();
 	}
 
 	public void actionToQR() {
@@ -251,34 +277,10 @@ public class EditNoteActivity extends NotesActivity {
 		builder.show();
 	}
 
-	public ArrayList<String> getURLsInNote() {
-		Matcher m = applyRegexToNote(URL_REGEX);
-		if (m == null) {
-			return null;
-		}
-
-		ArrayList<String> list = new ArrayList<>();
-		while (m.find()) {
-			String match = m.group();
-			Timber.i("Found a match: " + m.group());
-
-			boolean add = true;
-			for (String s : list) {
-				if (s.equals(match)) {
-					add = false;
-				}
-			}
-
-			if (add) {
-				list.add(match);
-			}
-		}
-
-		return list;
-	}
-
 	public void actionOpenWeblinks() {
-		final ArrayList<String> list = getURLsInNote();
+		String text = String.valueOf(noteTF.getText());
+		final ArrayList<String> list = URLUtils.getURLRegexManager().findMatchesInText(text);
+
 		if (list == null) {
 			return;
 		}
@@ -289,7 +291,7 @@ public class EditNoteActivity extends NotesActivity {
 		}
 
 		if (list.size() == 1) {
-			browseURL(list.get(0));
+			new URLUtils(this).browseURL(list.get(0));
 			return;
 		}
 
@@ -324,7 +326,7 @@ public class EditNoteActivity extends NotesActivity {
 				for (int i = 0; i < list.size(); i++) {
 					if (sel.get(i)) {
 						String url = list.get(i);
-						browseURL(url);
+						new URLUtils(((AlertDialog) dialog).getContext()).browseURL(url);
 						Timber.i("Browsing URL '" + url + "'. " + (i + 1) + "/" + list.size());
 					}
 				}
@@ -334,33 +336,12 @@ public class EditNoteActivity extends NotesActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				for (String s : list) {
-					browseURL(s);
+					new URLUtils(((AlertDialog) dialog).getContext()).browseURL(s);
 				}
 			}
 		});
 
 		b.show();
-	}
-
-	private void browseURL(String url) {
-		if (!url.toLowerCase().startsWith("http://") && !url.toLowerCase().startsWith("https://")) {
-			url = "http://" + url;
-		}
-
-		Intent i = new Intent(Intent.ACTION_VIEW);
-		i.setData(Uri.parse(url));
-		startActivity(i);
-	}
-
-	private Matcher applyRegexToNote(String regex) {
-		String text = String.valueOf(noteTF.getText());
-		Timber.i("Applying Regex: " + regex);
-		Timber.i("Text to apply it to: " + text);
-
-		if (text == null || text.trim().equals("")) return null;
-
-		Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-		return p.matcher(text);
 	}
 
 	private void shareQRImage(Bitmap image) {
@@ -407,8 +388,14 @@ public class EditNoteActivity extends NotesActivity {
 		switch (item.getItemId()) {
 			// Respond to the action bar's Up/Home button
 			case android.R.id.home:
-				setShowNotifications(false);
-				NavUtils.navigateUpFromSameTask(this);
+				if (standalone) {
+					Intent intent = new Intent(this, MainActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					startActivity(intent);
+				} else {
+					setShowNotifications(false);
+					NavUtils.navigateUpFromSameTask(this);
+				}
 				return true;
 
 			case R.id.action_clear:
@@ -438,18 +425,24 @@ public class EditNoteActivity extends NotesActivity {
 			case R.id.action_open_weblinks:
 				actionOpenWeblinks();
 				return true;
+
+			default:
+				Timber.w("Unknown menu item pressed!");
+				Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
 	public void onBackPressed() {
-		setShowNotifications(false);
+		setShowNotifications(standalone);
 		super.onBackPressed();
 	}
 
 	private void handleIllegalNote() {
+		Timber.w("Needing to take care of illiegal note! Action taken: finish activity!");
 		Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		finish();
 	}
 
 	@Override
