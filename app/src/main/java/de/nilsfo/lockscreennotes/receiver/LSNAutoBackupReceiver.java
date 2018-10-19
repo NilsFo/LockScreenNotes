@@ -1,5 +1,6 @@
 package de.nilsfo.lockscreennotes.receiver;
 
+import android.app.AlarmManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -86,7 +87,11 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 
 					if (showNotification) {
 						LSNAlarmManager alarmManager = new LSNAlarmManager(context);
-						Date d = new Date(new Date().getTime()+alarmManager.getTimeUntilNextNewAutoBackup());
+
+						int days = Integer.valueOf(preferences.getString("pref_auto_backups_schedule_days", "3"));
+						days = Math.max(days, 1);
+						long interval = AlarmManager.INTERVAL_DAY * days;
+						Date d = new Date(new Date().getTime()+alarmManager.getTimeUntilNextNewAutoBackup()+interval);
 						String formatedDate = new TimeUtils(context).formatDateAbsolute(d, DateFormat.FULL);
 
 						String text =context.getString(R.string.notification_auto_backup_next,formatedDate);

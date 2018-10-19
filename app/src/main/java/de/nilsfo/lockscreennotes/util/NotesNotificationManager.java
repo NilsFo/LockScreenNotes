@@ -342,11 +342,6 @@ public class NotesNotificationManager {
 		intent.putExtra(EditNoteActivity.EXTRA_ACTIVITY_STANDALONE, true);
 
 		int requestCode = (int) (REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE_DYNAMIC_BASE + note.getDatabaseID());
-		//return TaskStackBuilder.create(context)
-		//		// add all of DetailsActivity's parents to the stack,
-		//		// followed by DetailsActivity itself
-		//		.addNextIntentWithParentStack(intent)
-		//		.getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT);
 		return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
