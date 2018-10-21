@@ -165,5 +165,13 @@
     <string name="notification_auto_backup_failed">Automatisches Backup fehlgeschlagen</string>
     <string name="error_no_external_storage">Die App hat keinen Zugriff auf den externen Speicher.</string>
     <string name="error_no_old_backup_files_deleted">Aber es konnten keine alten Backups gelöscht werden!</string>
-    <string name="notification_auto_backup_file_count">Gesamte Backups: %1$s.</string>
+    <string name="delete_dialog_content_multiple">Sollen diese %1$s Notizen wirklich gelöscht werden?</string>
+    <string name="notification_auto_backup_next_detail">%1$s\nBackups bisher angelegt: %2$s.</string>
+    <string name="notification_auto_backup_next">Nächstes Backup: %1$s.</string>
+    <string name="error_clipboard_unavailable">Fehler: Zwischenablage-Service ist auf diesem Gerät nicht verfügbar.</string>
+    <string name="error_keyboard_unavailable">Fehler: Virtuelle Tastatur ist auf diesem Gerät nicht verfügbar.</string>
+    <string name="action_browse">Öffnen</string>
+    <string name="action_shortcut_add">Neue Notiz</string>
+    <string name="action_shortcut_general_error">Diese Aktion ist nicht länger unterstützt.</string>
+    <string name="action_shortcut_add_long">Eine neue Notiz anlegen</string>
 </resources>

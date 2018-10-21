@@ -6,11 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
-import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.receiver.LSNAutoBackupReceiver;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import timber.log.Timber;
@@ -19,6 +17,7 @@ import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_AUTO
 
 public class LSNAlarmManager {
 
+	public static final int AUTO_BACKUP_SCHEDULE_HOUR = 3;
 	private Context context;
 	private AlarmManager alarmManager;
 
@@ -52,9 +51,9 @@ public class LSNAlarmManager {
 		Timber.i("Scheduling next alarm at " + triggerTime + ". That's: " + formatedDebugTimestamp);
 		Timber.i("Repeating every " + interval + "ms. That should be every " + days + " day(s).");
 
-		if (LockScreenNotes.isDebugBuild()) {
-			Toast.makeText(context, "Debug: Backup Scheduler set up for: " + formatedDebugTimestamp + ". Cycle days: " + days, Toast.LENGTH_LONG).show();
-		}
+		//if (LockScreenNotes.isDebugBuild()) {
+		//	Toast.makeText(context, "Debug: Backup Scheduler set up for: " + formatedDebugTimestamp + ". Cycle days: " + days, Toast.LENGTH_LONG).show();
+		//}
 
 		alarmManager.setInexactRepeating(AlarmManager.RTC, triggerTime, interval, intent);
 	}
@@ -68,11 +67,10 @@ public class LSNAlarmManager {
 	public long getTimeUntilNextNewAutoBackup() {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 1);
-		c.set(Calendar.HOUR_OF_DAY, 2);
+		c.set(Calendar.HOUR_OF_DAY, AUTO_BACKUP_SCHEDULE_HOUR);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		return (c.getTimeInMillis() - System.currentTimeMillis());
 	}
-
 }

@@ -176,14 +176,14 @@
     <string name="notification_auto_backup_failed">Automatic backup failed</string>
     <string name="error_no_external_storage">Failed to obtain permissions to access the external storage.</string>
     <string name="error_no_old_backup_files_deleted">But failed to delete old backup files!</string>
-    <string name="notification_auto_backup_next_detail">%1$s.\nTotal backups: %2$s.</string>
+    <string name="notification_auto_backup_next_detail">%1$s\nTotal backups: %2$s.</string>
     <string name="notification_auto_backup_next">Next backup: %1$s.</string>
     <string name="error_clipboard_unavailable">Error: Clipboard service not available on this device.</string>
     <string name="error_keyboard_unavailable">Error: Virtual keyboard not available on this device.</string>
     <string name="action_browse">Browse</string>
     <string name="action_shortcut_add">New note</string>
-    <string name="action_shortcut_add_id">add_new</string>
+    <string name="action_shortcut_add_id" translatable="false">add_new</string>
     <string name="action_shortcut_general_error">This action is no longer supported.</string>
     <string name="action_shortcut_add_long">Create a new note</string>
-    <string name="lipsum">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</string>
+    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</string>
 </resources>

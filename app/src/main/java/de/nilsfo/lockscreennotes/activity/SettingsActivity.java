@@ -352,9 +352,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				public boolean onPreferenceClick(Preference preference) {
 					ClipboardManager clipboard = (ClipboardManager) preference.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
 					ClipData clip = ClipData.newPlainText(getString(R.string.app_name), getString(R.string.const_github_update_feed_url));
-					clipboard.setPrimaryClip(clip);
-					Toast.makeText(preference.getContext(), R.string.action_github_url_success, Toast.LENGTH_LONG).show();
-
+					if (clipboard != null) {
+						clipboard.setPrimaryClip(clip);
+						Toast.makeText(preference.getContext(), R.string.action_github_url_success, Toast.LENGTH_LONG).show();
+					}else{
+						Toast.makeText(preference.getContext(),R.string.error_clipboard_unavailable,Toast.LENGTH_LONG).show();
+					}
 					return true;
 				}
 			});

@@ -21,7 +21,7 @@
             />
 
         <EditTextPreference
-            android:defaultValue="3"
+            android:defaultValue="4"
             android:dependency="pref_auto_backups_enabled"
             android:inputType="number"
             android:singleLine="true"
