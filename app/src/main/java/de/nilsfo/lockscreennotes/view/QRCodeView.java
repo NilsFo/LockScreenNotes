@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.support.v4.os.AsyncTaskCompat;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,7 +48,8 @@ public class QRCodeView extends LinearLayout {
 		addView(bar);
 
 		QRTask task = new QRTask(textToDisplay, size);
-		AsyncTaskCompat.executeParallel(task);
+		task.execute();
+		//AsyncTaskCompat.executeParallel(task);
 	}
 
 	public void displayQRImage(Bitmap map) {
@@ -78,16 +78,16 @@ public class QRCodeView extends LinearLayout {
 		return qrImage != null;
 	}
 
-	public Bitmap getQrImage() {
-		return qrImage;
-	}
-
 	public void addListener(QRFinishListener listener) {
 		listeners.add(listener);
 	}
 
 	public boolean removeListener(QRFinishListener listener) {
 		return listeners.remove(listener);
+	}
+
+	public Bitmap getQrImage() {
+		return qrImage;
 	}
 
 	public interface QRFinishListener {
@@ -99,7 +99,7 @@ public class QRCodeView extends LinearLayout {
 		private String text;
 		private int size;
 
-		public QRTask(String text, int size) {
+		public QRTask(@org.jetbrains.annotations.NotNull String text, int size) {
 			if (text.equals("")) {
 				text = " ";
 			}
@@ -117,6 +117,13 @@ public class QRCodeView extends LinearLayout {
 			try {
 				Timber.i("QR - Preparations");
 				BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, size, size);
+
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
 				Timber.i("QR - Encoding finished");
 				int width = bitMatrix.getWidth();
 				int height = bitMatrix.getHeight();
