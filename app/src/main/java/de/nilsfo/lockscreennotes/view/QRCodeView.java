@@ -3,21 +3,16 @@ package de.nilsfo.lockscreennotes.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-
 import java.util.ArrayList;
 
+import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
+import de.nilsfo.lockscreennotes.concurrent.QRTask;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
@@ -25,11 +20,15 @@ import timber.log.Timber;
  * Created by Nils on 15.05.2017.
  */
 
-public class QRCodeView extends LinearLayout {
+public class QRCodeView extends LinearLayout implements QRTask.QRTaskListener {
 
 	protected ArrayList<QRFinishListener> listeners;
 	private ProgressBar bar;
 	private Bitmap qrImage;
+
+	public QRCodeView(Context context) {
+		this(context, "", EditNoteActivity.QR_IMAGE_SIZE);
+	}
 
 	public QRCodeView(Context context, String textToDisplay, int size) {
 		super(context);
@@ -48,6 +47,7 @@ public class QRCodeView extends LinearLayout {
 		addView(bar);
 
 		QRTask task = new QRTask(textToDisplay, size);
+		task.addListener(this);
 		task.execute();
 		//AsyncTaskCompat.executeParallel(task);
 	}
@@ -86,6 +86,16 @@ public class QRCodeView extends LinearLayout {
 		return listeners.remove(listener);
 	}
 
+	@Override
+	public void onSuccess(Bitmap image) {
+		displayQRImage(image);
+	}
+
+	@Override
+	public void onFailure(int reason) {
+		Toast.makeText(getContext(), reason, Toast.LENGTH_LONG).show();
+	}
+
 	public Bitmap getQrImage() {
 		return qrImage;
 	}
@@ -93,68 +103,4 @@ public class QRCodeView extends LinearLayout {
 	public interface QRFinishListener {
 		public void onFinished(Bitmap image);
 	}
-
-	private class QRTask extends AsyncTask<Void, Integer, Bitmap> {
-
-		private String text;
-		private int size;
-
-		public QRTask(@org.jetbrains.annotations.NotNull String text, int size) {
-			if (text.equals("")) {
-				text = " ";
-			}
-
-			this.text = text;
-			this.size = size;
-		}
-
-		@Override
-		protected Bitmap doInBackground(Void... params) {
-			Timber.i("Convertion from '" + text + "' to Bitmap starts now.");
-			QRCodeWriter writer = new QRCodeWriter();
-			Bitmap bmp = null;
-
-			try {
-				Timber.i("QR - Preparations");
-				BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, size, size);
-
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-				Timber.i("QR - Encoding finished");
-				int width = bitMatrix.getWidth();
-				int height = bitMatrix.getHeight();
-				bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-				for (int x = 0; x < width; x++) {
-					for (int y = 0; y < height; y++) {
-						bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-					}
-				}
-				Timber.i("QR - Bitmatp available");
-
-			} catch (WriterException e) {
-				e.printStackTrace();
-				Timber.e(e, "Error while creating the QR code for " + text);
-				return null;
-			}
-			return bmp;
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap map) {
-			Timber.i("Finished QR Bitmap creation!");
-
-			if (map != null) {
-				Timber.i("Parsing into Dialog...");
-				displayQRImage(map);
-			} else {
-				Timber.w("QR Bitmap creation failed!");
-				Toast.makeText(getContext(), R.string.error_qr_generation_failed, Toast.LENGTH_LONG).show();
-			}
-		}
-	}
-
 }
