@@ -114,6 +114,7 @@
     <string name="info_changelog_version">Changes in Version %1$s</string>
     <string name="action_full_changelog">Full changelog</string>
     <string name="prefs_reverse_displayed_notifications_tilte">Reverse order</string>
+    <string name="prefs_reverse_displayed_notifications_flavor_android7">When choosing this option, the timstamp of individual notes can no longer be displayed on your device.</string>
     <string name="action_open_weblinks">Open weblinks</string>
     <string name="error_no_weblings">No weblinks found.</string>
     <string name="info_choose_url">Select URL(s):</string>

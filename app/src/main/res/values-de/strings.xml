@@ -23,7 +23,7 @@
     <string name="error_invalid_value">Konnte nicht mit diesem Wert umgehen. Wird zurückgesetzt.</string>
     <string name="home_screen_lines_too_small">Die angegebene Zahl der Linien ist zu klein.</string>
     <string name="note_position">#%1$s</string>
-    <string name="notification_multiple_notes">%1$s Notizen!</string>
+    <string name="notification_multiple_notes">%1$s Notizen</string>
     <string name="notes_notification_ticker">Sperrbildschirm-Notiz wurde erstellt</string>
     <string name="position">Position</string>
     <string name="pref_settings_general">Allgemein</string>
@@ -71,7 +71,7 @@
     <string name="error_note_save_failed">Die Notiz konnte nicht gespeichert werden.</string>
     <string name="info_note_deleted">Notiz gelöscht: %1$s</string>
     <string name="info_note_recovered">Notiz wiederhergestellt: %1$s</string>
-    <string name="pref_date_and_time">Zeit &amp; Datum</string>
+    <string name="pref_date_and_time">Zeit und Datum</string>
     <string name="pref_header_general">Allgemein</string>
     <string name="pref_heder_info">Über</string>
     <string name="pref_notifications">Benachrichtigungen</string>
@@ -93,7 +93,7 @@
     <string name="settings_high_priority_note_flavor">Benachrichtigungen werden hoch in der Liste angezeigt.</string>
     <string name="settings_high_priority_note_title">Hohe Priorität</string>
     <string name="error_qr_generation_failed">QR-Code konnte nicht erstellt werden!</string>
-    <string name="action_feedback">Bewerten &amp; Feedback</string>
+    <string name="action_feedback">Bewerten und Feedback</string>
     <string name="action_full_changelog">Vollständiger Changelog</string>
     <string name="error_no_update_highlight">Kein Highlight-Feature gefunden.</string>
     <string name="error_qr_not_rendered">Der QR Code wurde noch nicht erstellt!</string>
@@ -113,7 +113,7 @@
     <string name="action_dismiss_all">Alle deaktivieren</string>
     <string name="last_edited">Zuletzt bearbeitet: %1$s</string>
     <string name="share_via">Teilen mit</string>
-    <string name="action_backup">Backups &amp; Wiederherstellen</string>
+    <string name="action_backup">Backups und Wiederherstellen</string>
     <string name="action_create_backup">Backup erstellen</string>
     <string name="action_import_backup">Backup importieren</string>
     <string name="action_import">Importieren</string>
@@ -174,4 +174,5 @@
     <string name="action_shortcut_add">Neue Notiz</string>
     <string name="action_shortcut_general_error">Diese Aktion ist nicht länger unterstützt.</string>
     <string name="action_shortcut_add_long">Eine neue Notiz anlegen</string>
+    <string name="prefs_reverse_displayed_notifications_flavor_android7">Wenn Sie diese Option wählen, kann der Erstellzeitpunkt individueller Notizen auf Ihrem gerät nicht mehr angezeigt werden.</string>
 </resources>

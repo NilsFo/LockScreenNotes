@@ -109,17 +109,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		if (isShowNotifications())
-			new NotesNotificationManager(this).showNoteNotifications();
-	}
-
-	@Override
 	protected void onResume() {
 		super.onResume();
 		new NotesNotificationManager(this).hideAllNotifications();
 		setShowNotifications(true);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (isShowNotifications())
+			new NotesNotificationManager(this).showNoteNotifications();
 	}
 
 	private void setupActionBar() {
@@ -130,12 +130,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 	}
 
-	public boolean isShowNotifications() {
-		return showNotifications;
-	}
-
-	public void setShowNotifications(boolean showNotifications) {
-		this.showNotifications = showNotifications;
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				super.onBackPressed();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	/**
@@ -164,13 +165,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				|| InfoAndAboutPreferenceFragment.class.getName().equals(fragmentName);
 	}
 
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				super.onBackPressed();
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
+	public boolean isShowNotifications() {
+		return showNotifications;
+	}
+
+	public void setShowNotifications(boolean showNotifications) {
+		this.showNotifications = showNotifications;
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -212,6 +212,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			addPreferencesFromResource(R.xml.prefs_notifications);
 			setHasOptionsMenu(true);
 
+			Preference reversePreference = findPreference("prefs_reverse_displayed_notifications");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+				reversePreference.setSummary(R.string.prefs_reverse_displayed_notifications_flavor_android7);
+				return;
+			}
+
 			findPreference("prefs_system_notifications").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
@@ -241,6 +247,25 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	public static class AutoBackupPreferenceFragment extends PreferenceFragment {
 
 		@Override
+		public void onPause() {
+			super.onPause();
+			Timber.i("Stopping the Backup preference activity. Let's see if a alarm will be scheduled...");
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+			LSNAlarmManager manager = new LSNAlarmManager(getActivity());
+			if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
+				//if (scheduleChanged) {
+				Timber.i("Changes detected. Requesting a new backup timer!");
+				manager.cancelNextAutoBackup();
+				manager.scheduleNextAutoBackup();
+				//} else {
+				//	Timber.i("Backups are enabled, but the schedule didn't change. So no new schedule is requested.");
+				//}
+			} else {
+				manager.cancelNextAutoBackup();
+				Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
+			}
+		}		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_auto_backup);
@@ -274,26 +299,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			schedulePreference.setSummary(getActivity().getString(R.string.pref_auto_backups_schedule_days_summary, preferences.getString("pref_auto_backups_schedule_days", "3")));
 		}
 
-		@Override
-		public void onPause() {
-			super.onPause();
-			Timber.i("Stopping the Backup preference activity. Let's see if a alarm will be scheduled...");
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-			LSNAlarmManager manager = new LSNAlarmManager(getActivity());
-			if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
-				//if (scheduleChanged) {
-				Timber.i("Changes detected. Requesting a new backup timer!");
-				manager.cancelNextAutoBackup();
-				manager.scheduleNextAutoBackup();
-				//} else {
-				//	Timber.i("Backups are enabled, but the schedule didn't change. So no new schedule is requested.");
-				//}
-			} else {
-				manager.cancelNextAutoBackup();
-				Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
-			}
-		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -355,8 +361,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 					if (clipboard != null) {
 						clipboard.setPrimaryClip(clip);
 						Toast.makeText(preference.getContext(), R.string.action_github_url_success, Toast.LENGTH_LONG).show();
-					}else{
-						Toast.makeText(preference.getContext(),R.string.error_clipboard_unavailable,Toast.LENGTH_LONG).show();
+					} else {
+						Toast.makeText(preference.getContext(), R.string.error_clipboard_unavailable, Toast.LENGTH_LONG).show();
 					}
 					return true;
 				}

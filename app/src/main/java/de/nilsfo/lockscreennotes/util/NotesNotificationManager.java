@@ -64,6 +64,7 @@ public class NotesNotificationManager {
 	public static final int INTENT_EXTRA_NOTE_ID_NONE = -1;
 	private Context context;
 	private ArrayList<Note> notesList;
+	private boolean reversed;
 	private NotificationChannelManager channelManager;
 
 	public NotesNotificationManager(Context context) {
@@ -88,10 +89,14 @@ public class NotesNotificationManager {
 		}
 		databaseAdapter.close();
 
-		Timber.i("Notes to display: " + Arrays.toString(notesList.toArray()));
 		Collections.sort(notesList);
-		if (sharedPreferences.getBoolean(PREFERENCE_REVERSE_ORDERING, false)) {
+		Timber.i("Sorted Notes to display: " + Arrays.toString(notesList.toArray()));
+
+		reversed = sharedPreferences.getBoolean(PREFERENCE_REVERSE_ORDERING, false);
+		Timber.i("Reversed notes preference: " + reversed);
+		if (reversed) {
 			Collections.reverse(notesList);
+			Timber.i("Reversed note contents: " + Arrays.toString(notesList.toArray()));
 		}
 
 		Timber.i("Preparing Channels...");
@@ -105,10 +110,6 @@ public class NotesNotificationManager {
 
 	public boolean hasOnlyOneNoteNotification() {
 		return getNoteNotificationCount() == 1;
-	}
-
-	public int getNoteNotificationCount() {
-		return notesList.size();
 	}
 
 	public void showNoteNotifications() {
@@ -175,7 +176,13 @@ public class NotesNotificationManager {
 		HashMap<Integer, NotificationCompat.Builder> map = generateSeparateNoteNotifications();
 		for (int id : map.keySet()) {
 			NotificationCompat.Builder builder = map.get(id);
-			manager.notify(id, builder.build());
+			Timber.i("Attempting to display a notification via builder from ID " + id);
+
+			if (builder != null) {
+				manager.notify(id, builder.build());
+			} else {
+				Timber.w("There was no builder for ID " + id);
+			}
 		}
 	}
 
@@ -222,7 +229,7 @@ public class NotesNotificationManager {
 			return;
 		}
 
-		ArrayList<Note> tempList = new ArrayList<Note>(notesList);
+		ArrayList<Note> tempList = new ArrayList<>(notesList);
 		Collections.reverse(tempList);
 		for (int i = 0; i < tempList.size(); i++) {
 			Note note = tempList.get(i);
@@ -233,7 +240,10 @@ public class NotesNotificationManager {
 			builder.setContentTitle(noteIndex);
 			builder.setContentText(note.getTextPreview());
 			builder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.getText()));
-			builder.setWhen(note.getTimestamp());
+
+			if (!reversed) {
+				builder.setWhen(note.getTimestamp());
+			}
 
 			applyActionsToIndividualNote(builder, note);
 			manager.notify(note.getNotificationID(), builder.build());
@@ -296,30 +306,6 @@ public class NotesNotificationManager {
 		return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
-	private NotificationCompat.Builder getNotesBuilder() {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		//builder.setDefaults(Notification.DEFAULT_ALL);
-		builder.setSmallIcon(R.drawable.notification_ticker_bar);
-		builder.setTicker(context.getString(R.string.notes_notification_ticker));
-		builder.setAutoCancel(true);
-		builder.setOngoing(!sharedPreferences.getBoolean("prefs_dismissable_notes", false));
-
-		int prioity = getNoteNotificationPriority();
-		builder.setPriority(prioity);
-		builder.setChannelId(channelManager.getNoteChannel(prioity));
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			builder.setColor(context.getColor(R.color.colorNotificationLight));
-		} else {
-			builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
-			builder.setContentTitle(context.getString(R.string.app_name));
-		}
-
-		builder.setContentIntent(getIntentToMainActivity());
-		return builder;
-	}
-
 	private NotificationCompat.Builder getGenericNotificationBuilder(String tickerMessage, boolean ongoing, int priority, String channelID) {
 		NotificationCompat.Builder builder = getNotesBuilder();
 		builder.setTicker(tickerMessage);
@@ -327,12 +313,6 @@ public class NotesNotificationManager {
 		builder.setPriority(priority);
 		builder.setChannelId(channelID);
 		return builder;
-	}
-
-	private PendingIntent getIntentToMainActivity() {
-		Intent intent = new Intent(context, MainActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		return PendingIntent.getActivity(context, REQUEST_CODE_INTENT_OPEN_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	private PendingIntent getIntentToNote(Note note) {
@@ -375,17 +355,6 @@ public class NotesNotificationManager {
 		manager.notify(NOTIFICATION_STATIC_ID_AUTOMATIC_BACKUP, builder.build());
 	}
 
-	private int getNoteNotificationPriority() {
-		int priority = NotificationCompat.PRIORITY_DEFAULT;
-		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_LOW_PRIORITY_NOTE, false)) {
-			priority = NotificationCompat.PRIORITY_MIN;
-		}
-		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_HIGH_PRIORITY_NOTE, false)) {
-			priority = NotificationCompat.PRIORITY_MAX;
-		}
-		return priority;
-	}
-
 	public void hideAllNotifications() {
 		Timber.i("NotesNotificationManager: Request to hide notifications received!");
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -396,5 +365,54 @@ public class NotesNotificationManager {
 		}
 
 		manager.cancelAll();
+	}
+
+	public boolean isReversed() {
+		return reversed;
+	}
+
+	public int getNoteNotificationCount() {
+		return notesList.size();
+	}
+
+	private NotificationCompat.Builder getNotesBuilder() {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+		//builder.setDefaults(Notification.DEFAULT_ALL);
+		builder.setSmallIcon(R.drawable.notification_ticker_bar);
+		builder.setTicker(context.getString(R.string.notes_notification_ticker));
+		builder.setAutoCancel(true);
+		builder.setOngoing(!sharedPreferences.getBoolean("prefs_dismissable_notes", false));
+
+		int prioity = getNoteNotificationPriority();
+		builder.setPriority(prioity);
+		builder.setChannelId(channelManager.getNoteChannel(prioity));
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			builder.setColor(context.getColor(R.color.colorNotificationLight));
+		} else {
+			builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
+			builder.setContentTitle(context.getString(R.string.app_name));
+		}
+
+		builder.setContentIntent(getIntentToMainActivity());
+		return builder;
+	}
+
+	private PendingIntent getIntentToMainActivity() {
+		Intent intent = new Intent(context, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		return PendingIntent.getActivity(context, REQUEST_CODE_INTENT_OPEN_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+
+	private int getNoteNotificationPriority() {
+		int priority = NotificationCompat.PRIORITY_DEFAULT;
+		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_LOW_PRIORITY_NOTE, false)) {
+			priority = NotificationCompat.PRIORITY_MIN;
+		}
+		if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFERENCE_HIGH_PRIORITY_NOTE, false)) {
+			priority = NotificationCompat.PRIORITY_MAX;
+		}
+		return priority;
 	}
 }
