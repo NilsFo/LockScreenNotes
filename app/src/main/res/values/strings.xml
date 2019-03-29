@@ -77,9 +77,9 @@
     <string name="prefs_time_relative_summary">If enabled dates will be displayed relative to the current time (e.g. \'5 minutes ago\').\nOtherwise absolute dates will be used (e.g. \'May 20, 2017\').</string>
     <string name="prefs_time_locale_default_value" translatable="false">default locale</string>
     <string name="pref_credits" translatable="false">Credits</string>
-    <string name="prefs_credits_font_awesome" translatable="false"><i>Font awesome</i> Icon Pack by Dave Gandy</string>
     <string name="prefs_credits_text_drawable" translatable="false"><i>Text Drawable</i> by Wireless Designs, LLC</string>
     <string name="prefs_credits_timber" translatable="false"><i>Timber</i> by Jake Wharton</string>
+    <string name="prefs_credits_leakcanary" translatable="false"><i>LeakCanary</i> by Square, Inc.</string>
     <string name="action_cancel_edit">Cancel edit</string>
     <string name="action_cancel_edit_confirm">Are you sure you want to cancel editing this note?\n\nAll unsaved changes will be lost.</string>
     <string name="action_delete_all_disabled">Delete all disabled</string>
@@ -97,8 +97,8 @@
     <string name="pref_view_on_play_store">View on Google Play</string>
     <string name="pref_share_app_summary">Share this app</string>
     <string name="pref_share_app_text">Check out the app %1$s on Google Play: %2$s</string>
-    <string name="prefs_credits_debug_db" translatable="false">Android Debug Database by Amit Shekhar</string>
-    <string name="prefs_credits_zxing" translatable="false">ZXing by Google Inc.</string>
+    <string name="prefs_credits_debug_db" translatable="false"><i>Android Debug Database</i> by Amit Shekhar</string>
+    <string name="prefs_credits_zxing" translatable="false"><i>ZXing</i> by Google, Inc.</string>
     <string name="action_to_qr_code">Display as QR Code</string>
     <string name="action_dismiss">Dismiss</string>
     <string name="pref_settings_display_style">Display style</string>

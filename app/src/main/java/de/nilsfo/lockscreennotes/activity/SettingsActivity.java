@@ -298,8 +298,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			});
 			schedulePreference.setSummary(getActivity().getString(R.string.pref_auto_backups_schedule_days_summary, preferences.getString("pref_auto_backups_schedule_days", "3")));
 		}
-
-
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -369,10 +367,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			});
 
 			bindPreferenceURLAsAction(findPreference("pref_view_on_github"), Uri.parse(getString(R.string.const_github_url)));
-			bindPreferenceURLAsAction(findPreference("prefs_credits_font_awesome"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_text_drawable"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_timber"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_debug_db"));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_zxing"));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_leakcanary"));
 			bindPreferenceURLAsAction(findPreference("pref_view_on_play_store"), Uri.parse(getString(R.string.const_google_play_url)));
 
 			findPreference("pref_share_app").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
