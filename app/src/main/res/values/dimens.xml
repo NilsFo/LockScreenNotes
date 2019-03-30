@@ -8,4 +8,8 @@
     <dimen name="activity_vertical_margin_double">32dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="widget_margin">8dp</dimen>
+
+    <dimen name="card_padding">4dp</dimen>
+    <dimen name="card_margin">3dp</dimen>
+    <dimen name="card_elevation">3dp</dimen>
 </resources>

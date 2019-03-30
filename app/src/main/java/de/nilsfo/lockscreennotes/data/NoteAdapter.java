@@ -27,12 +27,17 @@ import timber.log.Timber;
  * Created by Nils on 13.08.2016.
  */
 
+@Deprecated
 public class NoteAdapter extends ArrayAdapter<Note> {
+
+	//TODO Replace this all other, old adapters?
 
 	public static final String PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY = "prefs_allow_edit_note_activity";
 	public static final int DELETE_BT_SIZE = 36;
 	public static final int DELETE_BT_COLOR = Color.GRAY;
-	private static final int DEFAULT_MIN_LINES = 5;
+
+	@Deprecated
+	private static final int DEFAULT_MIN_LINES = 5; //TODO remove this from preferences
 
 	public NoteAdapter(Context context, int resource, List<Note> objects) {
 		super(context, resource, objects);
@@ -128,7 +133,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 				Context context = getContext();
 				if (context instanceof MainActivity) {
 					MainActivity activity = (MainActivity) context;
-					activity.requestDeleteNote(getItem(position));
+					activity.requestDeleteNote(getItem(position).getDatabaseID());
 				}
 			}
 		});
@@ -148,16 +153,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		return view;
 	}
 
-
-	private int getMinLines() {
-		String lines = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("prefs_homescreen_lines", String.valueOf(DEFAULT_MIN_LINES));
-		try {
-			return Integer.parseInt(lines);
-		} catch (NumberFormatException e) {
-			return DEFAULT_MIN_LINES;
-		}
-	}
-
 	private boolean requestEditNoteActivity(Note note) {
 		if (!isFullscreenEditMode()) {
 			Timber.i("A request was made to edit via fullscreen. But it was not enabled in the prefs_general.");
@@ -167,16 +162,8 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		Context context = getContext();
 		if (context instanceof MainActivity) {
 			MainActivity activity = (MainActivity) context;
-			activity.requestEditNote(note);
+			activity.requestEditNote(note.getDatabaseID());
 		}
-		return true;
-	}
-
-	public boolean isFullscreenEditMode() {
-		//boolean b = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY, true);
-		//Log.i(LOGTAG, "A check was made if its fullscreen edit mode. Result: " + b);
-		//return b;
-
 		return true;
 	}
 
@@ -189,6 +176,23 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 	private int getNoteTextColor(boolean enabled) {
 		if (enabled) return android.R.color.black;
 		return android.R.color.holo_red_dark;
+	}
+
+	private int getMinLines() {
+		String lines = PreferenceManager.getDefaultSharedPreferences(getContext()).getString("prefs_homescreen_lines", String.valueOf(DEFAULT_MIN_LINES));
+		try {
+			return Integer.parseInt(lines);
+		} catch (NumberFormatException e) {
+			return DEFAULT_MIN_LINES;
+		}
+	}
+
+	public boolean isFullscreenEditMode() {
+		//boolean b = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY, true);
+		//Log.i(LOGTAG, "A check was made if its fullscreen edit mode. Result: " + b);
+		//return b;
+
+		return true;
 	}
 
 }

@@ -34,15 +34,15 @@
             android:layout_height="match_parent"/>
     </ScrollView>
 
-    <ListView
-        android:id="@+id/notes_list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/notes_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/activity_notes_margin"
         android:layout_marginEnd="@dimen/activity_notes_margin"
         android:descendantFocusability="beforeDescendants"
         android:scrollbars="horizontal"
-        android:dividerHeight="1sp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:layout_editor_absoluteX="59dp"
         tools:layout_editor_absoluteY="224dp"/>
 

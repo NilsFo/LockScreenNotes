@@ -19,13 +19,15 @@ import timber.log.Timber;
 public class Note implements Comparable<Note> {
 
 	public static final int DEFAULT_PREVIEW_CHARS = 250;
+	public static final long DEFAULT_TIMESTAMP = 0;
+
 	private String text;
 	private boolean enabled;
 	private long timestamp;
 	private long databaseID;
 
 	public Note() {
-		this("", false, 0);
+		this("", false, DEFAULT_TIMESTAMP);
 	}
 
 	public Note(String text, boolean enabled, long timestamp) {
@@ -56,12 +58,12 @@ public class Note implements Comparable<Note> {
 	}
 
 	public static ArrayList<Note> getAllNotesFromDB(DBAdapter adapter) {
-		Cursor cursor = adapter.getAllRows();
+		Cursor cursor = adapter.getAllIDs();
 		ArrayList<Note> list = new ArrayList<>();
 
 		if (cursor.moveToFirst()) {
 			do {
-				int id = cursor.getInt(DBAdapter.COL_ROWID);
+				long id = cursor.getLong(DBAdapter.COL_ROWID);
 				Note note = Note.getNoteFromDB(id, adapter);
 
 				Timber.i("Adding note with ID: " + id);
@@ -93,6 +95,16 @@ public class Note implements Comparable<Note> {
 		return "Note. ID: " + getDatabaseID() + ", Content: '" + getTextPreview(15) + "', timestamp: " + DateUtils.getRelativeTimeSpanString(getTimestamp(), new Date().getTime(), 0L, DateUtils.FORMAT_ABBREV_ALL);
 	}
 
+	public int isEnabledSQL() {
+		if (isEnabled()) return 1;
+		return 0;
+	}
+
+	@Override
+	public int compareTo(@NonNull Note note) {
+		return (note.getTimestampAsDate().compareTo(getTimestampAsDate()));
+	}
+
 	public String getTextPreview() {
 		return getTextPreview(DEFAULT_PREVIEW_CHARS);
 	}
@@ -117,10 +129,6 @@ public class Note implements Comparable<Note> {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
-		setTimestamp(timestamp.getTime());
-	}
-
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
@@ -141,13 +149,7 @@ public class Note implements Comparable<Note> {
 		this.enabled = enabled;
 	}
 
-	public int isEnabledSQL() {
-		if (isEnabled()) return 1;
-		return 0;
-	}
-
-	@Override
-	public int compareTo(@NonNull Note note) {
-		return (note.getTimestampAsDate().compareTo(getTimestampAsDate()));
+	public void setTimestamp(Date timestamp) {
+		setTimestamp(timestamp.getTime());
 	}
 }

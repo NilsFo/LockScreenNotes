@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/card_margin"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground"
+    card_view:cardElevation="@dimen/card_elevation"
+    card_view:contentPadding="@dimen/card_padding">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin_small"
+        android:paddingBottom="@dimen/activity_vertical_margin_small">
+
+        <ImageView
+            android:id="@+id/card_note_image"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/baseline_error_outline_black_18"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/info_note_toggle_button" />
+
+        <TextView
+            android:id="@+id/note_status_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
+            android:layout_alignBottom="@+id/card_menu_more"
+            android:layout_toStartOf="@+id/card_menu_more"
+            android:layout_toEndOf="@+id/card_note_image" />
+
+        <ImageView
+            android:id="@+id/card_menu_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            card_view:srcCompat="@drawable/baseline_more_vert_black_24"
+            android:contentDescription="@string/info_note_toggle_button" />
+
+        <!--
+        <TextView
+            android:id="@+id/player_streak_current"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/player_name"
+            android:layout_toEndOf="@+id/player_image"
+            android:textSize="30sp" />
+            -->
+
+        <de.nilsfo.lockscreennotes.imported.view.LinedEditText
+            android:id="@+id/note_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/card_menu_more"
+            android:layout_toEndOf="@+id/card_note_image"
+            android:editable="false"
+            android:focusable="false"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:textIsSelectable="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+
+        <TextView
+            android:id="@+id/note_timestamp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/note_text"
+            android:layout_toEndOf="@+id/card_note_image" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

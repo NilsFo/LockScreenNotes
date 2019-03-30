@@ -138,10 +138,10 @@ public class DBAdapter extends Observable {
 		notifyObservers();
 	}
 
-	// Return all data in the database.
-	public synchronized Cursor getAllRows() {
+	public synchronized Cursor getAllColEntries(String columnName) {
 		String where = null;
-		Cursor c = db.query(true, DATABASE_TABLE, ALL_KEYS,
+		String[] rows = new String[]{columnName};
+		Cursor c = db.query(true, DATABASE_TABLE, rows,
 				where, null, null, null, null, null);
 		if (c != null) {
 			c.moveToFirst();
@@ -187,6 +187,33 @@ public class DBAdapter extends Observable {
 		notifyObservers();
 
 		return oldTimestamp != timestamp;
+	}
+
+	// Returns all IDs
+	public synchronized Cursor getAllIDs() {
+		return getAllColEntries(KEY_ROWID);
+	}
+
+	public synchronized Cursor getAllIDsSorted() {
+		String[] keys = new String[]{KEY_ROWID};
+
+		Cursor c = db.query(true, DATABASE_TABLE, keys,
+				null, null, null, null, KEY_TIMESTAMP, null);
+		if (c != null) {
+			c.moveToFirst();
+		}
+		return c;
+	}
+
+	// Return all data in the database.
+	public synchronized Cursor getAllRows() {
+		String where = null;
+		Cursor c = db.query(true, DATABASE_TABLE, ALL_KEYS,
+				where, null, null, null, null, null);
+		if (c != null) {
+			c.moveToFirst();
+		}
+		return c;
 	}
 
 	/////////////////////////////////////////////////////////////////////
