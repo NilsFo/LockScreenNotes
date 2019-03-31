@@ -14,28 +14,30 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_vertical_margin_small"
-        android:paddingBottom="@dimen/activity_vertical_margin_small">
+        android:paddingTop="@dimen/activity_vertical_margin_very_small"
+        android:paddingBottom="@dimen/activity_vertical_margin_very_small">
 
         <ImageView
             android:id="@+id/card_note_image"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/baseline_error_outline_black_18"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="@string/info_note_toggle_button" />
+            android:layout_marginStart="@dimen/activity_horizontal_margin_very_small"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin_small"
+            android:contentDescription="@string/info_note_toggle_button"
+            android:src="@drawable/baseline_error_outline_black_18" />
 
         <TextView
             android:id="@+id/note_status_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:gravity="center_vertical"
             android:layout_alignBottom="@+id/card_menu_more"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin_small"
             android:layout_toStartOf="@+id/card_menu_more"
-            android:layout_toEndOf="@+id/card_note_image" />
+            android:layout_toEndOf="@+id/card_note_image"
+            android:gravity="center_vertical" />
 
         <ImageView
             android:id="@+id/card_menu_more"
@@ -43,37 +45,27 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            card_view:srcCompat="@drawable/baseline_more_vert_black_24"
-            android:contentDescription="@string/info_note_toggle_button" />
+            android:layout_marginEnd="@dimen/activity_horizontal_margin_small"
+            android:contentDescription="@string/info_note_toggle_button"
+            card_view:srcCompat="@drawable/baseline_more_vert_black_24" />
 
-        <!--
-        <TextView
-            android:id="@+id/player_streak_current"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/player_name"
-            android:layout_toEndOf="@+id/player_image"
-            android:textSize="30sp" />
-            -->
-
-        <de.nilsfo.lockscreennotes.imported.view.LinedEditText
+        <de.nilsfo.lockscreennotes.imported.view.LinedTextView
             android:id="@+id/note_text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/card_menu_more"
+            android:layout_marginTop="@dimen/activity_horizontal_margin_very_small"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin_small"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin_very_small"
             android:layout_toEndOf="@+id/card_note_image"
-            android:editable="false"
-            android:focusable="false"
-            android:gravity="top"
-            android:inputType="textMultiLine"
-            android:textIsSelectable="false"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
+            android:textAppearance="@android:style/TextAppearance.Medium" />
 
         <TextView
             android:id="@+id/note_timestamp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/note_text"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin_small"
             android:layout_toEndOf="@+id/card_note_image" />
 
     </RelativeLayout>

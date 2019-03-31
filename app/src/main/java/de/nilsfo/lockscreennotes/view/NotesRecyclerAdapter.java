@@ -21,7 +21,7 @@ import java.util.Collections;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
-import de.nilsfo.lockscreennotes.imported.view.LinedEditText;
+import de.nilsfo.lockscreennotes.imported.view.LinedTextView;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;
@@ -53,7 +53,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 	public ViewHolder onCreateViewHolder(@NotNull ViewGroup viewGroup, int i) {
 		Timber.i("Creating view holder - " + i + ". ViewGroup: " + viewGroup);
 		View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_note_layout, viewGroup, false);
-		ViewHolder holder = new ViewHolder(v);
+		ViewHolder holder = new ViewHolder(v, context);
 		holder.setDefault();
 		return holder;
 	}
@@ -145,15 +145,17 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 		private long noteID;
 		private ImageView noteImageIM;
 		private TextView statusbarLB;
-		private LinedEditText noteText;
+		private LinedTextView noteText;
 		private TextView timestampLB;
 		private ImageView menu;
 		private View itemView;
 		private NotesRecyclerAdapterListener listener;
 
-		public ViewHolder(final View itemView) {
+		public ViewHolder(final View itemView, Context context) {
 			super(itemView);
 			this.itemView = itemView;
+
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 			noteID = -1; //TODO reference a static final field?
 			Timber.e("A new ViewHolder has been created!");
@@ -161,8 +163,13 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			noteImageIM = (ImageView) itemView.findViewById(R.id.card_note_image);
 			statusbarLB = (TextView) itemView.findViewById(R.id.note_status_bar);
 			timestampLB = (TextView) itemView.findViewById(R.id.note_timestamp);
-			noteText = (LinedEditText) itemView.findViewById(R.id.note_text); //TODO make this not focusable!
 			menu = (ImageView) itemView.findViewById(R.id.card_menu_more);
+			noteText = (LinedTextView) itemView.findViewById(R.id.note_text); //TODO make this not focusable!
+
+			noteText.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+			if (preferences.getBoolean("prefs_large_font", false)) {
+				noteText.setTextAppearance(context, android.R.style.TextAppearance_Large);
+			}
 
 			itemView.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -228,7 +235,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 				imageID = R.drawable.enabled_button;
 			}
 			noteImageIM.setImageResource(imageID);
-			noteText.setText(note.getText());
+			noteText.setText(note.getText().trim());
 
 			long time = note.getTimestamp();
 			if (utils.isRelativeTimePrefered()) {

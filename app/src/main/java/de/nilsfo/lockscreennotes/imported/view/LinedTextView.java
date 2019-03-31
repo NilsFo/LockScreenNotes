@@ -1,22 +1,19 @@
 package de.nilsfo.lockscreennotes.imported.view;
 
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
-/**
- * Created by Nils on 14.08.2016.
- */
-
-public class LinedEditText extends AppCompatEditText {
+public class LinedTextView extends AppCompatTextView {
 
 	private LinedTextHelper helper;
 
 	// we need this constructor for LayoutInflater
-	public LinedEditText(Context context, AttributeSet attrs) {
+	public LinedTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		helper = new LinedTextHelper(context);
 	}

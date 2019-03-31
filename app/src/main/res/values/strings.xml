@@ -188,4 +188,6 @@
     <string name="action_shortcut_add_long">Create a new note</string>
     <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</string>
     <string name="info_note_toggle_button">Toggle note enabled</string>
+    <string name="prefs_large_font_title">Large font</string>
+    <string name="prefs_large_font_flavor">Displays notes  in the main window in a larger font. May require a restart.</string>
 </resources>

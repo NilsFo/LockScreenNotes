@@ -175,4 +175,7 @@
     <string name="action_shortcut_general_error">Diese Aktion ist nicht länger unterstützt.</string>
     <string name="action_shortcut_add_long">Eine neue Notiz anlegen</string>
     <string name="prefs_reverse_displayed_notifications_flavor_android7">Wenn Sie diese Option wählen, kann der Erstellzeitpunkt individueller Notizen auf Ihrem gerät nicht mehr angezeigt werden.</string>
+    <string name="info_note_toggle_button">Notiz einschalten umschalten</string>
+    <string name="prefs_large_font_title">Große Schrift</string>
+    <string name="prefs_large_font_flavor">Zeigt Notizen im Hauptmenü in größerer Schrift an. Erfordert eventuell einen Neustart.</string>
 </resources>

@@ -796,5 +796,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		Timber.i("Mainactivity: onResume()");
 		new NotesNotificationManager(this).hideAllNotifications();
+
+		noteRecyclerAdapter.refreshNotesList();
 	}
 }

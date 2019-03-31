@@ -181,8 +181,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			addPreferencesFromResource(R.xml.prefs_general);
 			setHasOptionsMenu(true);
 
-			//TODO Remove min note lines!
-
 			bindPreferenceSummaryToValue(findPreference("prefs_homescreen_lines"), R.string.prefs_homescreen_lines_summary);
 			bindPreferenceSummaryToValue(findPreference("prefs_action_bar_icon_scale"));
 

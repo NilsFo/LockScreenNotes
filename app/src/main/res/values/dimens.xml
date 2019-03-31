@@ -4,6 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_horizontal_margin_small">8dp</dimen>
     <dimen name="activity_vertical_margin_small">8dp</dimen>
+    <dimen name="activity_horizontal_margin_very_small">4dp</dimen>
+    <dimen name="activity_vertical_margin_very_small">4dp</dimen>
     <dimen name="activity_notes_margin">6dp</dimen>
     <dimen name="activity_vertical_margin_double">32dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
