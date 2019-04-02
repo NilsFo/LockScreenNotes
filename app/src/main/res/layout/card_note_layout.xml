@@ -39,6 +39,37 @@
             android:layout_toEndOf="@+id/card_note_image"
             android:gravity="center_vertical" />
 
+        <!--
+        <ImageView
+            android:id="@+id/note_status_bar_image_placeholder1"
+            android:layout_alignBottom="@+id/card_menu_more"
+            android:adjustViewBounds="true"
+            android:scaleType="fitStart"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/baseline_error_outline_black_18"
+            android:layout_toEndOf="@+id/note_status_bar"
+            android:layout_height="18dp"
+            android:layout_width="18dp" />
+
+        <ImageView
+            android:id="@+id/note_status_bar_image_placeholder2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/card_menu_more"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/baseline_error_outline_black_18"
+            android:layout_toEndOf="@+id/note_status_bar_image_placeholder1" />
+
+        <ImageView
+            android:id="@+id/note_status_bar_image_placeholder3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/card_menu_more"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/baseline_error_outline_black_18"
+            android:layout_toEndOf="@+id/note_status_bar_image_placeholder2" />
+            -->
+
         <ImageView
             android:id="@+id/card_menu_more"
             android:layout_width="wrap_content"

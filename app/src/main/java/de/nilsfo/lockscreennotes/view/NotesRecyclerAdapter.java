@@ -21,6 +21,7 @@ import java.util.Collections;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
+import de.nilsfo.lockscreennotes.data.font.NoteContentAnalyzer;
 import de.nilsfo.lockscreennotes.imported.view.LinedTextView;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
@@ -223,6 +224,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 				setDefault();
 				return;
 			}
+			NoteContentAnalyzer contentAnalyzer = new NoteContentAnalyzer(note);
 
 			noteImageIM.setClickable(true);
 			menu.setClickable(true);
@@ -246,6 +248,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			}
 
 			statusbarLB.setText(context.getString(R.string.note_position, String.valueOf(index + 1)));
+			Timber.i("Note content status check: URL: " + contentAnalyzer.containsURL() + ". Number: " + contentAnalyzer.containsPhoneNumber() + ". E-Mail: " + contentAnalyzer.containsEMail());
 		}
 
 		public void setDefault() {
