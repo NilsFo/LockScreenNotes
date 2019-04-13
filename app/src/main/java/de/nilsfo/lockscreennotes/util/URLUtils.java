@@ -9,6 +9,7 @@ import timber.log.Timber;
 import static de.nilsfo.lockscreennotes.util.RegexManager.URL_PATTERN;
 
 public class URLUtils {
+	public static final int URL_MIN_SIZE = 4;
 	private Context context;
 
 	public URLUtils(Context context) {
@@ -31,8 +32,6 @@ public class URLUtils {
 	}
 
 	public static RegexManager getURLRegexManager() {
-		return new RegexManager(URL_PATTERN);
+		return new RegexManager(URL_PATTERN, URL_MIN_SIZE, true);
 	}
-
-
 }

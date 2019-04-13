@@ -115,7 +115,7 @@
     <string name="action_full_changelog">Full changelog</string>
     <string name="prefs_reverse_displayed_notifications_tilte">Reverse order</string>
     <string name="prefs_reverse_displayed_notifications_flavor_android7">When choosing this option, the timstamp of individual notes can no longer be displayed on your device.</string>
-    <string name="action_open_weblinks">Open weblinks</string>
+    <string name="action_open_weblinks">Open weblink</string>
     <string name="error_no_weblings">No weblinks found.</string>
     <string name="info_choose_url">Select URL(s):</string>
     <string name="action_browse_all">Browse all</string>
@@ -190,4 +190,6 @@
     <string name="info_note_toggle_button">Toggle note enabled</string>
     <string name="prefs_large_font_title">Large font</string>
     <string name="prefs_large_font_flavor">Displays notes  in the main window in a larger font. May require a restart.</string>
+    <string name="action_open_phone">Call number</string>
+    <string name="action_open_mail">Send mail</string>
 </resources>

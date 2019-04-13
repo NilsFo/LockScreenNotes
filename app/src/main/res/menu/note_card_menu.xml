@@ -3,8 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_card_share"
+        android:title="@string/action_share"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_card_open_url"
+        android:title="@string/action_open_weblinks"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_card_open_phone"
+        android:title="@string/action_open_phone"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_card_open_mail"
+        android:title="@string/action_open_mail"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_card_delete_note"
         android:title="@string/delete"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
 </menu>

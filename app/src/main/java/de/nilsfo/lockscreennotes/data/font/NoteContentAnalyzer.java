@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.util.RegexManager;
+import de.nilsfo.lockscreennotes.util.URLUtils;
+import timber.log.Timber;
 
 import static de.nilsfo.lockscreennotes.util.RegexManager.MAIL_PATTERN;
 import static de.nilsfo.lockscreennotes.util.RegexManager.PHONE_NUMBER_PATTERN;
-import static de.nilsfo.lockscreennotes.util.RegexManager.URL_PATTERN;
 
 public class NoteContentAnalyzer {
 
@@ -17,6 +18,10 @@ public class NoteContentAnalyzer {
 	private ArrayList<String> phoneList;
 
 	public NoteContentAnalyzer(String inputText) {
+		if (inputText == null) {
+			Timber.e("Text to analyze is null!!");
+			inputText = "";
+		}
 		this.inputText = inputText;
 	}
 
@@ -38,7 +43,7 @@ public class NoteContentAnalyzer {
 
 	public ArrayList<String> getURLs() {
 		if (urlList == null) {
-			urlList = new RegexManager(URL_PATTERN).findMatchesInText(inputText);
+			urlList = URLUtils.getURLRegexManager().findMatchesInText(inputText);
 		}
 		return urlList;
 	}

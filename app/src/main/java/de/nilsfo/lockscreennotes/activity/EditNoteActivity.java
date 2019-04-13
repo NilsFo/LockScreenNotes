@@ -14,6 +14,8 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +33,7 @@ import java.util.Date;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.data.font.NoteContentAnalyzer;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import de.nilsfo.lockscreennotes.util.URLUtils;
@@ -51,6 +54,7 @@ public class EditNoteActivity extends NotesActivity {
 	private boolean standalone;
 	private DBAdapter databaseAdapter;
 	private EditText noteTF;
+	private MenuItem menuURL, menuPhone, menuMail;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,23 @@ public class EditNoteActivity extends NotesActivity {
 		setShowNotifications(true);
 		noteTF = (EditText) findViewById(R.id.enditNoteFullscreenTF);
 		noteTF.setText(myNote.getText());
+		noteTF.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				Timber.i("onTextChange: '" + s.toString().replace("\n", " ") + "'. Start: " + start + ". After: " + after + ". Count: " + count);
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				Timber.i("onTextChange: '" + s.toString().replace("\n", " ") + "'. Start: " + start + ". Before: " + before + ". Count: " + count);
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				Timber.i("onAfter text change: '" + s.toString().replace("\n", " ") + "'");
+				updateContentMenuItems(s.toString());
+			}
+		});
 		Timber.i("Recieved this text from the DB: " + myNote.getText());
 
 		if (!preferencses.getBoolean("prefs_ignore_tutorial_autosave", false)) {
@@ -119,6 +140,12 @@ public class EditNoteActivity extends NotesActivity {
 		if (savedInstanceState == null) {
 			actionMoveToBottom();
 		}
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		databaseAdapter.close();
 	}
 
 	private void actionClear() {
@@ -165,7 +192,6 @@ public class EditNoteActivity extends NotesActivity {
 		sendIntent.putExtra(Intent.EXTRA_TEXT, noteTF.getText().toString());
 		sendIntent.setType("text/plain");
 		startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_using)));
-		//startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.share_using)));
 	}
 
 	private void actionCopyText() {
@@ -183,22 +209,94 @@ public class EditNoteActivity extends NotesActivity {
 		Toast.makeText(this, R.string.action_copy_text_success, Toast.LENGTH_LONG).show();
 	}
 
+	private void updateContentMenuItems(String text) {
+		Timber.i("Updating content relying menus.");
+
+		if (menuURL == null) {
+			Timber.i("Menus aren't ready yet.");
+			return;
+		}
+
+		menuURL.setVisible(false);
+		menuPhone.setVisible(false);
+		menuMail.setVisible(false);
+
+		NoteContentAnalyzer analyzer = new NoteContentAnalyzer(text); //TODO use analyzer
+		if (analyzer.containsURL()) {
+			menuURL.setVisible(true);
+			Timber.i("Disabling the open URL button.");
+		}
+		if (analyzer.containsPhoneNumber()) {
+			menuPhone.setVisible(true);
+			Timber.i("Disabling the open PHONE NUMBER button.");
+		}
+		if (analyzer.containsEMail()) {
+			menuMail.setVisible(true);
+			Timber.i("Disabling the open MAIL button.");
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.edit_note_menu, menu);
+		Timber.i("Inflating menu.");
+
+		menuURL = menu.findItem(R.id.action_open_url);
+		menuPhone = menu.findItem(R.id.action_open_phone);
+		menuMail = menu.findItem(R.id.action_open_mail);
+
+		updateContentMenuItems(myNote.getText());
 		return true;
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		Timber.i("EditNoteFrame: Paused");
-		if (!canceled) saveNote();
-		databaseAdapter.close();
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			// Respond to the action bar's Up/Home button
+			case android.R.id.home:
+				if (standalone) {
+					Intent intent = new Intent(this, MainActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					startActivity(intent);
+				} else {
+					setShowNotifications(false);
+					NavUtils.navigateUpFromSameTask(this);
+				}
+				return true;
 
-		if (isShowNotifications()) {
-			new NotesNotificationManager(this).showNoteNotifications();
+			case R.id.action_clear:
+				actionClear();
+				return true;
+
+			case R.id.action_move_to_bottom:
+				actionMoveToBottom();
+				return true;
+
+			case R.id.action_share:
+				actionShare();
+				return true;
+
+			case R.id.action_copy_note:
+				actionCopyText();
+				return true;
+
+			case R.id.action_cancel_edit:
+				actionCancelEdit();
+				return true;
+
+			case R.id.action_to_qr_code:
+				actionToQR();
+				return true;
+
+			case R.id.action_open_url:
+				actionOpenWeblinks();
+				return true;
+
+			default:
+				Timber.w("Unknown menu item pressed!");
+				Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -384,70 +482,26 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			// Respond to the action bar's Up/Home button
-			case android.R.id.home:
-				if (standalone) {
-					Intent intent = new Intent(this, MainActivity.class);
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					startActivity(intent);
-				} else {
-					setShowNotifications(false);
-					NavUtils.navigateUpFromSameTask(this);
-				}
-				return true;
-
-			case R.id.action_clear:
-				actionClear();
-				return true;
-
-			case R.id.action_move_to_bottom:
-				actionMoveToBottom();
-				return true;
-
-			case R.id.action_share:
-				actionShare();
-				return true;
-
-			case R.id.action_copy_note:
-				actionCopyText();
-				return true;
-
-			case R.id.action_cancel_edit:
-				actionCancelEdit();
-				return true;
-
-			case R.id.action_to_qr_code:
-				actionToQR();
-				return true;
-
-			case R.id.action_open_weblinks:
-				actionOpenWeblinks();
-				return true;
-
-			default:
-				Timber.w("Unknown menu item pressed!");
-				Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
 	public void onBackPressed() {
 		setShowNotifications(standalone);
 		super.onBackPressed();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Timber.i("EditNoteFrame: Paused");
+		if (!canceled) saveNote();
+		databaseAdapter.close();
+
+		if (isShowNotifications()) {
+			new NotesNotificationManager(this).showNoteNotifications();
+		}
 	}
 
 	private void handleIllegalNote() {
 		Timber.w("Needing to take care of illiegal note! Action taken: finish activity!");
 		Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 		finish();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		databaseAdapter.close();
 	}
 }

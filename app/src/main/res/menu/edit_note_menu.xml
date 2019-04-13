@@ -28,10 +28,19 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_open_weblinks"
+        android:id="@+id/action_open_url"
         android:title="@string/action_open_weblinks"
-        android:icon="@drawable/ic_open_in_browser_white_48dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_open_phone"
+        android:title="@string/action_open_phone"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_open_mail"
+        android:title="@string/action_open_mail"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_to_qr_code"
