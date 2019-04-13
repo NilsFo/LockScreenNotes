@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,6 +152,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 		private ImageView menu;
 		private View itemView;
 		private NotesRecyclerAdapterListener listener;
+		private NoteContentAnalyzer contentAnalyzer;
 
 		public ViewHolder(final View itemView, Context context) {
 			super(itemView);
@@ -224,8 +226,8 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 				setDefault();
 				return;
 			}
-			NoteContentAnalyzer contentAnalyzer = new NoteContentAnalyzer(note);
 
+			contentAnalyzer = new NoteContentAnalyzer(note);
 			noteImageIM.setClickable(true);
 			menu.setClickable(true);
 			itemView.setClickable(true);
@@ -255,6 +257,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			noteImageIM.setClickable(false);
 			menu.setClickable(false);
 			itemView.setClickable(false);
+			contentAnalyzer = null;
 
 			noteImageIM.setImageResource(R.drawable.baseline_error_outline_black_18);
 			statusbarLB.setText(R.string.error_internal_error);
@@ -265,10 +268,29 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 		}
 
 		private void showPopupMenu(View source) {
-			Timber.i("Note image has been pressed! Note ID: " + noteID);
+			Timber.i("Showing popup menu for note ID: " + noteID + ". Source: " + source.toString());
 			PopupMenu popupMenu = new PopupMenu(context, source);
 			popupMenu.inflate(R.menu.note_card_menu);
 			popupMenu.setOnMenuItemClickListener(this);
+
+			Menu menu = popupMenu.getMenu();
+			MenuItem menuURL = menu.findItem(R.id.action_card_open_url);
+			MenuItem menuPhone = menu.findItem(R.id.action_card_open_phone);
+			MenuItem menuMail = menu.findItem(R.id.action_card_open_mail);
+
+			if (!contentAnalyzer.containsURL()) {
+				Timber.i("Disabling URL menu item.");
+				menuURL.setVisible(false);
+			}
+			if (!contentAnalyzer.containsPhoneNumber()) {
+				Timber.i("Disabling phone menu item.");
+				menuPhone.setVisible(false);
+			}
+			if (!contentAnalyzer.containsEMail()) {
+				Timber.i("Disabling mail menu item.");
+				menuMail.setVisible(false);
+			}
+
 			popupMenu.show();
 		}
 

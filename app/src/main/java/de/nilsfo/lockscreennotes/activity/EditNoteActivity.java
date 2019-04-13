@@ -224,15 +224,15 @@ public class EditNoteActivity extends NotesActivity {
 		NoteContentAnalyzer analyzer = new NoteContentAnalyzer(text); //TODO use analyzer
 		if (analyzer.containsURL()) {
 			menuURL.setVisible(true);
-			Timber.i("Disabling the open URL button.");
+			Timber.i("Enabling the open URL button.");
 		}
 		if (analyzer.containsPhoneNumber()) {
 			menuPhone.setVisible(true);
-			Timber.i("Disabling the open PHONE NUMBER button.");
+			Timber.i("Enabling the open PHONE NUMBER button.");
 		}
 		if (analyzer.containsEMail()) {
 			menuMail.setVisible(true);
-			Timber.i("Disabling the open MAIL button.");
+			Timber.i("Enabling the open MAIL button.");
 		}
 	}
 
