@@ -115,7 +115,7 @@
     <string name="action_full_changelog">Full changelog</string>
     <string name="prefs_reverse_displayed_notifications_tilte">Reverse order</string>
     <string name="prefs_reverse_displayed_notifications_flavor_android7">When choosing this option, the timstamp of individual notes can no longer be displayed on your device.</string>
-    <string name="action_open_weblinks">Open weblink</string>
+    <string name="action_open_weblinks">Open weblinks</string>
     <string name="error_no_weblings">No weblinks found.</string>
     <string name="info_choose_url">Select URL(s):</string>
     <string name="action_browse_all">Browse all</string>
@@ -192,4 +192,12 @@
     <string name="prefs_large_font_flavor">Displays notes  in the main window in a larger font. May require a restart.</string>
     <string name="action_open_phone">Call number</string>
     <string name="action_open_mail">Send mail</string>
+    <string name="error_nothing_selected">Error: Nothing selected.</string>
+    <string name="action_call">Call</string>
+    <string name="error_no_numbers">No phone number found</string>
+    <string name="info_choose_phone_number">Select phone number to dial:</string>
+    <string name="action_write_mail">Write mail</string>
+    <string name="error_no_mail">No mail addresses found</string>
+    <string name="info_choose_mail">Select mail address to write to:</string>
+    <string name="action_dial">Dial</string>
 </resources>

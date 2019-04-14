@@ -1,4 +1,4 @@
-package de.nilsfo.lockscreennotes.data.font;
+package de.nilsfo.lockscreennotes.data.content;
 
 import java.util.ArrayList;
 
@@ -12,6 +12,7 @@ import static de.nilsfo.lockscreennotes.util.RegexManager.PHONE_NUMBER_PATTERN;
 
 public class NoteContentAnalyzer {
 
+	public static final int DEFAULT_PHONE_NUMBER_MIN_LENGTH = 5;
 	private String inputText;
 	private ArrayList<String> urlList;
 	private ArrayList<String> mailList;
@@ -41,6 +42,27 @@ public class NoteContentAnalyzer {
 		return !getPhoneNumbers().isEmpty();
 	}
 
+	public ArrayList<String> getPhoneNumbers(int minimumCharacterLength) {
+		if (minimumCharacterLength <= 0) {
+			throw new IllegalArgumentException("Minimum phone number character [" + minimumCharacterLength + "] must not be zero or negative!");
+		}
+
+		if (phoneList == null) {
+			ArrayList<String> tempList = new RegexManager(PHONE_NUMBER_PATTERN).findMatchesInText(inputText);
+			phoneList = new ArrayList<>();
+			for (String s : tempList) {
+				if (s.length() >= minimumCharacterLength) {
+					phoneList.add(s.trim());
+				}
+			}
+		}
+		return phoneList;
+	}
+
+	public ArrayList<String> getPhoneNumbers() {
+		return getPhoneNumbers(DEFAULT_PHONE_NUMBER_MIN_LENGTH);
+	}
+
 	public ArrayList<String> getURLs() {
 		if (urlList == null) {
 			urlList = URLUtils.getURLRegexManager().findMatchesInText(inputText);
@@ -54,12 +76,4 @@ public class NoteContentAnalyzer {
 		}
 		return mailList;
 	}
-
-	public ArrayList<String> getPhoneNumbers() {
-		if (phoneList == null) {
-			phoneList = new RegexManager(PHONE_NUMBER_PATTERN).findMatchesInText(inputText);
-		}
-		return phoneList;
-	}
-
 }

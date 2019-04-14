@@ -22,7 +22,7 @@ import java.util.Collections;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
-import de.nilsfo.lockscreennotes.data.font.NoteContentAnalyzer;
+import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
 import de.nilsfo.lockscreennotes.imported.view.LinedTextView;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.TimeUtils;

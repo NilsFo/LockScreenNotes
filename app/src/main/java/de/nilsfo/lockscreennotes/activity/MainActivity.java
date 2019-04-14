@@ -42,9 +42,13 @@ import java.util.concurrent.Executors;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
+import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogMail;
+import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogPhone;
+import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogURLs;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NoteSharer;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
@@ -750,10 +754,29 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	@Override
 	public void onCardNoteMenuPressed(long noteID, MenuItem item) {
 		int itemID = item.getItemId();
-		Timber.i("Main: Note menu was pressed: " + noteID + ": '" + item.getTitle() + "'");
+		Note note = Note.getNoteFromDB(noteID, databaseAdapter);
+
+		if (note == null) {
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		Timber.i("Main: Note menu was pressed: " + note.getTextPreview() + ": '" + item.getTitle() + "'");
 		switch (itemID) {
 			case R.id.action_card_delete_note:
 				requestDeleteNote(noteID);
+				return;
+			case R.id.action_card_share:
+				new NoteSharer(this).share(note);
+				return;
+			case R.id.action_card_open_url:
+				new NoteContentBrowseDialogURLs(this).displayDialog(note);
+				return;
+			case R.id.action_card_open_phone:
+				new NoteContentBrowseDialogPhone(this).displayDialog(note);
+				return;
+			case R.id.action_card_open_mail:
+				new NoteContentBrowseDialogMail(this).displayDialog(note);
 				return;
 			default:
 		}

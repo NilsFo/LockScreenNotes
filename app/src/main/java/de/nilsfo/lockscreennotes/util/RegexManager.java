@@ -64,7 +64,7 @@ public class RegexManager {
 	}
 
 	private boolean isNumeric(String text) {
-		Timber.i("Checking if '" + text + " is a number.");
+		Timber.i("Checking if '" + text + "' is a number.");
 		try {
 			Double.parseDouble(text);
 			return true;
@@ -77,7 +77,6 @@ public class RegexManager {
 			}
 		}
 	}
-
 
 	public boolean containsSingleMatch(String input) {
 		ArrayList<String> list = findMatchesInText(input);

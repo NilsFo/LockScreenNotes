@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,15 +27,17 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
-import de.nilsfo.lockscreennotes.data.font.NoteContentAnalyzer;
+import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
+import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogMail;
+import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogPhone;
+import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogURLs;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
+import de.nilsfo.lockscreennotes.util.NoteSharer;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
-import de.nilsfo.lockscreennotes.util.URLUtils;
 import de.nilsfo.lockscreennotes.view.QRCodeView;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
@@ -55,6 +56,10 @@ public class EditNoteActivity extends NotesActivity {
 	private DBAdapter databaseAdapter;
 	private EditText noteTF;
 	private MenuItem menuURL, menuPhone, menuMail;
+
+	{
+		Timber.i("Text didn't change. Nothing to be done.");
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -187,11 +192,7 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void actionShare() {
-		Intent sendIntent = new Intent();
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_TEXT, noteTF.getText().toString());
-		sendIntent.setType("text/plain");
-		startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_using)));
+		new NoteSharer(this).share(noteTF.getText().toString());
 	}
 
 	private void actionCopyText() {
@@ -221,7 +222,7 @@ public class EditNoteActivity extends NotesActivity {
 		menuPhone.setVisible(false);
 		menuMail.setVisible(false);
 
-		NoteContentAnalyzer analyzer = new NoteContentAnalyzer(text); //TODO use analyzer
+		NoteContentAnalyzer analyzer = new NoteContentAnalyzer(text);
 		if (analyzer.containsURL()) {
 			menuURL.setVisible(true);
 			Timber.i("Enabling the open URL button.");
@@ -281,7 +282,7 @@ public class EditNoteActivity extends NotesActivity {
 				return true;
 
 			case R.id.action_cancel_edit:
-				actionCancelEdit();
+				actionRequestCancelEdit();
 				return true;
 
 			case R.id.action_to_qr_code:
@@ -290,6 +291,14 @@ public class EditNoteActivity extends NotesActivity {
 
 			case R.id.action_open_url:
 				actionOpenWeblinks();
+				return true;
+
+			case R.id.action_open_phone:
+				actionOpenPhone();
+				return true;
+
+			case R.id.action_open_mail:
+				actionOpenMail();
 				return true;
 
 			default:
@@ -315,14 +324,20 @@ public class EditNoteActivity extends NotesActivity {
 		Timber.i("EditNoteFrame: Saving the note. Has something changed? " + changed);
 
 		if (changed) {
-			myNote.setText(text);
-			myNote.setTimestamp(new Date());
+			Timber.i("Text changed: -> " + oldText + " -> " + text);
 
-			databaseAdapter.updateRow(myNote.getDatabaseID(), myNote.getText(), myNote.isEnabledSQL(), myNote.getTimestamp());
+			if (canceled) {
+				Timber.i("But note editing was canceled.");
+			} else {
+				myNote.setText(text);
+				myNote.setTimestamp(new Date());
+
+				databaseAdapter.updateRow(myNote.getDatabaseID(), myNote.getText(), myNote.isEnabledSQL(), myNote.getTimestamp());
+			}
 		}
 	}
 
-	public void actionCancelEdit() {
+	public void actionRequestCancelEdit() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.action_cancel_edit);
 		builder.setMessage(R.string.action_cancel_edit_confirm);
@@ -376,70 +391,18 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	public void actionOpenWeblinks() {
-		String text = String.valueOf(noteTF.getText());
-		final ArrayList<String> list = URLUtils.getURLRegexManager().findMatchesInText(text);
+		String text = noteTF.getText().toString();
+		new NoteContentBrowseDialogURLs(this).displayDialog(text);
+	}
 
-		if (list == null) {
-			return;
-		}
+	public void actionOpenPhone() {
+		String text = noteTF.getText().toString();
+		new NoteContentBrowseDialogPhone(this).displayDialog(text);
+	}
 
-		if (list.isEmpty()) {
-			Toast.makeText(this, R.string.error_no_weblings, Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		if (list.size() == 1) {
-			new URLUtils(this).browseURL(list.get(0));
-			return;
-		}
-
-		boolean[] sel = new boolean[list.size()];
-		String[] urls = new String[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			urls[i] = list.get(i);
-			sel[i] = false;
-		}
-		AlertDialog.Builder b = new AlertDialog.Builder(this);
-		b.setTitle(R.string.info_choose_url);
-		b.setIcon(R.mipmap.ic_launcher);
-		b.setMultiChoiceItems(urls, sel, new DialogInterface.OnMultiChoiceClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
-				Timber.v("URLs selected: " + sel);
-			}
-		});
-		b.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-		b.setPositiveButton(R.string.action_browse_selected, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
-				Timber.i("URLs to browse selected: " + sel);
-				for (int i = 0; i < list.size(); i++) {
-					if (sel.get(i)) {
-						String url = list.get(i);
-						new URLUtils(((AlertDialog) dialog).getContext()).browseURL(url);
-						Timber.i("Browsing URL '" + url + "'. " + (i + 1) + "/" + list.size());
-					}
-				}
-			}
-		});
-		b.setNeutralButton(R.string.action_browse_all, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				for (String s : list) {
-					new URLUtils(((AlertDialog) dialog).getContext()).browseURL(s);
-				}
-			}
-		});
-
-		b.show();
+	public void actionOpenMail() {
+		String text = noteTF.getText().toString();
+		new NoteContentBrowseDialogMail(this).displayDialog(text);
 	}
 
 	private void shareQRImage(Bitmap image) {
