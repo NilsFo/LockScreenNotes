@@ -21,8 +21,9 @@ import java.util.HashMap;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
-import de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseURLActivity;
+import de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity;
 import de.nilsfo.lockscreennotes.data.Note;
+import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver;
 import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
@@ -32,6 +33,7 @@ import timber.log.Timber;
 
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
 import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.INTENT_EXTRA_NOTE_CONTENT_TYPE;
 import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
 
 /**
@@ -269,6 +271,8 @@ public class NotesNotificationManager {
 		builder.setDeleteIntent(createOnNoteDismissIntent((int) note.getDatabaseID()));
 		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent((int) note.getDatabaseID()));
 
+		Timber.i("Setting up notification actions for note ID " + note.getDatabaseID() + " (" + note.getTextPreview() + ").");
+		/*
 		URLUtils utils = new URLUtils(context);
 		String text = note.getText();
 		boolean includeBrowse = false;
@@ -276,9 +280,10 @@ public class NotesNotificationManager {
 			includeBrowse = true;
 			builder.addAction(R.drawable.baseline_open_in_browser_black_24, context.getString(R.string.action_browse), createOnNoteBrowseURLIntent((int) note.getDatabaseID()));
 		}
-		builder.setContentIntent(getIntentToNote(note));
+		*/
 
-		Timber.i("Setting up notification actions for note ID " + note.getDatabaseID() + " (" + note.getTextPreview() + "): OnClick: true. Disable: true. Browse: " + includeBrowse);
+		builder.setContentIntent(getIntentToNote(note));
+		createOnNoteContentIntent(builder, note);
 	}
 
 	private PendingIntent createOnNoteDismissIntent(int notificationId) {
@@ -288,14 +293,47 @@ public class NotesNotificationManager {
 		return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
-	private PendingIntent createOnNoteBrowseURLIntent(int notificationId) {
-		Intent intent = new Intent(context, NotificationBrowseURLActivity.class);
-		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
+	private void createOnNoteContentIntent(NotificationCompat.Builder builder, Note note) {
+		//Applies a specific intent depending on the note's content to this
+		NoteContentAnalyzer contentAnalyzer = new NoteContentAnalyzer(note);
+		Timber.i("Checking if this note contains content to browse: " + note.getTextPreview());
+
+		if (!contentAnalyzer.containsAnything()) {
+			Timber.i("Nope, doesn't contain anything.");
+			return;
+		}
+
+		Intent intent = new Intent(context, NotificationBrowseContentActivity.class);
+		intent.putExtra(INTENT_EXTRA_NOTE_ID, note.getDatabaseID());
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-		Timber.i("Creating a URL intent. ID: " + notificationId);
-		return PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		int iconID;
+		int textID;
+		if (contentAnalyzer.containsURL()) {
+			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, 0);
+			textID = R.string.action_browse;
+			iconID = R.drawable.baseline_link_black_24;
+			Timber.i("The note '" + note.getTextPreview() + "' got resisted as a link. Note ID: " + note.getDatabaseID());
+		} else if (contentAnalyzer.containsPhoneNumber()) {
+			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, 1);
+			textID = R.string.action_dial;
+			iconID = R.drawable.baseline_phone_black_24;
+			Timber.i("The note '" + note.getTextPreview() + "' got resisted as a phone number. Note ID: " + note.getDatabaseID());
+		} else if (contentAnalyzer.containsEMail()) {
+			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, 2);
+			textID = R.string.action_write_mail;
+			iconID = R.drawable.baseline_email_black_24;
+			Timber.i("The note '" + note.getTextPreview() + "' got resisted as an email. Note ID: " + note.getDatabaseID());
+		} else {
+			Timber.e("A very hard and unexpected error occured while scanning a note's content and prepping a notification button for it! This should be reported somehow!");
+			//TODO notify user or dev about this (automatically?)
+			return;
+		}
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) note.getDatabaseID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		builder.addAction(iconID, context.getString(textID), pendingIntent);
 	}
 
 	@Deprecated

@@ -55,6 +55,11 @@ public class NoteContentBrowseDialogMail extends NoteContentBrowseDialog {
 	}
 
 	@Override
+	protected int getDialogIcon() {
+		return R.drawable.baseline_email_black_48;
+	}
+
+	@Override
 	protected boolean isSingleSelection() {
 		return true;
 	}

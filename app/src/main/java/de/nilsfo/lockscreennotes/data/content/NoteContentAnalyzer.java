@@ -59,6 +59,10 @@ public class NoteContentAnalyzer {
 		return phoneList;
 	}
 
+	public boolean containsAnything() {
+		return containsURL() || containsEMail() || containsPhoneNumber();
+	}
+
 	public ArrayList<String> getPhoneNumbers() {
 		return getPhoneNumbers(DEFAULT_PHONE_NUMBER_MIN_LENGTH);
 	}

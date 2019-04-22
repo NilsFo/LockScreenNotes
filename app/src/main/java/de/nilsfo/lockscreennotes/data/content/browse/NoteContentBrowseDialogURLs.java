@@ -50,6 +50,11 @@ public class NoteContentBrowseDialogURLs extends NoteContentBrowseDialog {
 	}
 
 	@Override
+	protected int getDialogIcon() {
+		return R.drawable.baseline_link_black_48;
+	}
+
+	@Override
 	protected boolean isSingleSelection() {
 		return false;
 	}

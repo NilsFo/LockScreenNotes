@@ -110,7 +110,7 @@
             android:theme="@android:style/Theme.NoDisplay">
         </activity>
         <activity
-            android:name="de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseURLActivity"
+            android:name="de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity"
             android:theme="@android:style/Theme.NoDisplay">
         </activity>
     </application>

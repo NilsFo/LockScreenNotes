@@ -9,7 +9,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import de.nilsfo.lockscreennotes.data.Note;
-import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
 public abstract class NoteContentBrowseDialog {
@@ -138,9 +137,7 @@ public abstract class NoteContentBrowseDialog {
 
 	protected abstract int getDialogTitle();
 
-	protected int getDialogIcon() {
-		return R.mipmap.ic_launcher;
-	}
+	protected abstract int getDialogIcon();
 
 	protected abstract boolean isSingleSelection();
 }
