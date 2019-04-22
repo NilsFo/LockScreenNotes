@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
-import de.nilsfo.lsn.R;
 
 public class NoteSharer {
 
@@ -32,11 +31,8 @@ public class NoteSharer {
 	}
 
 	public void share(String text) {
-		Intent sendIntent = new Intent();
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_TEXT, text);
-		sendIntent.setType(INTENT_TYPE);
-		context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.share_using)));
+		Intent intent = new IntentUtils(context).getNoteShareIntent(text);
+		context.startActivity(intent);
 	}
 
 }

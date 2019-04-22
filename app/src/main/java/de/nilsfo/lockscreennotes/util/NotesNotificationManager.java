@@ -33,6 +33,9 @@ import timber.log.Timber;
 
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
 import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_MAIL;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_PHONE_NUMBER;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_URL;
 import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.INTENT_EXTRA_NOTE_CONTENT_TYPE;
 import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
 
@@ -311,21 +314,21 @@ public class NotesNotificationManager {
 
 		int iconID;
 		int textID;
-		if (contentAnalyzer.containsURL()) {
-			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, 0);
-			textID = R.string.action_browse;
-			iconID = R.drawable.baseline_link_black_24;
-			Timber.i("The note '" + note.getTextPreview() + "' got resisted as a link. Note ID: " + note.getDatabaseID());
-		} else if (contentAnalyzer.containsPhoneNumber()) {
-			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, 1);
-			textID = R.string.action_dial;
-			iconID = R.drawable.baseline_phone_black_24;
-			Timber.i("The note '" + note.getTextPreview() + "' got resisted as a phone number. Note ID: " + note.getDatabaseID());
-		} else if (contentAnalyzer.containsEMail()) {
-			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, 2);
+		if (contentAnalyzer.containsEMail()) {
+			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, CONTENT_TYPE_MAIL);
 			textID = R.string.action_write_mail;
 			iconID = R.drawable.baseline_email_black_24;
 			Timber.i("The note '" + note.getTextPreview() + "' got resisted as an email. Note ID: " + note.getDatabaseID());
+		} else if (contentAnalyzer.containsPhoneNumber()) {
+			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, CONTENT_TYPE_PHONE_NUMBER);
+			textID = R.string.action_dial;
+			iconID = R.drawable.baseline_phone_black_24;
+			Timber.i("The note '" + note.getTextPreview() + "' got resisted as a phone number. Note ID: " + note.getDatabaseID());
+		} else if (contentAnalyzer.containsURL()) {
+			intent.putExtra(INTENT_EXTRA_NOTE_CONTENT_TYPE, CONTENT_TYPE_URL);
+			textID = R.string.action_browse;
+			iconID = R.drawable.baseline_link_black_24;
+			Timber.i("The note '" + note.getTextPreview() + "' got resisted as a link. Note ID: " + note.getDatabaseID());
 		} else {
 			Timber.e("A very hard and unexpected error occured while scanning a note's content and prepping a notification button for it! This should be reported somehow!");
 			//TODO notify user or dev about this (automatically?)
@@ -422,9 +425,9 @@ public class NotesNotificationManager {
 		builder.setAutoCancel(true);
 		builder.setOngoing(!sharedPreferences.getBoolean("prefs_dismissable_notes", false));
 
-		int prioity = getNoteNotificationPriority();
-		builder.setPriority(prioity);
-		builder.setChannelId(channelManager.getNoteChannel(prioity));
+		int priority = getNoteNotificationPriority();
+		builder.setPriority(priority);
+		builder.setChannelId(channelManager.getNoteChannel(priority));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			builder.setColor(context.getColor(R.color.colorNotificationLight));

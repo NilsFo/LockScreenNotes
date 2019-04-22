@@ -57,10 +57,6 @@ public class EditNoteActivity extends NotesActivity {
 	private EditText noteTF;
 	private MenuItem menuURL, menuPhone, menuMail;
 
-	{
-		Timber.i("Text didn't change. Nothing to be done.");
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -211,6 +207,7 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void updateContentMenuItems(String text) {
+		//TODO can this be done on opening the menu? Not on every keystroke?
 		Timber.i("Updating content relying menus.");
 
 		if (menuURL == null) {

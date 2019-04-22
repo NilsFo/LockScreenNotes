@@ -2,14 +2,16 @@ package de.nilsfo.lockscreennotes.data.content.browse;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 
 import java.util.ArrayList;
 
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
+import de.nilsfo.lockscreennotes.util.IntentUtils;
 import de.nilsfo.lsn.R;
 
 public class NoteContentBrowseDialogMail extends NoteContentBrowseDialog {
+
+	public static final boolean FORCE_CHOOSER = true;
 
 	public NoteContentBrowseDialogMail(Context context) {
 		super(context);
@@ -17,11 +19,8 @@ public class NoteContentBrowseDialogMail extends NoteContentBrowseDialog {
 
 	@Override
 	protected void browseElement(String element) {
-		String title = context.getString(R.string.share_via);
-		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", element, null));
-		emailIntent.putExtra(Intent.EXTRA_EMAIL, element);
-
-		context.startActivity(Intent.createChooser(emailIntent, title));
+		Intent intent = new IntentUtils(context).getMailIntent(element, FORCE_CHOOSER);
+		context.startActivity(intent);
 	}
 
 	@Override

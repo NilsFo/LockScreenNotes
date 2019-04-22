@@ -2,11 +2,11 @@ package de.nilsfo.lockscreennotes.data.content.browse;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 
 import java.util.ArrayList;
 
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
+import de.nilsfo.lockscreennotes.util.IntentUtils;
 import de.nilsfo.lsn.R;
 
 public class NoteContentBrowseDialogPhone extends NoteContentBrowseDialog {
@@ -16,9 +16,7 @@ public class NoteContentBrowseDialogPhone extends NoteContentBrowseDialog {
 
 	@Override
 	protected void browseElement(String element) {
-		String uri = "tel:" + element;
-		Intent intent = new Intent(Intent.ACTION_DIAL);
-		intent.setData(Uri.parse(uri));
+		Intent intent = new IntentUtils(context).getPhoneNumberIntent(element);
 		context.startActivity(intent);
 	}
 
