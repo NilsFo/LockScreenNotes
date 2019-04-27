@@ -178,4 +178,15 @@
     <string name="info_note_toggle_button">Notiz einschalten umschalten</string>
     <string name="prefs_large_font_title">Große Schrift</string>
     <string name="prefs_large_font_flavor">Zeigt Notizen im Hauptmenü in größerer Schrift an. Erfordert eventuell einen Neustart.</string>
+    <string name="mail_via">Mail verschicken via</string>
+    <string name="action_open_phone">Nummer wählen</string>
+    <string name="action_open_mail">Mail verschicken</string>
+    <string name="error_nothing_selected">Fehler: Nichts ausgewählt</string>
+    <string name="action_call">Anrufen</string>
+    <string name="error_no_numbers">Keine Telefonnummer gefunden</string>
+    <string name="info_choose_phone_number">Wählen Sie eine Telefonnummer aus, welche gewählt werden soll:</string>
+    <string name="action_write_mail">Mail schreiben</string>
+    <string name="error_no_mail">Keine E-Mail Adresse gefunden</string>
+    <string name="info_choose_mail">Wählen Sie eine Adresse aus, an die eine Mail geschickt werden soll:</string>
+    <string name="action_dial">Wählen</string>
 </resources>
