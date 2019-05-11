@@ -3,6 +3,7 @@ package de.nilsfo.lockscreennotes.io.backups;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
@@ -20,6 +21,7 @@ import java.util.Comparator;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.FileManager;
+import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
@@ -76,22 +78,6 @@ public class BackupManager {
 		return list;
 	}
 
-	@Nullable
-	public File getLastestBackupFile() {
-		ArrayList<File> list = findBackupFiles();
-		Collections.sort(list, new Comparator<File>() {
-			@Override
-			public int compare(File f1, File f2) {
-				return (int) (f2.lastModified() - f1.lastModified());
-			}
-		});
-
-		if (list.isEmpty()) return null;
-		File f = list.get(0);
-		Timber.i("Assumed latest Backup File: " + f.getAbsolutePath());
-		return f;
-	}
-
 	public boolean hasBackupsMade() {
 		return !findBackupFiles().isEmpty();
 	}
@@ -111,6 +97,38 @@ public class BackupManager {
 
 	public boolean hasExternalStoragePermission() {
 		return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+	}
+
+	@Nullable
+	public File getLatestBackupFile() {
+		ArrayList<File> list = findBackupFiles();
+		Collections.sort(list, new Comparator<File>() {
+			@Override
+			public int compare(File f1, File f2) {
+				long lastModifiedF1 = f1.lastModified();
+				long lastModifiedF2 = f2.lastModified();
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+					return Long.compare(lastModifiedF2, lastModifiedF1);
+				}
+
+				String s1 = String.valueOf(f2);
+				String s2 = String.valueOf(f1);
+				return s1.compareTo(s2);
+			}
+		});
+
+		Timber.i("Here's the reversed list state:");
+		TimeUtils timeUtils = new TimeUtils(context);
+		for (File f : list) {
+			long date = f.lastModified();
+			Timber.i(f.getName() + " -> " + timeUtils.formatDateAccordingToPreferences(date));
+		}
+
+		if (list.isEmpty()) return null;
+		File f = list.get(0);
+		Timber.i("Assumed latest Backup File: " + f.getAbsolutePath());
+		return f;
 	}
 
 	public class BackupMetaData {

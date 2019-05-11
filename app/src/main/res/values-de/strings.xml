@@ -182,7 +182,6 @@
     <string name="action_open_phone">Nummer wählen</string>
     <string name="action_open_mail">Mail verschicken</string>
     <string name="error_nothing_selected">Fehler: Nichts ausgewählt</string>
-    <string name="action_call">Anrufen</string>
     <string name="error_no_numbers">Keine Telefonnummer gefunden</string>
     <string name="info_choose_phone_number">Wählen Sie eine Telefonnummer aus, welche gewählt werden soll:</string>
     <string name="action_write_mail">Mail schreiben</string>

@@ -303,7 +303,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		String lastBackup = "-";
 		if (bcm.hasBackupsMade()) {
 			backupCount = String.valueOf(bcm.findBackupFiles().size());
-			long l = bcm.getLastestBackupFile().lastModified();
+			long l = bcm.getLatestBackupFile().lastModified();
 			lastBackup = new TimeUtils(this).formatDateAccordingToPreferences(l);
 		}
 
@@ -358,7 +358,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	public void requestBackupImportMenu() {
 		BackupManager manager = new BackupManager(this);
-		File f = manager.getLastestBackupFile();
+		File f = manager.getLatestBackupFile();
 
 		if (f == null) {
 			Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
