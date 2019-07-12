@@ -1,6 +1,6 @@
 {
   "10": {
-    "date": "21.10.2018",
+    "date": "12.07.2019",
     "version": "1.08",
     "text": "-Neuer Look für das Hauptmenü! Die alte Listen-Struktur wurde durch ein Karten Design ersetzt\n-Löschen einer Notiz nun möglich über die einzelnen Menüs einer Notiz. Oder diese lange gedrückt halten.\n-Mehr Aktionen basierend auf dem Inhalt von Notizen: Links öffnen, Telefonnummern wählen und E-Mails verschicken\n-Diese Aktionen sind auch über die Benachrichtigungen verfügbar\n-Ein Fehler wurde behoben, wenn Notizen in umgekehrter Reihenfolge angezeigt werden\n-Ein Fehler wurde behoben wenn das zuletzt erstellte Backup importiert werden sollte\n-Icons aktualisiert\n-Danksagungen aktualisiert\n-Kleinere Fehlerbehebungen und verbesserte Leistung\n-Sprachdateien aktualisiert"
   },

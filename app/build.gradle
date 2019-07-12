@@ -7,8 +7,8 @@ android {
         applicationId "de.nilsfo.lsn"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 9
-        versionName "1.0.7"
+        versionCode 10
+        versionName "1.0.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -32,9 +32,9 @@ dependencies {
     implementation 'org.jetbrains:annotations-java5:15.0'
 
     testImplementation 'junit:junit:4.12'
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.0'
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
+    //debugImplementation 'com.amitshekhar.android:debug-db:1.0.0'
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
     //compile group: 'org.json', name: 'json', version: '20090211'
 }

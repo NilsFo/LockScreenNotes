@@ -1,8 +1,8 @@
 {
   "10": {
-    "date": "21.10.2018",
+    "date": "12.07.2019",
     "version": "1.08",
-    "text": "-New look for the main menu! Replaced the old list structure with a card design\n-Delete notes via the note's menu or long-press it\n-More note context actions: Browse URLs, dial phone numbers and send mails\n-Those actions are also available from within notifications\n-Fixed a bug when reversing notifications\n-Fixed a bug when detecting the lastest backup file\n-Updated icons\n-Updated credits\n-Bugfixes and performance improvements\n-Updated typos and localization files"
+    "text": "-New look for the main menu! Replaced the old list structure with a card design\n-Delete notes via the note's menu or long-press it\n-More note context actions: Browse URLs, dial phone numbers and send mails\n-Those actions are also available from within notifications\n-Fixed a bug when reversing notifications\n-Fixed a bug when detecting the lastest backup file\n-Updated icons\n-Updated credits\n-Bugfixes and performance improvements\n-Fixed typos\n-Updated localization files"
   },
   "9": {
     "date": "21.10.2018",
