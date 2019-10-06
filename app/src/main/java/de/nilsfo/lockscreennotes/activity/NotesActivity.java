@@ -1,6 +1,6 @@
 package de.nilsfo.lockscreennotes.activity;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by Nils on 16.08.2016.

@@ -17,13 +17,13 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.Date;
 import java.util.List;
 
+import androidx.appcompat.app.ActionBar;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;

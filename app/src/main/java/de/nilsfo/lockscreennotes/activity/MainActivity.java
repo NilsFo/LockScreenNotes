@@ -7,13 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
@@ -24,6 +17,9 @@ import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
 
@@ -40,6 +36,11 @@ import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
 import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogMail;
@@ -185,7 +186,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
 
 			View snackbarView = snackbar.getView();
-			TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+			TextView textView = (TextView) snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
 			textView.setMaxLines(2);
 			textView.setMinLines(2);
 			textView.setEllipsize(TextUtils.TruncateAt.END);

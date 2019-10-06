@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +17,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
+import androidx.core.app.NotificationCompat;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
 import de.nilsfo.lockscreennotes.activity.MainActivity;

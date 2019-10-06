@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.util.TimeUtils;

@@ -2,12 +2,12 @@ package de.nilsfo.lockscreennotes.data.content.browse;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.util.SparseBooleanArray;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import androidx.appcompat.app.AlertDialog;
 import de.nilsfo.lockscreennotes.data.Note;
 import timber.log.Timber;
 

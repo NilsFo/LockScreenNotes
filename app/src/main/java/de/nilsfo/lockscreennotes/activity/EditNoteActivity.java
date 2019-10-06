@@ -9,11 +9,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -24,11 +19,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NavUtils;
+import androidx.core.content.FileProvider;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
@@ -131,7 +132,7 @@ public class EditNoteActivity extends NotesActivity {
 			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
 
 			View snackbarView = snackbar.getView();
-			TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+			TextView textView = (TextView) snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
 			textView.setMaxLines(4);
 			textView.setMinLines(2);
 
