@@ -129,7 +129,7 @@ public class EditNoteActivity extends NotesActivity {
 					PreferenceManager.getDefaultSharedPreferences(v.getContext()).edit().putBoolean("prefs_ignore_tutorial_autosave", true).apply();
 				}
 			});
-			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
 			View snackbarView = snackbar.getView();
 			TextView textView = (TextView) snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
@@ -243,6 +243,12 @@ public class EditNoteActivity extends NotesActivity {
 		menuURL = menu.findItem(R.id.action_open_url);
 		menuPhone = menu.findItem(R.id.action_open_phone);
 		menuMail = menu.findItem(R.id.action_open_mail);
+
+		if (LockScreenNotes.isDarkMode(this)) {
+			menu.findItem(R.id.action_clear).setIcon(getResources().getDrawable(R.drawable.ic_clear_white_24dp));
+			menu.findItem(R.id.action_share).setIcon(getResources().getDrawable(R.drawable.ic_share_white_24dp));
+			menu.findItem(R.id.action_copy_note).setIcon(getResources().getDrawable(R.drawable.outline_file_copy_white_24));
+		}
 
 		updateContentMenuItems(myNote.getText());
 		return true;

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <color name="colorPrimary">#FFC107</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorPrimaryLight">#FCF39F</color>
     <color name="colorAccent">#536DFE</color>
-    <color name="edit_note_line">#83DAF7</color>
 
+    <color name="edit_note_line">#83DAF7</color>
     <color name="colorNotificationLight">@color/colorPrimary</color>
+    <color name="notification_accent">#FFA000</color>
+    <color name="snackbar_accent">#FFC107</color>
     <!--
     <item name="colorPrimaryDark" tools:targetApi="23">@color/colorPrimary</item>
     <item name="windowLightStatusBar" tools:targetApi="23">true</item>

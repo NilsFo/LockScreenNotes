@@ -1,7 +1,9 @@
 package de.nilsfo.lockscreennotes;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -35,8 +37,19 @@ public class LockScreenNotes extends Application {
 	public static final int REQUEST_CODE_INTENT_OPEN_APP = 4;
 	public static final int REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE = 5;
 
-	public static boolean isDebugBuild() {
-		return BuildConfig.DEBUG;
+	public static boolean isDarkMode(Context context) {
+		return isDarkMode(context.getResources().getConfiguration());
+	}
+
+	public static boolean isDarkMode(Configuration configuration) {
+		int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
+		switch (currentNightMode) {
+			case Configuration.UI_MODE_NIGHT_NO:
+				return false;
+			case Configuration.UI_MODE_NIGHT_YES:
+				return true;
+		}
+		throw new IllegalStateException("Failed to obtain the state of the dark mode");
 	}
 
 	@Override
@@ -72,6 +85,10 @@ public class LockScreenNotes extends Application {
 	@Override
 	public void onTerminate() {
 		super.onTerminate();
+	}
+
+	public static boolean isDebugBuild() {
+		return BuildConfig.DEBUG;
 	}
 
 	private class DebugTree extends Timber.DebugTree {

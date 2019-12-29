@@ -430,7 +430,7 @@ public class NotesNotificationManager {
 		builder.setChannelId(channelManager.getNoteChannel(priority));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			builder.setColor(context.getColor(R.color.colorNotificationLight));
+			builder.setColor(context.getColor(R.color.notification_accent));
 		} else {
 			builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
 			builder.setContentTitle(context.getString(R.string.app_name));

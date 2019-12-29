@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import androidx.appcompat.app.ActionBar;
+import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
@@ -153,7 +154,36 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	@Override
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void onBuildHeaders(List<PreferenceActivity.Header> target) {
+		Timber.i("Loading headers from resource.");
 		loadHeadersFromResource(R.xml.prefs_headers, target);
+		Timber.i("Finished setting up headers.");
+
+		Configuration configuration = getResources().getConfiguration();
+		if (LockScreenNotes.isDarkMode(configuration)) {
+			Timber.i("Dark mode engaged. Replacing icons.");
+			for (PreferenceActivity.Header header : target) {
+				switch (header.titleRes) {
+					case R.string.pref_header_general:
+						header.iconRes = R.drawable.baseline_build_white_24;
+						break;
+					case R.string.pref_notifications:
+						header.iconRes = R.drawable.baseline_notifications_white_24;
+						break;
+					case R.string.pref_backup:
+						header.iconRes = R.drawable.baseline_save_alt_white_24;
+						break;
+					case R.string.pref_date_and_time:
+						header.iconRes = R.drawable.baseline_access_time_white_24;
+						break;
+					case R.string.pref_heder_info:
+						header.iconRes = R.drawable.baseline_info_white_24;
+						break;
+					default:
+						Timber.w("Error! There is no Dark Mode image for icon with this ID: " + header.titleRes + "! [Title: " + header.title + "]!");
+						break;
+				}
+			}
+		}
 	}
 
 	protected boolean isValidFragment(String fragmentName) {
@@ -265,7 +295,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				manager.cancelNextAutoBackup();
 				Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
 			}
-		}		@Override
+		}
+
+		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_auto_backup);

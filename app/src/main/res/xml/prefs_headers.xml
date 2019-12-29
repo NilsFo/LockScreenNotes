@@ -4,7 +4,7 @@
 
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$GeneralPreferenceFragment"
-        android:icon="@drawable/ic_settings_black_24dp"
+        android:icon="@drawable/baseline_build_black_24"
         android:title="@string/pref_header_general"/>
 
     <header

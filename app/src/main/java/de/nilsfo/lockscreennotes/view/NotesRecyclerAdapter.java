@@ -2,6 +2,7 @@ package de.nilsfo.lockscreennotes.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
+import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
@@ -159,6 +161,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			this.itemView = itemView;
 
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+			Configuration configuration = context.getResources().getConfiguration();
 
 			noteID = -1; //TODO reference a static final field?
 			Timber.e("A new ViewHolder has been created!");
@@ -219,6 +222,9 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 					showPopupMenu(menu);
 				}
 			});
+			if (LockScreenNotes.isDarkMode(configuration)){
+				menu.setImageResource(R.drawable.baseline_more_vert_white_24);
+			}
 		}
 
 		public void setNote(Note note, int index, Context context) {

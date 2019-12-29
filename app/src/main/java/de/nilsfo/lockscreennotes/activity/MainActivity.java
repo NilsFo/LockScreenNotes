@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -37,10 +38,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
 import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogMail;
@@ -81,8 +82,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
+		//Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		//setSupportActionBar(toolbar);
 
 		tutorialView = (ScrollView) findViewById(R.id.tutorial_view);
 		nothingToDisplayLB = (TextView) findViewById(R.id.nothing_to_display);
@@ -183,10 +184,10 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 					requestRecoverNote(note);
 				}
 			});
-			snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
 			View snackbarView = snackbar.getView();
-			TextView textView = (TextView) snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+			TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
 			textView.setMaxLines(2);
 			textView.setMinLines(2);
 			textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -818,8 +819,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		tutorialDontShowAgainCB.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREFS_HIDE_TUTORIAL, false));
 		setupRelativeDateUpdater();
 
-		Timber.i("Mainactivity: onResume()");
+		Timber.i("MainActivity: onResume()");
 		new NotesNotificationManager(this).hideAllNotifications();
+
+		Configuration configuration = getResources().getConfiguration();
+		Timber.i("Dark mode status: " + LockScreenNotes.isDarkMode(configuration));
 
 		noteRecyclerAdapter.refreshNotesList();
 	}
