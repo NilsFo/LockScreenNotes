@@ -13,6 +13,7 @@ import de.nilsfo.lsn.R;
 public class SettingsBindPreferenceSummaryToValueListener implements Preference.OnPreferenceChangeListener {
 
 	private Integer stringResource = null;
+	private Runnable additionalAction;
 
 	public SettingsBindPreferenceSummaryToValueListener() {
 	}
@@ -49,6 +50,23 @@ public class SettingsBindPreferenceSummaryToValueListener implements Preference.
 
 			preference.setSummary(stringValue);
 		}
+
+		if (hasAdditionalAction()) {
+			additionalAction.run();
+		}
+
 		return true;
+	}
+
+	public boolean hasAdditionalAction() {
+		return getAdditionalAction() != null;
+	}
+
+	public Runnable getAdditionalAction() {
+		return additionalAction;
+	}
+
+	public void setAdditionalAction(Runnable additionalAction) {
+		this.additionalAction = additionalAction;
 	}
 }

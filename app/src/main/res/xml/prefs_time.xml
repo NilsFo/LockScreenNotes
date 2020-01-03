@@ -27,6 +27,12 @@
         android:title="@string/prefs_time_detail"
         />
 
+    <Preference
+        android:title="@string/date_preference_preview"
+        android:key="prefs_time_preview"
+        android:dependency="prefs_time_relative"
+        />
+
     <!--
     <EditTextPreference
         android:key="prefs_time_locale"

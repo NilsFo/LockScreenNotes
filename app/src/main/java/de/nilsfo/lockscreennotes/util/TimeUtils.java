@@ -76,6 +76,14 @@ public class TimeUtils {
 		return DateFormat.getDateInstance(levelOfDetail, getLocale()).format(date);
 	}
 
+	public String formatDateAbsolute(long date, int levelOfDetailTime, int levelOfDetailDate) {
+		return formatDateAbsolute(new Date(date), levelOfDetailTime, levelOfDetailDate);
+	}
+
+	public String formatDateAbsolute(Date date, int levelOfDetailTime, int levelOfDetailDate) {
+		return formatTimeAbsolute(date, levelOfDetailTime) + " " + formatDateAbsolute(date, levelOfDetailDate);
+	}
+
 	public String formatDateAbsolute(Date date) {
 		String lod = preferences.getString("prefs_date_detail", context.getString(R.string.error_unknown));
 		return formatDateAbsolute(date, getLoDviaPreference(lod));

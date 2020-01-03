@@ -12,6 +12,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -22,12 +23,14 @@ import android.widget.Toast;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import androidx.appcompat.app.ActionBar;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
 import de.nilsfo.lsn.R;
@@ -72,10 +75,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	}
 
 	public static void bindPreferenceSummaryToValue(Preference preference) {
-		bindPreferenceSummaryToValue(preference, null);
+		bindPreferenceSummaryToValue(preference, null, null);
+	}
+
+	public static void bindPreferenceSummaryToValue(Preference preference, Runnable additionalAction) {
+		bindPreferenceSummaryToValue(preference, null, additionalAction);
 	}
 
 	public static void bindPreferenceSummaryToValue(Preference preference, Integer resource) {
+		bindPreferenceSummaryToValue(preference, resource, null);
+	}
+
+	public static void bindPreferenceSummaryToValue(Preference preference, Integer resource, Runnable additionalAction) {
 		if (preference == null) return;
 
 		SettingsBindPreferenceSummaryToValueListener listener = defaultListener;
@@ -84,6 +95,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 
 		preference.setOnPreferenceChangeListener(listener);
+
+		if (additionalAction != null) {
+			listener.setAdditionalAction(additionalAction);
+		}
+
 		listener.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), preference.getContext().getString(R.string.error_unknown)));
 	}
 
@@ -346,15 +362,89 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class DateAndTimePreferenceFragment extends PreferenceFragment {
+
+		private ExecutorService service;
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.prefs_time);
 			setHasOptionsMenu(true);
 
-			bindPreferenceSummaryToValue(findPreference("prefs_time_detail"));
-			bindPreferenceSummaryToValue(findPreference("prefs_date_detail"));
-			bindPreferenceSummaryToValue(findPreference("prefs_time_locale"));
+			Runnable dateAndTimeUpdater = new Runnable() {
+				@Override
+				public void run() {
+					Timber.i("Running nested Runnable!");
+					updateTimeAndDatePreference();
+				}
+			};
+
+			bindPreferenceSummaryToValue(findPreference("prefs_time_detail"), dateAndTimeUpdater);
+			bindPreferenceSummaryToValue(findPreference("prefs_date_detail"), dateAndTimeUpdater);
+			findPreference("prefs_time_preview").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					updateTimeAndDatePreference();
+					return true;
+				}
+			});
+			updateTimeAndDatePreference();
+		}
+
+		/**
+		@Override
+		public void onStart() {
+			super.onStart();
+			Timber.i("TimeAndDate: Start");
+			updateTimeAndDatePreference();
+			service = Executors.newFixedThreadPool(1);
+
+			service.submit(new Runnable() {
+				@Override
+				public void run() {
+					while (true) {
+						Timber.i("Running in parallel: Update Preview");
+						try {
+							//updateTimeAndDatePreference();
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							Timber.e(e);
+						}
+					}
+				}
+			});
+		}
+
+		@Override
+		public void onPause() {
+			super.onPause();
+			Timber.i("TimeAndDate: Pause");
+			service.shutdown();
+		}
+		**/
+
+		public void updateTimeAndDatePreference() {
+			Timber.i("Updating Time and Date preview.");
+			Preference preview = findPreference("prefs_time_preview");
+			TimeUtils utils = new TimeUtils(getActivity());
+
+			synchronized (preview) {
+				String summary = getActivity().getString(R.string.error_unknown);
+				try {
+					int levelOfDetailDate = utils.getLoDviaPreference(((ListPreference) (findPreference("prefs_date_detail"))).getValue());
+					int levelOfDetailTime = utils.getLoDviaPreference(((ListPreference) (findPreference("prefs_time_detail"))).getValue());
+
+					Timber.i("Current Level of Detail Date: " + levelOfDetailDate);
+					Timber.i("Current Level of Detail Time: " + levelOfDetailTime);
+
+					summary = utils.formatDateAbsolute(new Date(), levelOfDetailTime, levelOfDetailDate);
+				} catch (Exception e) {
+					Timber.e(e);
+				}
+
+				Timber.i("Summary: " + summary);
+				preview.setSummary(summary);
+			}
 		}
 	}
 

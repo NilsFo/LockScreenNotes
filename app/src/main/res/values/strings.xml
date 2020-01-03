@@ -160,7 +160,7 @@
     <string name="info_channel_notes_description">This channel is the main way to display your notes.</string>
     <string name="info_channel_groups_notes">Note reminders</string>
     <string name="action_info">Information</string>
-    <string name="pref_auto_backup_info_summary">You can create and restore notes from backups. Use the menu in the main screen to do this.  Backups are stored in this location: %1$s  The app needs access to the external storage in order to create backups.</string>
+    <string name="pref_auto_backup_info_summary">You can create and restore notes from backups. Use the menu in the main screen to do this.  Backups are stored in this location: %1$s\nThe app needs access to the external storage in order to create backups.</string>
     <string name="pref_auto_backup">Automatic Backups</string>
     <string name="pref_backup">Backups</string>
     <string name="pref_auto_backups_enabled_title">Create backups automatically</string>
@@ -199,4 +199,5 @@
     <string name="error_no_mail">No mail addresses found</string>
     <string name="info_choose_mail">Select mail address to write to:</string>
     <string name="action_dial">Dial</string>
+    <string name="date_preference_preview">Current time preview (Tap to update):</string>
 </resources>

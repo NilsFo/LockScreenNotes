@@ -1,4 +1,9 @@
 {
+  "11": {
+    "date": "03.01.2020",
+    "version": "1.09",
+    "text": "-Nachtmodus unterstützt (Sofern vom Gerät unterstützt und eingeschaltet)\n-Die Einstellungen für die Zeit- und Datumsformatierung haben jetzt eine Vorschau\n-Sprachdateien aktualisiert und Rechtschreibfehler behoben"
+  },
   "10": {
     "date": "12.07.2019",
     "version": "1.08",
