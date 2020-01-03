@@ -40,6 +40,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	public static final SettingsBindPreferenceSummaryToValueListener defaultListener = new SettingsBindPreferenceSummaryToValueListener();
 	public static final int LAST_UPDATE_DATE_UNKNOWN = -1;
 	private boolean showNotifications;
+	private List<PreferenceActivity.Header> bufferedHeaders;
 
 	private static boolean isXLargeTablet(Context context) {
 		return (context.getResources().getConfiguration().screenLayout
@@ -110,6 +111,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	}
 
 	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		Timber.i("You should know: The configuration has changed!");
+		applyDarkThemeToBufferedHeaders(); //FIXME I don't think this works
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		new NotesNotificationManager(this).hideAllNotifications();
@@ -156,12 +164,25 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	public void onBuildHeaders(List<PreferenceActivity.Header> target) {
 		Timber.i("Loading headers from resource.");
 		loadHeadersFromResource(R.xml.prefs_headers, target);
+		bufferedHeaders = target;
 		Timber.i("Finished setting up headers.");
 
-		Configuration configuration = getResources().getConfiguration();
-		if (LockScreenNotes.isDarkMode(configuration)) {
+		applyDarkThemeToBufferedHeaders();
+	}
+
+	protected boolean isValidFragment(String fragmentName) {
+		return PreferenceFragment.class.getName().equals(fragmentName)
+				|| GeneralPreferenceFragment.class.getName().equals(fragmentName)
+				|| NotificationsPreferenceFragment.class.getName().equals(fragmentName)
+				|| DateAndTimePreferenceFragment.class.getName().equals(fragmentName)
+				|| AutoBackupPreferenceFragment.class.getName().equals(fragmentName)
+				|| InfoAndAboutPreferenceFragment.class.getName().equals(fragmentName);
+	}
+
+	private void applyDarkThemeToBufferedHeaders() {
+		if (LockScreenNotes.isDarkMode(this)) {
 			Timber.i("Dark mode engaged. Replacing icons.");
-			for (PreferenceActivity.Header header : target) {
+			for (PreferenceActivity.Header header : bufferedHeaders) {
 				switch (header.titleRes) {
 					case R.string.pref_header_general:
 						header.iconRes = R.drawable.baseline_build_white_24;
@@ -184,15 +205,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				}
 			}
 		}
-	}
-
-	protected boolean isValidFragment(String fragmentName) {
-		return PreferenceFragment.class.getName().equals(fragmentName)
-				|| GeneralPreferenceFragment.class.getName().equals(fragmentName)
-				|| NotificationsPreferenceFragment.class.getName().equals(fragmentName)
-				|| DateAndTimePreferenceFragment.class.getName().equals(fragmentName)
-				|| AutoBackupPreferenceFragment.class.getName().equals(fragmentName)
-				|| InfoAndAboutPreferenceFragment.class.getName().equals(fragmentName);
 	}
 
 	public boolean isShowNotifications() {
