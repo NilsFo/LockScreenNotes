@@ -1,3 +1,17 @@
+[![GitHub stars](https://img.shields.io/github/stars/NilsFo/LockScreenNotes.svg?style=social&label=Star)](https://github.com/NilsFo/LockScreenNotes) 
+[![GitHub forks](https://img.shields.io/github/forks/NilsFo/LockScreenNotes.svg?style=social&label=Fork)](https://github.com/NilsFo/LockScreenNotes)
+
+***
+
+[![Generic badge](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](docs/contribute.md)
+[![License](https://img.shields.io/github/license/NilsFo/LockScreenNotes?color=green&style=plastic)](https://github.com/NilsFo/LockScreenNotes/LICENSE.txt)
+![Size](https://img.shields.io/github/repo-size/NilsFo/LockScreenNotes?style=plastic)
+[![Language](https://img.shields.io/github/languages/top/NilsFo/LockScreenNotes?style=plastic)](https://github.com/NilsFo/LockScreenNotes)
+
+***
+
+[![Follow me on Twitter](https://img.shields.io/twitter/follow/NilsFoer?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=NilsFoer)
+
 # LockScreenNotes
 This project was derived from another one created during my B. Sc. Education at the Ruhr Universität Bochum, Germany.
 
@@ -7,10 +21,12 @@ You can download it from two sources. Either the Android Play Store, or via GitH
 * https://play.google.com/store/apps/details?id=de.nilsfo.lsn&hl=en_US
 * https://github.com/NilsFo/LockScreenNotes/releases
 
-Any other source is not officially supported by me!
+:warning: Any other source is not officially supported by me! :warning:
 
 **Note**: Yes, this app is free and open source, and yes, you may edit and use all its contents.
 But please notify me if you do so and report any imposters.
+
+***
 
 ### Google Play Store entry:
 With this app you can easily create notes that stick around for later!
@@ -35,7 +51,15 @@ This means, I have no way of tracking you or spying on your notes.
 * External storage: To read / write backups
 
 ## Screenshots:
+
 ![Example screenshot #1](/example/sc1.png?raw=true "Example screenshot #1")
+
 ![Example screenshot #2](/example/sc2.png?raw=true "Example screenshot #2")
+
 ![Example screenshot #3](/example/sc3.png?raw=true "Example screenshot #3")
+
 ![Example screenshot #4](/example/sc4.png?raw=true "Example screenshot #4")
+
+***
+
+Thanks for Reading! I hope you have a beautiful day. :heart:

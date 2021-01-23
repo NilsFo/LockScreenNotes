@@ -167,7 +167,7 @@ public abstract class VersionManager {
 		SimpleDateFormat sdf = new SimpleDateFormat(VERSION_RELEASE_DATE_PATTERN);
 		Date d = sdf.parse(s);
 
-		Timber.i("Formating the update counter string. Read JSON date: " + s + ". Expected pattern: " + VERSION_RELEASE_DATE_PATTERN + " -> " + d.getTime());
+		Timber.i("Formatting the update counter string. Read JSON date: " + s + ". Expected pattern: " + VERSION_RELEASE_DATE_PATTERN + " -> " + d.getTime());
 
 		return d;
 	}

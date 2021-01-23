@@ -56,7 +56,7 @@
     <string name="prefs_seperate_notes_tilte">Separate notifications</string>
     <string name="prefs_seperate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.\nDepending on your device, too many notifications may be automatically grouped together by the system.</string>
     <string name="error_invalid_value">Could not handle that value. Resetting to default.</string>
-    <string name="pref_view_on_github_summary">This app is free, open source and does not contain apps. This will not change in the future. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
+    <string name="pref_view_on_github_summary">This app is free, open source and does not contain ads. This will not change in the future. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
     <string name="settings_auto_enable_new_notes_flavor">When you add a new note it will automatically be enabled.</string>
     <string name="tutorial_welcome">Let\'s get started!</string>
