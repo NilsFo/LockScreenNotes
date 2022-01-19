@@ -3,7 +3,7 @@
 
 ***
 
-[![Generic badge](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](docs/contribute.md)
+[![Generic badge](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](docs/contribute.md)
 [![License](https://img.shields.io/github/license/NilsFo/LockScreenNotes?color=green&style=plastic)](https://github.com/NilsFo/LockScreenNotes/LICENSE.txt)
 ![Size](https://img.shields.io/github/repo-size/NilsFo/LockScreenNotes?style=plastic)
 [![Language](https://img.shields.io/github/languages/top/NilsFo/LockScreenNotes?style=plastic)](https://github.com/NilsFo/LockScreenNotes)
