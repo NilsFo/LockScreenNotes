@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Lock Screen Notes</string>
-    <string translatable="false" name="qr_cache_name">lock_screen_notes_qr</string>
+    <string name="qr_cache_name" translatable="false">lock_screen_notes_qr</string>
     <string name="action_settings">Settings</string>
     <string name="concat_dash" translatable="false">%1$s - %2$s</string>
     <string name="last_edited">Last edited: %1$s</string>
@@ -137,7 +137,7 @@
     <string name="pref_github_releases_title">External update feed</string>
     <string name="pref_github_releases_summary">You can subscribe to this external feed and get notified about updates to this app.</string>
     <string name="pref_update_day_counter_title">Last update</string>
-    <string name="pref_update_day_counter_summary">Last update was %1$s day(s) ago.</string>
+    <string name="pref_update_day_counter_summary">Last update was %1$s day(s) ago.\nApp launched since then: %2$s times (%3$s overall).</string>
     <string name="action_github_url_success">Feed URL copied to clipboard.</string>
     <string name="error_no_backup">No backup file found in the default directory.</string>
     <string name="action_different_file">Different file</string>
@@ -200,4 +200,13 @@
     <string name="info_choose_mail">Select mail address to write to:</string>
     <string name="action_dial">Dial</string>
     <string name="date_preference_preview">Current time preview (Tap to update):</string>
+    <string name="error_line_rendering_contact_dev">An error occurred while drawing the lines. Please contact the developer regarding this (if this keep happening).</string>
+    <string name="action_review_notification_permissions">Review notification permissions</string>
+    <string name="warning_no_storage_permission">Cannot use backups without access to device storage. Please enable storage and try again.</string>
+    <string name="action_review_notification_permissions_info">This app needs permissions to display notifications on the lock screen.\nThese are currently denied. Review notification settings on your device below.\n\nThe options available depend on your device and software version.</string>
+    <string name="action_review_notification_permissions_enable_permissions">Check app permissions</string>
+    <string name="action_review_notification_permissions_enable_notification_center">Check notification center</string>
+    <string name="error_no_notification_permission_options">No notification permissions available to be changes on this device. Try granting permissions manually.</string>
+    <string name="action_review_notification_permissions_review_permissions">Review permissions</string>
+    <string name="info_review_notification_permissions_granted">All permissions granted. Thank you.</string>
 </resources>

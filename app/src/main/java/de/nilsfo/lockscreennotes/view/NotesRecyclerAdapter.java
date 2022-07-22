@@ -222,7 +222,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 					showPopupMenu(menu);
 				}
 			});
-			if (LockScreenNotes.isDarkMode(configuration)){
+			if (LockScreenNotes.isDarkMode(configuration)) {
 				menu.setImageResource(R.drawable.baseline_more_vert_white_24);
 			}
 		}

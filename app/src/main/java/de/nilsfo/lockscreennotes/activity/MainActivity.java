@@ -1,6 +1,7 @@
 package de.nilsfo.lockscreennotes.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
@@ -77,6 +79,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	private CheckBox tutorialDontShowAgainCB;
 	private TextView nothingToDisplayLB;
 	private ExecutorService executorService;
+	private MenuItem checkNotificationPermissionItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -294,9 +297,93 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		noteRecyclerAdapter.refreshNotesList();
 	}
 
+	private void reviewNotificationPermissions() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
+		final Activity activity = this;
+
+		if (notesNotificationManager.hasUserPermissionToDisplayNotifications(activity)) {
+			Toast.makeText(activity, R.string.info_review_notification_permissions_granted, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		builder.setTitle(R.string.action_review_notification_permissions);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setMessage(getString(R.string.action_review_notification_permissions_info));
+
+		if (notesNotificationManager.shouldShowRequestPermissionRationale(this)) {
+			builder.setNeutralButton(R.string.action_review_notification_permissions_enable_permissions, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					try {
+						notesNotificationManager.requestPermissionRationale(activity);
+					} catch (Exception e) {
+						Timber.e(e);
+						Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					}
+				}
+			});
+		} else {
+			builder.setNeutralButton(R.string.action_review_notification_permissions_review_permissions, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+
+					try {
+						Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+						Uri uri = Uri.fromParts("package", getPackageName(), null);
+						intent.setData(uri);
+						startActivity(intent);
+					} catch (Exception e) {
+						Timber.e(e);
+						Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					}
+				}
+			});
+		}
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+			builder.setPositiveButton(R.string.action_review_notification_permissions_enable_notification_center, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+
+					// Starting a new intent to navigate the user to the settings activity on the device
+					Intent intent = new Intent();
+					intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+					//for Android 5-7
+					intent.putExtra("app_package", getPackageName());
+					intent.putExtra("app_uid", getApplicationInfo().uid);
+
+					// for Android 8 and above
+					intent.putExtra("android.provider.extra.APP_PACKAGE", getPackageName());
+
+					try {
+						startActivity(intent);
+					} catch (Exception e) {
+						Timber.e(e);
+						Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					}
+				}
+			});
+		}
+
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		builder.show();
+	}
+
 	private void requestBackupMenu() {
 		BackupManager bcm = new BackupManager(this);
 		if (!bcm.hasExternalStoragePermission()) {
+			Toast.makeText(this, R.string.warning_no_storage_permission, Toast.LENGTH_LONG).show();
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
 			return;
 		}
@@ -655,7 +742,28 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+		checkNotificationPermissionItem = menu.findItem(R.id.action_notification_permissions);
+		updateNotificationPermissionMenuItem();
+
 		return true;
+	}
+
+	private void updateNotificationPermissionMenuItem() {
+		Timber.i("Updating notification permission menu item.");
+		if (checkNotificationPermissionItem == null) {
+			return;
+		}
+
+		if (LockScreenNotes.isDarkMode(this)) {
+			checkNotificationPermissionItem.setIcon(getResources().getDrawable(R.drawable.baseline_notifications_active_white_24));
+		}
+
+		checkNotificationPermissionItem.setVisible(false);
+		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
+		if (!notesNotificationManager.hasUserPermissionToDisplayNotifications(this)) {
+			Timber.w("The user has not allowed permissions for push notifications!");
+			checkNotificationPermissionItem.setVisible(true);
+		}
 	}
 
 	@Override
@@ -683,6 +791,9 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				return true;
 			case R.id.action_backup:
 				requestBackupMenu();
+				return true;
+			case R.id.action_notification_permissions:
+				reviewNotificationPermissions();
 				return true;
 		}
 
@@ -821,6 +932,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		Timber.i("MainActivity: onResume()");
 		new NotesNotificationManager(this).hideAllNotifications();
+		updateNotificationPermissionMenuItem();
 
 		Configuration configuration = getResources().getConfiguration();
 		Timber.i("Dark mode status: " + LockScreenNotes.isDarkMode(configuration));

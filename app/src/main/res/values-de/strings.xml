@@ -123,7 +123,7 @@
     <string name="pref_github_releases_title">Externer Aktualisierungs-Feed</string>
     <string name="pref_github_releases_summary">Dieser Feed kann benutzt werden um, über externe Wege, über Aktualisierungen von dieser App informiert zu werden.</string>
     <string name="pref_update_day_counter_title">Zuletzt aktualisiert</string>
-    <string name="pref_update_day_counter_summary">Letzte Aktualisierung war vor %1$s Tag(en).</string>
+    <string name="pref_update_day_counter_summary">Letzte Aktualisierung war vor %1$s Tag(en).\nApp seitdem %2$s mal gestartet (%3$s mal seit Installation).</string>
     <string name="action_github_url_success">Feed URL in die Zwischenablage kopiert.</string>
     <string name="error_no_backup">Keine Backup-Datei in dem Standardpfad gefunden.</string>
     <string name="action_different_file">Andere Datei importieren</string>

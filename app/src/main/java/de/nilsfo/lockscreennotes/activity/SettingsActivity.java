@@ -258,6 +258,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
 			editor.putBoolean("prefs_hide_tutorial", false);
 			editor.putBoolean("prefs_ignore_tutorial_autosave", false);
+			editor.putLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
 			editor.apply();
 		}
 	}
@@ -392,36 +393,32 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 
 		/**
-		@Override
-		public void onStart() {
-			super.onStart();
-			Timber.i("TimeAndDate: Start");
-			updateTimeAndDatePreference();
-			service = Executors.newFixedThreadPool(1);
-
-			service.submit(new Runnable() {
-				@Override
-				public void run() {
-					while (true) {
-						Timber.i("Running in parallel: Update Preview");
-						try {
-							//updateTimeAndDatePreference();
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							Timber.e(e);
-						}
-					}
-				}
-			});
-		}
-
-		@Override
-		public void onPause() {
-			super.onPause();
-			Timber.i("TimeAndDate: Pause");
-			service.shutdown();
-		}
-		**/
+		 * @Override public void onStart() {
+		 * super.onStart();
+		 * Timber.i("TimeAndDate: Start");
+		 * updateTimeAndDatePreference();
+		 * service = Executors.newFixedThreadPool(1);
+		 * <p>
+		 * service.submit(new Runnable() {
+		 * @Override public void run() {
+		 * while (true) {
+		 * Timber.i("Running in parallel: Update Preview");
+		 * try {
+		 * //updateTimeAndDatePreference();
+		 * Thread.sleep(1000);
+		 * } catch (InterruptedException e) {
+		 * Timber.e(e);
+		 * }
+		 * }
+		 * }
+		 * });
+		 * }
+		 * @Override public void onPause() {
+		 * super.onPause();
+		 * Timber.i("TimeAndDate: Pause");
+		 * service.shutdown();
+		 * }
+		 **/
 
 		public void updateTimeAndDatePreference() {
 			Timber.i("Updating Time and Date preview.");
@@ -525,9 +522,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			Preference updateDayCounter = findPreference("pref_update_day_counter");
 			int lastUpdateDays = getUpdateDays(getActivity());
 			if (lastUpdateDays == LAST_UPDATE_DATE_UNKNOWN) {
-				Timber.w("Failed to get the last date this app was updated! Doing nothing, as this will result in the text that an error occured!");
+				Timber.w("Failed to get the last date this app was updated! Doing nothing, as this will result in the text that an error occurred!");
 			} else {
-				updateDayCounter.setSummary(getString(R.string.pref_update_day_counter_summary, String.valueOf(lastUpdateDays)));
+				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+				long launchedCountAllTime = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
+				long launchedCountThisVersion = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+
+				String displayedText = getString(R.string.pref_update_day_counter_summary, String.valueOf(lastUpdateDays), String.valueOf(launchedCountThisVersion), String.valueOf(launchedCountAllTime));
+				updateDayCounter.setSummary(displayedText);
 			}
 			updateDayCounter.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
 		}

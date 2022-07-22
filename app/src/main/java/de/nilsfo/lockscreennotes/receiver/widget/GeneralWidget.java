@@ -16,6 +16,14 @@ import timber.log.Timber;
 public class GeneralWidget extends AppWidgetProvider {
 
 	@Override
+	public void onReceive(Context context, Intent intent) {
+		//Called on every intent ever sent to this widget
+		super.onReceive(context, intent);
+
+		Timber.i("GeneralWidget got a general intent: " + intent.getDataString());
+	}
+
+	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		//Called when the auto timer is triggered
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
@@ -43,6 +51,17 @@ public class GeneralWidget extends AppWidgetProvider {
 	}
 
 	@Override
+	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+		//Called on resize
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+
+		Bundle b = appWidgetManager.getAppWidgetOptions(appWidgetId);
+		Timber.i("GeneralWidget options changed:");
+		Timber.i("Old: " + Arrays.toString(b.keySet().toArray()));
+		Timber.i("New: " + Arrays.toString(newOptions.keySet().toArray()));
+	}
+
+	@Override
 	public void onEnabled(Context context) {
 		//Called when widget added
 		super.onEnabled(context);
@@ -54,24 +73,5 @@ public class GeneralWidget extends AppWidgetProvider {
 		//Called when widget is removed
 		super.onDisabled(context);
 		Timber.w("LSN General-Widget removed from host pane!");
-	}
-
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		//Called on every intent ever sent to this widget
-		super.onReceive(context, intent);
-
-		Timber.i("GeneralWidget got a general intent: " + intent.getDataString());
-	}
-
-	@Override
-	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
-		//Called on resize
-		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-
-		Bundle b = appWidgetManager.getAppWidgetOptions(appWidgetId);
-		Timber.i("GeneralWidget options changed:");
-		Timber.i("Old: " + Arrays.toString(b.keySet().toArray()));
-		Timber.i("New: " + Arrays.toString(newOptions.keySet().toArray()));
 	}
 }

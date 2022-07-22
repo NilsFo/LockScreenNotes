@@ -22,6 +22,14 @@
         android:icon="@drawable/ic_access_time_black_24dp"
         android:title="@string/pref_date_and_time"/>
 
+    <!--
+    TODO implement a statistics TAB
+    <header
+        android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$Statistics"
+        android:icon="@drawable/ic_access_time_black_24dp"
+        android:title="@string/pref_date_and_time"/>
+         -->
+
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$InfoAndAboutPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"

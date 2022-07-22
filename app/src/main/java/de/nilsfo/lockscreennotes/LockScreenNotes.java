@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -15,7 +16,8 @@ import de.nilsfo.lsn.BuildConfig;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
-//import com.amitshekhar.DebugDB;
+// TODO For debugging purposes: Enable / Disable this line for debugDB
+// import com.amitshekhar.DebugDB;
 
 /**
  * Created by Nils on 19.02.2017.
@@ -58,7 +60,9 @@ public class LockScreenNotes extends Application {
 
 		if (isDebugBuild()) {
 			Timber.plant(new DebugTree());
-			//Timber.i("Debug-DB URL: " + DebugDB.getAddressLog());
+
+			// TODO For debugging purposes: Enable / Disable this line for debugDB
+			// Timber.i("Debug-DB URL: " + DebugDB.getAddressLog());
 		} else {
 			Timber.plant(new ReleaseTree());
 		}
@@ -80,6 +84,25 @@ public class LockScreenNotes extends Application {
 		Timber.i("Started the app. Locale used: " + locale.getISO3Country() + " - " + locale.getCountry() + " - " + locale.getDisplayLanguage() + " - " + locale.getDisplayCountry());
 		int currentVer = VersionManager.getCurrentVersion(this);
 		Timber.i("App Version: " + currentVer + ". Device Android-Version Code: " + Build.VERSION.SDK_INT);
+
+		// Incrementing launch timer
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		long launchedCountAllTime = 0;
+		long launchedCountThisVersion = 0;
+		try {
+			launchedCountAllTime = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
+			launchedCountThisVersion = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+		} catch (Exception e) {
+			Timber.w("Failed to read app launch counts. Resetting!");
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		}
+		Timber.i("App previously launched count all time: " + launchedCountAllTime + ".");
+		Timber.i("App previously launched count this version: " + launchedCountThisVersion + ".");
+
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putLong(VersionManager.PREFERENCE_APP_LAUNCHED_ALL_TIME, launchedCountAllTime + 1);
+		editor.putLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, launchedCountThisVersion + 1);
+		editor.apply();
 	}
 
 	@Override

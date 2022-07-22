@@ -1,15 +1,19 @@
 package de.nilsfo.lockscreennotes.util;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +21,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
@@ -161,7 +167,7 @@ public class NotesNotificationManager {
 		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
 
-		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager manager = getNotificationManagerService();
 		Notification notification = builder.build();
 		if (manager != null) {
 			manager.notify(DEFAULT_NOTIFICATION_ID, notification);
@@ -456,4 +462,52 @@ public class NotesNotificationManager {
 		}
 		return priority;
 	}
+
+	public NotificationManager getNotificationManagerService() {
+		NotificationManager manager = null;
+		try {
+			manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		} catch (Exception e) {
+			Timber.w(e);
+			Timber.w("Failed to create 'NotificationManager'. See above warning for stacktrace.");
+			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		}
+		return manager;
+	}
+
+	public boolean hasUserPermissionToDisplayNotifications(Activity activity) {
+		NotificationManager manager = getNotificationManagerService();
+		if (manager == null) {
+			return false;
+		}
+
+		boolean ret = true;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			ret &= manager.areNotificationsEnabled();
+		}
+		ret &= hasDeviceNotificationPermission();
+
+		return ret;
+	}
+
+	public boolean shouldShowRequestPermissionRationale(Activity activity) {
+		if (Build.VERSION.SDK_INT >= 33) {
+			return ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS);
+		}
+		return false;
+	}
+
+	private boolean hasDeviceNotificationPermission() {
+		if (Build.VERSION.SDK_INT >= 33) {
+			return ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+		}
+		return true;
+	}
+
+	public void requestPermissionRationale(Activity activity) {
+		ActivityCompat.requestPermissions(activity,
+				new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+				1);
+	}
+
 }

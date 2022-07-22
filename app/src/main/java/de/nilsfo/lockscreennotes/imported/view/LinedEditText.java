@@ -5,8 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
+import timber.log.Timber;
 
 /**
  * Created by Nils on 14.08.2016.
@@ -47,6 +49,10 @@ public class LinedEditText extends AppCompatEditText {
 
 	@Override
 	public boolean isInEditMode() {
+		if (helper == null) {
+			Timber.e("NO LinedTextHelper DECLARED!");
+			return false;
+		}
 		return helper.isInEditMode();
 	}
 

@@ -32,11 +32,16 @@ import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
+import static de.nilsfo.lockscreennotes.util.NotesNotificationManager.PREFERENCE_REVERSE_ORDERING;
+
 /**
  * Created by Nils on 13.05.2017.
  */
 
 public abstract class VersionManager {
+
+	public static final String PREFERENCE_APP_LAUNCHED_ALL_TIME = "prefs_app_launched_all_time";
+	public static final String PREFERENCE_APP_LAUNCHED_THIS_VERSION = "prefs_app_launched_this_version";
 
 	public static final String VERSION_RELEASE_DATE_PATTERN = "dd.MM.yyyy";
 	public static final int CURRENT_VERSION_UNKNOWN = -1;
@@ -46,16 +51,29 @@ public abstract class VersionManager {
 	public static void onVersionChange(Context context, int oldVersion, int newVersion) {
 		Timber.i("App version changed! " + oldVersion + " -> " + newVersion);
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
+		// Checking for every 'new' version specifically, in case big changes must be made that are not downward compatible.
 		switch (newVersion) {
 			default:
 				Timber.w("This version has no special changes!");
 				break;
 		}
 
-		displayVersionUpdateNews(context, newVersion);
+		// (Re-) setting some preferences
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		int launchedCountAllTime = preferences.getInt(PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
+		int launchedCountThisVersion = preferences.getInt(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+		Timber.i("App launched count all time: " + launchedCountAllTime + ".");
+		Timber.i("App launched count this version: " + launchedCountThisVersion + ". (will be reset)");
 
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putInt(PREFERENCE_APP_LAUNCHED_ALL_TIME, launchedCountAllTime);
+		editor.putInt(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+		editor.apply();
+
+		// Showing the version update changes as a dialog window
+		VersionManager.displayVersionUpdateNews(context, newVersion);
+
+		// Resetting the timer for the next local update
 		LSNAlarmManager alarmManager = new LSNAlarmManager(context);
 		if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
 			alarmManager.cancelNextAutoBackup();

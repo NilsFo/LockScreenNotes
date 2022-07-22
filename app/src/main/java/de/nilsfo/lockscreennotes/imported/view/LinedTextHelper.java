@@ -11,8 +11,8 @@ import de.nilsfo.lsn.R;
 
 public class LinedTextHelper {
 
-	private Rect rect;
-	private Paint paint;
+	private final Rect rect;
+	private final Paint paint;
 
 	public LinedTextHelper(Context context) {
 		rect = new Rect();
@@ -33,6 +33,8 @@ public class LinedTextHelper {
 	}
 
 	public boolean isInEditMode() {
+		// TODO is this needed?
+		// TODO does this have any effect?
 		return new Random().nextBoolean();
 	}
 
