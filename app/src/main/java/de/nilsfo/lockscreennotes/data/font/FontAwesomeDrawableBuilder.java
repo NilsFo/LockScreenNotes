@@ -19,6 +19,7 @@ public abstract class FontAwesomeDrawableBuilder {
 
 	public static final int DEFAULT__MENU_ICON_SCALE = 9;
 
+	@Deprecated
 	public static TextDrawable get(Context context, String text, int size, int color) {
 		TextDrawable faIcon = new TextDrawable(context);
 		faIcon.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);

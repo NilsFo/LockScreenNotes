@@ -51,10 +51,6 @@ public class LSNAlarmManager {
 		Timber.i("Scheduling next alarm at " + triggerTime + ". That's: " + formatedDebugTimestamp);
 		Timber.i("Repeating every " + interval + "ms. That should be every " + days + " day(s).");
 
-		//if (LockScreenNotes.isDebugBuild()) {
-		//	Toast.makeText(context, "Debug: Backup Scheduler set up for: " + formatedDebugTimestamp + ". Cycle days: " + days, Toast.LENGTH_LONG).show();
-		//}
-
 		alarmManager.setInexactRepeating(AlarmManager.RTC, triggerTime, interval, intent);
 	}
 

@@ -431,8 +431,6 @@ public class EditNoteActivity extends NotesActivity {
 			return;
 		}
 
-		//File imagePath = new File(getCacheDir(), "images");
-		//File newFile = new File(imagePath, "image.png");
 		Timber.i("Shared QR-Imagefile info: " + imageFile);
 		Uri contentUri = FileProvider.getUriForFile(this, "de.nilsfo.lockscreennotes.LockScreenNotes.fileprovider", imageFile);
 

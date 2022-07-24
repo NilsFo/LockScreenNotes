@@ -47,12 +47,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 	@Override
 	public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 		LayoutInflater inflater = LayoutInflater.from(getContext());
-		//View view;
-		//if (convertView == null)
-		//	view = inflater.inflate(R.layout.note_row, parent, false);
-		//else
-		//	view = convertView;
-		//
 		Note note = getItem(position);
 		@SuppressLint("ViewHolder") View view = inflater.inflate(R.layout.note_row, parent, false);
 
@@ -94,18 +88,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 					requestEditNoteActivity(getItem(position));
 				}
 			});
-			//editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			//
-			//	@Override
-			//	public void onFocusChange(View v, boolean hasFocus) {
-			//		if (getCount() == 0) return;
-			//
-			//		if (hasFocus) {
-			//			Log.i(LOGTAG, "Turns out... its a focus gain on the note.");
-			//			requestEditNoteActivity(getItem(position));
-			//		}
-			//	}
-			//});
 			editText.setFocusable(false);
 			editText.setClickable(true);
 			Timber.i("Seems that it is fullscreenEditMoode... So all listeners have been added.");
@@ -188,10 +170,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 	}
 
 	public boolean isFullscreenEditMode() {
-		//boolean b = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(PREFERENCE_ALLOW_EDIT_NOTE_ACTIVITY, true);
-		//Log.i(LOGTAG, "A check was made if its fullscreen edit mode. Result: " + b);
-		//return b;
-
 		return true;
 	}
 

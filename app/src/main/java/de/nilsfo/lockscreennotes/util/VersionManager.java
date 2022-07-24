@@ -203,15 +203,6 @@ public abstract class VersionManager {
 		dialogBuilder.setIcon(R.mipmap.ic_launcher);
 		dialogBuilder.setTitle(R.string.update_news);
 		dialogBuilder.setView(v);
-		//dialogBuilder.setMessage("nuls tests");
-		//dialogBuilder.setPositiveButton(R.string.action_changelog_highlight,
-		//		new DialogInterface.OnClickListener() {
-		//			public void onClick(DialogInterface dialog, int whichButton) {
-		//				dialog.dismiss();
-		//				displayVersionHighlight(context, version);
-		//			}
-		//		}
-		//);
 		if (showAllButton) {
 			dialogBuilder.setNegativeButton(R.string.action_full_changelog,
 					new DialogInterface.OnClickListener() {

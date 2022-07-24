@@ -1,36 +1,40 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context="de.nilsfo.lockscreennotes.activity.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.nilsfo.lockscreennotes.activity.MainActivity">
 
     <item
         android:id="@+id/action_notification_permissions"
-        android:title="@string/action_review_notification_permissions"
         android:icon="@drawable/baseline_notifications_active_black_24"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/action_review_notification_permissions"
+        app:showAsAction="ifRoom" />
+    <!--
+    Action view available with this:
+    app:actionViewClass="android.widget.ImageButton"
+    -->
 
     <item
         android:id="@+id/action_delete_all"
         android:title="@string/action_delete_all"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_delete_all_disabled"
         android:title="@string/action_delete_all_disabled"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_disable_all"
         android:title="@string/action_disable_all"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_backup"
         android:title="@string/action_backup"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

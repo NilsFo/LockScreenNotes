@@ -52,19 +52,6 @@ public class FileManager {
 		f = new File(f, context.getString(R.string.app_name));
 
 		Timber.i("Requested external home directory. Location: " + f.getAbsolutePath());
-
-		/*
-		if (!f.exists()) {
-			if (!f.mkdirs()) {
-				Timber.e("Directory not created");
-			} else {
-				Timber.i("External origin dir was created without problems.");
-			}
-		} else {
-			Timber.i("External origin dir already exists. No need to create.");
-		}
-		createNoMediaFile(f);
-		*/
 		createDirectory(f, true);
 
 		return f;
@@ -104,20 +91,6 @@ public class FileManager {
 	}
 
 	public void browseFolder(File file) {
-		/*
-		Log.i(LOGTAG, "Requesting to browse file: " + file.getAbsolutePath());
-		//Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		//Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath()
-		//		+ "/myFolder/");
-
-		intent.setDataAndType(Uri.parse(file.getAbsolutePath()), "resource/folder");
-		context.startActivity(Intent.createChooser(intent, "Open folder"));
-		Uri selectedUri = Uri.parse(Environment.getExternalStorageDirectory() + "/myFolder/");
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setDataAndType(selectedUri, "resource/folder");
-		context.startActivity(Intent.createChooser(intent, "Open folder"));
-		*/
 		String folderPath = file.getAbsolutePath();
 
 		Intent intent = new Intent();
@@ -224,11 +197,4 @@ public class FileManager {
 
 		return null;
 	}
-
-	//public void notifyMediaScanner(File file) {
-	//	Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-	//	intent.setData(Uri.fromFile(file));
-	//	context.sendBroadcast(intent);
-	//}
-
 }

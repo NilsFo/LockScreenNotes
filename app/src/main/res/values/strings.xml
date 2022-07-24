@@ -19,7 +19,7 @@
     <string name="settings_low_priority_note_title">Subtle notifications</string>
     <string name="settings_low_priority_note_flavor">Hides the notifications from the notification bar and only displays them when pulling down the <i>notification pull down bar</i>.\nDepending on your system, the device needs to be unlocked for notifications to be displayed this way.</string>
     <string name="advanced">Advanced</string>
-    <string name="share_via_this_app">Create a new note</string>
+    <string name="share_via_this_app">Create Note</string>
     <string name="prefs_homescreen_lines_title">Minimum note lines</string>
     <string name="prefs_homescreen_lines_summary">In the main screen, the minimum amount of lines a note must have. Minimum lines differ by device resolution.\nCurrently selected: %1$s</string>
     <string name="home_screen_lines_too_small">Given line size is too small. Changed back to default.</string>
@@ -78,9 +78,10 @@
     <string name="prefs_time_relative_summary">If enabled dates will be displayed relative to the current time (e.g. \'5 minutes ago\').\nOtherwise absolute dates will be used (e.g. \'May 20, 2017\').</string>
     <string name="prefs_time_locale_default_value" translatable="false">default locale</string>
     <string name="pref_credits" translatable="false">Credits</string>
-    <string name="prefs_credits_text_drawable" translatable="false"><i>Text Drawable</i> by Wireless Designs, LLC</string>
-    <string name="prefs_credits_timber" translatable="false"><i>Timber</i> by Jake Wharton</string>
+    <string name="prefs_credits_text_drawable" translatable="false"><i>Text Drawable</i> by Wireless Designs, LLC.</string>
+    <string name="prefs_credits_timber" translatable="false"><i>Timber</i> by Jake Wharton.</string>
     <string name="prefs_credits_leakcanary" translatable="false"><i>LeakCanary</i> by Square, Inc.</string>
+    <string name="prefs_credits_balloon" translatable="false"><i>Balloon</i> by skydoves.</string>
     <string name="action_cancel_edit">Cancel edit</string>
     <string name="action_cancel_edit_confirm">Are you sure you want to cancel editing this note?\n\nAll unsaved changes will be lost.</string>
     <string name="action_delete_all_disabled">Delete all disabled</string>
@@ -209,4 +210,6 @@
     <string name="error_no_notification_permission_options">No notification permissions available to be changes on this device. Try granting permissions manually.</string>
     <string name="action_review_notification_permissions_review_permissions">Review permissions</string>
     <string name="info_review_notification_permissions_granted">All permissions granted. Thank you.</string>
+    <string name="error_not_displaying_notifications_no_permissions">%1$s: Cannot show notes. Insufficient app permissions.</string>
+    <string name="info_review_notification_permissions_balloon_text">Insufficient App permissions.\nReview them here.</string>
 </resources>

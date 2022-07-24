@@ -15,6 +15,8 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.google.android.material.internal.ContextUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +39,7 @@ import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
+import static com.google.android.material.internal.ContextUtils.getActivity;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
 import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
 import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_MAIL;
@@ -132,10 +135,16 @@ public class NotesNotificationManager {
 			return;
 		}
 
-		NotificationCompat.Builder builder = getNotesBuilder();
+		if (!hasUserPermissionToDisplayNotifications()) {
+			String appName = context.getString(R.string.app_name);
+			String s = context.getString(R.string.error_not_displaying_notifications_no_permissions, appName);
+			Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+			return;
+		}
 
+		NotificationCompat.Builder builder = getNotesBuilder();
 		String text = "";
-		String bigtext = "";
+		String bigText = "";
 		if (hasOnlyOneNoteNotification()) {
 			displayMultipleNoteNotifications();
 			return;
@@ -154,15 +163,15 @@ public class NotesNotificationManager {
 
 			text = String.format(context.getString(R.string.notification_multiple_notes), String.valueOf(getNoteNotificationCount()));
 			builder.setNumber(getNoteNotificationCount());
-			bigtext = "";
+			bigText = "";
 			for (int i = 0; i < notesList.size(); i++) {
-				bigtext += (i + 1) + ". " + notesList.get(i).getText() + "\n";
+				bigText += (i + 1) + ". " + notesList.get(i).getText() + "\n";
 			}
-			bigtext = bigtext.trim();
+			bigText = bigText.trim();
 		}
 
 		builder.setContentText(text);
-		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigtext));
+		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
 		builder.setDeleteIntent(createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
@@ -281,16 +290,6 @@ public class NotesNotificationManager {
 		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent((int) note.getDatabaseID()));
 
 		Timber.i("Setting up notification actions for note ID " + note.getDatabaseID() + " (" + note.getTextPreview() + ").");
-		/*
-		URLUtils utils = new URLUtils(context);
-		String text = note.getText();
-		boolean includeBrowse = false;
-		if (utils.containsSingleURL(text)) {
-			includeBrowse = true;
-			builder.addAction(R.drawable.baseline_open_in_browser_black_24, context.getString(R.string.action_browse), createOnNoteBrowseURLIntent((int) note.getDatabaseID()));
-		}
-		*/
-
 		builder.setContentIntent(getIntentToNote(note));
 		createOnNoteContentIntent(builder, note);
 	}
@@ -475,7 +474,7 @@ public class NotesNotificationManager {
 		return manager;
 	}
 
-	public boolean hasUserPermissionToDisplayNotifications(Activity activity) {
+	public boolean hasUserPermissionToDisplayNotifications() {
 		NotificationManager manager = getNotificationManagerService();
 		if (manager == null) {
 			return false;

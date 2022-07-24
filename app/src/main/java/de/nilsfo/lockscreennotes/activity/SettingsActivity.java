@@ -500,6 +500,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			bindPreferenceURLAsAction(findPreference("pref_view_on_github"), Uri.parse(getString(R.string.const_github_url)));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_text_drawable"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_timber"));
+			bindPreferenceURLAsAction(findPreference("prefs_credits_balloon"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_debug_db"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_zxing"));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_leakcanary"));

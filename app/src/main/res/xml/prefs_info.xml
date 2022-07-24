@@ -76,6 +76,12 @@
             android:title="@string/prefs_credits_leakcanary"/>
 
         <Preference
+            android:key="prefs_credits_balloon"
+            android:summary="https://github.com/skydoves/Balloon"
+            android:title="@string/prefs_credits_balloon"/>
+
+
+        <Preference
             android:title="@string/prefs_credits_icon"/>
 
     </PreferenceCategory>
