@@ -212,7 +212,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 					case R.string.pref_date_and_time:
 						header.iconRes = R.drawable.baseline_access_time_white_24;
 						break;
-					case R.string.pref_heder_info:
+					case R.string.pref_header_info:
 						header.iconRes = R.drawable.baseline_info_white_24;
 						break;
 					default:
@@ -239,7 +239,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			addPreferencesFromResource(R.xml.prefs_general);
 			setHasOptionsMenu(true);
 
-			bindPreferenceSummaryToValue(findPreference("prefs_homescreen_lines"), R.string.prefs_homescreen_lines_summary);
+			bindPreferenceSummaryToValue(findPreference("prefs_homescreen_lines"), R.string.prefs_home_screen_lines_summary);
 			bindPreferenceSummaryToValue(findPreference("prefs_action_bar_icon_scale"));
 
 			final Preference resetTutorial = findPreference("prefs_reset_tutorial");

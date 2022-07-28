@@ -30,7 +30,6 @@ import com.skydoves.balloon.BalloonAnimation;
 import com.skydoves.balloon.BalloonHighlightAnimation;
 import com.skydoves.balloon.BalloonSizeSpec;
 import com.skydoves.balloon.OnBalloonClickListener;
-import com.skydoves.balloon.overlay.BalloonOverlayAnimation;
 
 import org.json.JSONException;
 
@@ -245,8 +244,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.deleteall_dialog_title);
-		builder.setMessage(R.string.deleteall_dialog_text);
+		builder.setTitle(R.string.delete_all_dialog_title);
+		builder.setMessage(R.string.delete_all_dialog_text);
 		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				for (Note n : Note.getAllNotesFromDB(databaseAdapter)) {
@@ -286,7 +285,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.action_delete_all);
-		builder.setMessage(getString(R.string.deleteall_disabled_dialog_text, disabledCount, allCount));
+		builder.setMessage(getString(R.string.delete_all_disabled_dialog_text, disabledCount, allCount));
 		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				for (Note n : disabledList) {

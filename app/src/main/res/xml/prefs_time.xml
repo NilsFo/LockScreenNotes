@@ -6,8 +6,7 @@
         android:disableDependentsState="true"
         android:key="prefs_time_relative"
         android:summary="@string/prefs_time_relative_summary"
-        android:title="@string/prefs_time_relative_title"
-        />
+        android:title="@string/prefs_time_relative_title" />
 
     <ListPreference
         android:defaultValue="1"
@@ -15,8 +14,7 @@
         android:entries="@array/DateDetails"
         android:entryValues="@array/DateDetailsData"
         android:key="prefs_date_detail"
-        android:title="@string/prefs_date_detail_title"
-        />
+        android:title="@string/prefs_date_detail_title" />
 
     <ListPreference
         android:defaultValue="2"
@@ -24,14 +22,12 @@
         android:entries="@array/DateDetails"
         android:entryValues="@array/DateDetailsData"
         android:key="prefs_time_detail"
-        android:title="@string/prefs_time_detail"
-        />
+        android:title="@string/prefs_time_detail" />
 
     <Preference
-        android:title="@string/date_preference_preview"
-        android:key="prefs_time_preview"
         android:dependency="prefs_time_relative"
-        />
+        android:key="prefs_time_preview"
+        android:title="@string/date_preference_preview" />
 
     <!--
     <EditTextPreference

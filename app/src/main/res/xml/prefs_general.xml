@@ -9,19 +9,19 @@
             android:defaultValue="true"
             android:key="prefs_auto_enable_new_notes"
             android:summary="@string/settings_auto_enable_new_notes_flavor"
-            android:title="@string/settings_auto_enable_new_notes_title"/>
+            android:title="@string/settings_auto_enable_new_notes_title" />
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="prefs_large_font"
             android:summary="@string/prefs_large_font_flavor"
-            android:title="@string/prefs_large_font_title"/>
+            android:title="@string/prefs_large_font_title" />
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="prefs_quick_delete"
             android:summary="@string/prefs_quick_delete_flavor"
-            android:title="@string/prefs_quick_delete_title"/>
+            android:title="@string/prefs_quick_delete_title" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -46,7 +46,7 @@
         <Preference
             android:key="prefs_reset_tutorial"
             android:summary="@string/prefs_reset_tutorial_summary"
-            android:title="@string/prefs_reset_tutorial_title"/>
+            android:title="@string/prefs_reset_tutorial_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>

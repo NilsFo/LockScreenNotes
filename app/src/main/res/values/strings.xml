@@ -20,8 +20,8 @@
     <string name="settings_low_priority_note_flavor">Hides the notifications from the notification bar and only displays them when pulling down the <i>notification pull down bar</i>.\nDepending on your system, the device needs to be unlocked for notifications to be displayed this way.</string>
     <string name="advanced">Advanced</string>
     <string name="share_via_this_app">Create Note</string>
-    <string name="prefs_homescreen_lines_title">Minimum note lines</string>
-    <string name="prefs_homescreen_lines_summary">In the main screen, the minimum amount of lines a note must have. Minimum lines differ by device resolution.\nCurrently selected: %1$s</string>
+    <string name="prefs_home_screen_lines_title">Minimum note lines</string>
+    <string name="prefs_home_screen_lines_summary">In the main screen, the minimum amount of lines a note must have. Minimum lines differ by device resolution.\nCurrently selected: %1$s</string>
     <string name="home_screen_lines_too_small">Given line size is too small. Changed back to default.</string>
     <string name="prefs_date_detail_title">Level of detail: Dates</string>
     <string name="prefs_currently_selected">Currently selected: %1$s</string>
@@ -38,9 +38,9 @@
     <string name="success_note_sharing_listener">Your note was created without problems.</string>
     <string name="action_delete_all">Delete all notes</string>
     <string name="action_disable_all">Disable all notes</string>
-    <string name="deleteall_dialog_title">Delete all notes</string>
-    <string name="deleteall_dialog_text">Are you sure you want to delete all notes currently saved?</string>
-    <string name="deleteall_disabled_dialog_text">Are you sure you want to delete %1$d out of the %2$d notes currently saved?</string>
+    <string name="delete_all_dialog_title">Delete all notes</string>
+    <string name="delete_all_dialog_text">Are you sure you want to delete all notes currently saved?</string>
+    <string name="delete_all_disabled_dialog_text">Are you sure you want to delete %1$d out of the %2$d notes currently saved?</string>
     <string name="action_clear">Clear</string>
     <string name="action_move_to_bottom">Move cursor to bottom</string>
     <string name="action_share">Share</string>
@@ -51,10 +51,10 @@
     <string name="mail_via">Mail via</string>
     <string name="action_clear_confirm">Are you sure you want to clear this note\'s text?</string>
     <string name="pref_view_on_github_title">View this App on GitHub</string>
-    <string name="settings_dismissable_notes_tilte">Dismissable notifications</string>
-    <string name="settings_dismissable_notes_flavor">While enabled you can dismiss the notifications in the lock screen by swiping horizontally.\nDismissing a notification automatically disables the corresponding note.</string>
-    <string name="prefs_seperate_notes_tilte">Separate notifications</string>
-    <string name="prefs_seperate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.\nDepending on your device, too many notifications may be automatically grouped together by the system.</string>
+    <string name="settings_dismissible_notes_title">Dismissible notifications</string>
+    <string name="settings_dismissible_notes_flavor">While enabled you can dismiss the notifications in the lock screen by swiping horizontally.\nDismissing a notification automatically disables the corresponding note.</string>
+    <string name="prefs_separate_notes_title">Separate notifications</string>
+    <string name="prefs_separate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.\nDepending on your device, too many notifications may be automatically grouped together by the system.</string>
     <string name="error_invalid_value">Could not handle that value. Resetting to default.</string>
     <string name="pref_view_on_github_summary">This app is free, open source and does not contain ads. This will not change in the future. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
@@ -64,14 +64,14 @@
     <string name="tutorial_disabled">No notifications</string>
     <string name="tutorial_enabled">Notifications</string>
     <string name="tutorial_starting_instructions">Add a new note by tapping on the button below.</string>
-    <string name="tutorial_dont_show_again">Don\'t show this again</string>
+    <string name="tutorial_do_not_show_again">Don\'t show this again</string>
     <string name="prefs_reset_tutorial_title">Reset tutorial</string>
     <string name="prefs_reset_tutorial_summary">While you have no notes stored on this device the app\'s tutorial will be displayed again.</string>
     <string name="prefs_reset_tutorial_success">Tutorial has been reset.</string>
     <string name="nothing_to_display">Nothing to display.</string>
     <string name="error_internal_error">An internal error occurred.</string>
     <string name="pref_header_general">General</string>
-    <string name="pref_heder_info"><![CDATA[Info & About]]></string>
+    <string name="pref_header_info"><![CDATA[Info & About]]></string>
     <string name="pref_notifications">Notifications</string>
     <string name="pref_date_and_time"><![CDATA[Date & Time]]></string>
     <string name="prefs_time_relative_title">Use relative date and time</string>
@@ -93,7 +93,7 @@
     <string name="error_note_save_failed">Failed to save the note.</string>
     <string name="info_note_recovered">Note recovered: %1$s</string>
     <string name="prefs_action_bar_icon_scale">Menu bar icon scale</string>
-    <string name="tutorial_autosave">Changes to notes are auto-saved whenever you leave this screen.</string>
+    <string name="tutorial_auto_save">Changes to notes are auto-saved whenever you leave this screen.</string>
     <string name="ok_got_it">OK, got it!</string>
     <string name="prefs_credits_icon" translatable="false">Original App Icon by Patrick Quiskamp</string>
     <string name="pref_view_on_play_store">View on Google Play</string>
@@ -115,14 +115,14 @@
     <string name="error_no_update_highlight">No highlight feature found.</string>
     <string name="info_changelog_version">Changes in Version %1$s</string>
     <string name="action_full_changelog">Full changelog</string>
-    <string name="prefs_reverse_displayed_notifications_tilte">Reverse order</string>
-    <string name="prefs_reverse_displayed_notifications_flavor_android7">When choosing this option, the timstamp of individual notes can no longer be displayed on your device.</string>
+    <string name="prefs_reverse_displayed_notifications_title">Reverse order</string>
+    <string name="prefs_reverse_displayed_notifications_flavor_android7">When choosing this option, the timestamp of individual notes can no longer be displayed on your device.</string>
     <string name="action_open_weblinks">Open weblinks</string>
-    <string name="error_no_weblings">No weblinks found.</string>
+    <string name="error_no_web_links">No weblinks found.</string>
     <string name="info_choose_url">Select URL(s):</string>
     <string name="action_browse_all">Browse all</string>
     <string name="action_browse_selected">Browse selected</string>
-    <string name="action_toggle_visibillity">Toggle visibility</string>
+    <string name="action_toggle_visibility">Toggle visibility</string>
     <string name="action_add">Add new</string>
     <string name="action_dismiss_all">Dismiss all</string>
     <string name="action_mark_disabled">Mark disabled</string>
@@ -154,7 +154,7 @@
     <string name="action_merge">Merge</string>
     <string name="error_no_file_manager">No file manager installed on the device.</string>
     <string name="action_external_file">External file</string>
-    <string name="prefs_system_notifications_tilte">View system notification settings</string>
+    <string name="prefs_system_notifications_title">View system notification settings</string>
     <string name="info_channel_notes_low_name">Style: Subtle</string>
     <string name="info_channel_notes_medium_name">Style: Default</string>
     <string name="info_channel_notes_high_name">Style: High priority</string>
@@ -212,4 +212,5 @@
     <string name="info_review_notification_permissions_granted">All permissions granted. Thank you.</string>
     <string name="error_not_displaying_notifications_no_permissions">%1$s: Cannot show notes. Insufficient app permissions.</string>
     <string name="info_review_notification_permissions_balloon_text">Insufficient App permissions.\nReview them here.</string>
+    <string name="pref_settings_permissions">Permissions</string>
 </resources>

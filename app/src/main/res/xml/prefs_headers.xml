@@ -5,22 +5,22 @@
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/baseline_build_black_24"
-        android:title="@string/pref_header_general"/>
+        android:title="@string/pref_header_general" />
 
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$NotificationsPreferenceFragment"
         android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_notifications"/>
+        android:title="@string/pref_notifications" />
 
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$AutoBackupPreferenceFragment"
         android:icon="@drawable/baseline_save_alt_black_24"
-        android:title="@string/pref_backup"/>
+        android:title="@string/pref_backup" />
 
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$DateAndTimePreferenceFragment"
         android:icon="@drawable/ic_access_time_black_24dp"
-        android:title="@string/pref_date_and_time"/>
+        android:title="@string/pref_date_and_time" />
 
     <!--
     TODO implement a statistics TAB
@@ -33,6 +33,6 @@
     <header
         android:fragment="de.nilsfo.lockscreennotes.activity.SettingsActivity$InfoAndAboutPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_heder_info"/>
+        android:title="@string/pref_header_info" />
 
 </preference-headers>

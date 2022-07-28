@@ -3,86 +3,68 @@
     <Preference
         android:key="pref_about"
         android:summary="@string/prefs_about_summary"
-        android:title="@string/prefs_about_title"
-        />
-
-    <!--
-    <Preference
-        android:key="pref_share_app"
-        android:title="@string/prefs_share_app_title"
-        android:summary="@string/prefs_share_app_summary"
-        />
-        -->
+        android:title="@string/prefs_about_title" />
 
     <Preference
         android:key="pref_view_on_github"
         android:summary="@string/pref_view_on_github_summary"
-        android:title="@string/pref_view_on_github_title"
-        />
+        android:title="@string/pref_view_on_github_title" />
 
-    <PreferenceCategory
-        android:title="@string/action_share">
+    <PreferenceCategory android:title="@string/action_share">
         <Preference
             android:key="pref_share_app"
-            android:title="@string/pref_share_app_summary"
-            />
+            android:title="@string/pref_share_app_summary" />
 
         <Preference
             android:key="pref_view_on_play_store"
-            android:title="@string/pref_view_on_play_store"
-            />
+            android:title="@string/pref_view_on_play_store" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_updates">
+    <PreferenceCategory android:title="@string/pref_updates">
         <Preference
             android:key="pref_github_releases_feed"
             android:summary="@string/pref_github_releases_summary"
-            android:title="@string/pref_github_releases_title"
-            />
+            android:title="@string/pref_github_releases_title" />
         <Preference
             android:key="pref_update_day_counter"
             android:summary="@string/error_internal_error"
-            android:title="@string/pref_update_day_counter_title"
-            />
+            android:title="@string/pref_update_day_counter_title" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_credits">
+    <PreferenceCategory android:title="@string/pref_credits">
 
         <Preference
             android:key="prefs_credits_text_drawable"
             android:summary="https://github.com/devunwired/textdrawable"
-            android:title="@string/prefs_credits_text_drawable"/>
+            android:title="@string/prefs_credits_text_drawable" />
 
         <Preference
             android:key="prefs_credits_debug_db"
             android:summary="https://github.com/amitshekhariitbhu/Android-Debug-Database"
-            android:title="@string/prefs_credits_debug_db"/>
+            android:title="@string/prefs_credits_debug_db" />
 
         <Preference
             android:key="prefs_credits_zxing"
             android:summary="https://github.com/zxing/zxing"
-            android:title="@string/prefs_credits_zxing"/>
+            android:title="@string/prefs_credits_zxing" />
 
         <Preference
             android:key="prefs_credits_timber"
             android:summary="https://github.com/JakeWharton/timber"
-            android:title="@string/prefs_credits_timber"/>
+            android:title="@string/prefs_credits_timber" />
 
         <Preference
             android:key="prefs_credits_leakcanary"
             android:summary="https://github.com/square/leakcanary"
-            android:title="@string/prefs_credits_leakcanary"/>
+            android:title="@string/prefs_credits_leakcanary" />
 
         <Preference
             android:key="prefs_credits_balloon"
             android:summary="https://github.com/skydoves/Balloon"
-            android:title="@string/prefs_credits_balloon"/>
+            android:title="@string/prefs_credits_balloon" />
 
 
-        <Preference
-            android:title="@string/prefs_credits_icon"/>
+        <Preference android:title="@string/prefs_credits_icon" />
 
     </PreferenceCategory>
 

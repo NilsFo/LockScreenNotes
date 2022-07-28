@@ -121,7 +121,7 @@ public class EditNoteActivity extends NotesActivity {
 		if (!preferencses.getBoolean("prefs_ignore_tutorial_autosave", false)) {
 			Timber.i("Displaying the auto-save tutorial now.");
 
-			Snackbar snackbar = Snackbar.make(noteTF, R.string.tutorial_autosave, Snackbar.LENGTH_INDEFINITE);
+			Snackbar snackbar = Snackbar.make(noteTF, R.string.tutorial_auto_save, Snackbar.LENGTH_INDEFINITE);
 			snackbar.setAction(R.string.ok_got_it, new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

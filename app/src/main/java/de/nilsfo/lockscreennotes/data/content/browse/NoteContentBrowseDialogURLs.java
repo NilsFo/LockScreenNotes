@@ -41,7 +41,7 @@ public class NoteContentBrowseDialogURLs extends NoteContentBrowseDialog {
 
 	@Override
 	protected int getErrorNothingFoundText() {
-		return R.string.error_no_weblings;
+		return R.string.error_no_web_links;
 	}
 
 	@Override
