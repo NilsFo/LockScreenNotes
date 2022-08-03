@@ -103,7 +103,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		tutorialView = (ScrollView) findViewById(R.id.tutorial_view);
 		nothingToDisplayLB = (TextView) findViewById(R.id.nothing_to_display);
 
-		tutorialDontShowAgainCB = (CheckBox) findViewById(R.id.tutorial_dont_show_again_cb);
+		tutorialDontShowAgainCB = (CheckBox) findViewById(R.id.tutorial_do_not_show_again_cb);
 		tutorialDontShowAgainCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -344,9 +344,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 					dialog.dismiss();
 
 					try {
-						Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-						Uri uri = Uri.fromParts("package", getPackageName(), null);
-						intent.setData(uri);
+						Intent intent = LockScreenNotes.BuildPermissionIntentSystemSettings(MainActivity.this);
 						startActivity(intent);
 					} catch (Exception e) {
 						Timber.e(e);
@@ -362,18 +360,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 
-					// Starting a new intent to navigate the user to the settings activity on the device
-					Intent intent = new Intent();
-					intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-					//for Android 5-7
-					intent.putExtra("app_package", getPackageName());
-					intent.putExtra("app_uid", getApplicationInfo().uid);
-
-					// for Android 8 and above
-					intent.putExtra("android.provider.extra.APP_PACKAGE", getPackageName());
-
+					Intent intent = LockScreenNotes.BuildPermissionIntentNotificationDrawer(MainActivity.this);
 					try {
 						startActivity(intent);
 					} catch (Exception e) {

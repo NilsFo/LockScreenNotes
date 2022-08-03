@@ -1,11 +1,15 @@
 package de.nilsfo.lockscreennotes;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -103,6 +107,29 @@ public class LockScreenNotes extends Application {
 		editor.putLong(VersionManager.PREFERENCE_APP_LAUNCHED_ALL_TIME, launchedCountAllTime + 1);
 		editor.putLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, launchedCountThisVersion + 1);
 		editor.apply();
+	}
+
+	public static Intent BuildPermissionIntentNotificationDrawer(Context context) {
+		// Starting a new intent to navigate the user to the settings activity on the device
+		Intent intent = new Intent();
+		intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		//for Android 5-7
+		intent.putExtra("app_package", context.getPackageName());
+		intent.putExtra("app_uid", context.getApplicationInfo().uid);
+
+		// for Android 8 and above
+		intent.putExtra("android.provider.extra.APP_PACKAGE", context.getPackageName());
+
+		return intent;
+	}
+
+	public static Intent BuildPermissionIntentSystemSettings(Context context) {
+		Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+		Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+		intent.setData(uri);
+		return intent;
 	}
 
 	@Override

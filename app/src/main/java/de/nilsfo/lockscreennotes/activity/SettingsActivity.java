@@ -231,7 +231,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		this.showNotifications = showNotifications;
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class GeneralPreferenceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -252,6 +251,45 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 					return true;
 				}
 			});
+
+			final Preference permissionsHeader = findPreference("prefs_review_notifications_settings_header");
+			final Preference permissionsSystem = findPreference("prefs_review_notifications_settings_system");
+			final Preference permissionsDrawer = findPreference("prefs_review_notifications_settings_drawer");
+			UpdatePermissionButtonTexts();
+			permissionsHeader.setSelectable(false);
+
+			permissionsSystem.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					NotesNotificationManager notesNotificationManager = new NotesNotificationManager(getActivity());
+					if (notesNotificationManager.shouldShowRequestPermissionRationale(getActivity())) {
+						notesNotificationManager.requestPermissionRationale(getActivity());
+					} else {
+						try {
+							Intent intent = LockScreenNotes.BuildPermissionIntentSystemSettings(getActivity());
+							startActivity(intent);
+						} catch (Exception e) {
+							Timber.e(e);
+							Toast.makeText(getActivity(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
+						}
+					}
+					return true;
+				}
+			});
+
+			permissionsDrawer.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					Intent intent = LockScreenNotes.BuildPermissionIntentNotificationDrawer(getActivity());
+					try {
+						startActivity(intent);
+					} catch (Exception e) {
+						Timber.e(e);
+						Toast.makeText(getActivity(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					}
+					return true;
+				}
+			});
 		}
 
 		private void resetTutorial(Context context) {
@@ -261,9 +299,30 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			editor.putLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
 			editor.apply();
 		}
+
+		private void UpdatePermissionButtonTexts() {
+			final Preference permissionsHeader = findPreference("prefs_review_notifications_settings_header");
+			final Preference permissionsSystem = findPreference("prefs_review_notifications_settings_system");
+			final Preference permissionsDrawer = findPreference("prefs_review_notifications_settings_drawer");
+
+			NotesNotificationManager notesNotificationManager = new NotesNotificationManager(getActivity());
+			String headerStringState = getString(R.string.prefs_review_notifications_settings_header_summary_good);
+			if (!notesNotificationManager.hasUserPermissionToDisplayNotifications()) {
+				headerStringState = getString(R.string.prefs_review_notifications_settings_header_summary_insufficient);
+			}
+			Timber.i("Updating permission button texts! The text is now: '" + headerStringState + "'!");
+
+			String headerString = getString(R.string.prefs_review_notifications_settings_header_summary, headerStringState);
+			permissionsHeader.setSummary(headerString);
+		}
+
+		@Override
+		public void onResume() {
+			super.onResume();
+			UpdatePermissionButtonTexts();
+		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class NotificationsPreferenceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -274,35 +333,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			Preference reversePreference = findPreference("prefs_reverse_displayed_notifications");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				reversePreference.setSummary(R.string.prefs_reverse_displayed_notifications_flavor_android7);
-				return;
 			}
-
-			findPreference("prefs_system_notifications").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
-					Context context = preference.getContext();
-					Intent intent = new Intent();
-					if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-						intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
-						intent.putExtra("android.provider.extra.APP_PACKAGE", context.getPackageName());
-					} else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
-						intent.putExtra("app_package", context.getPackageName());
-						intent.putExtra("app_uid", context.getApplicationInfo().uid);
-					} else {
-						intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-						intent.addCategory(Intent.CATEGORY_DEFAULT);
-						intent.setData(Uri.parse("package:" + context.getPackageName()));
-					}
-
-					context.startActivity(intent);
-					return true;
-				}
-			});
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class AutoBackupPreferenceFragment extends PreferenceFragment {
 
 		@Override
@@ -346,6 +380,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				}
 			});
 
+			Preference autoBackupInfo = findPreference("pref_auto_backup_info");
+			autoBackupInfo.setSelectable(false);
+
 			Preference schedulePreference = findPreference("pref_auto_backups_schedule_days");
 			schedulePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 				@Override
@@ -361,7 +398,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class DateAndTimePreferenceFragment extends PreferenceFragment {
 
 		private ExecutorService service;
@@ -445,7 +481,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class InfoAndAboutPreferenceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {

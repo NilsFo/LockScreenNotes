@@ -213,4 +213,10 @@
     <string name="error_not_displaying_notifications_no_permissions">%1$s: Cannot show notes. Insufficient app permissions.</string>
     <string name="info_review_notification_permissions_balloon_text">Insufficient App permissions.\nReview them here.</string>
     <string name="pref_settings_permissions">Permissions</string>
+    <string name="prefs_review_notifications_settings_header_summary">Current <b>permission state to display notifications: %1$s.</b>\nReview permissions below. Not all settings are available on all devices and Android versions.</string>
+    <string name="prefs_review_notifications_settings_header_title">App Permissions</string>
+    <string name="prefs_review_notifications_settings_system_title">Review system permissions</string>
+    <string name="prefs_review_notifications_settings_drawer_title">Review notification drawer</string>
+    <string name="prefs_review_notifications_settings_header_summary_good">Okay</string>
+    <string name="prefs_review_notifications_settings_header_summary_insufficient">Insufficient</string>
 </resources>

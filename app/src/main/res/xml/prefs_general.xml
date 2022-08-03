@@ -24,6 +24,25 @@
             android:title="@string/prefs_quick_delete_title" />
     </PreferenceCategory>
 
+
+    <PreferenceCategory android:title="@string/pref_settings_permissions">
+
+        <Preference
+            android:key="prefs_review_notifications_settings_header"
+            android:summary="@string/prefs_review_notifications_settings_header_summary"
+            android:title="@string/prefs_review_notifications_settings_header_title" />
+
+        <Preference
+            android:key="prefs_review_notifications_settings_system"
+            android:title="@string/prefs_review_notifications_settings_system_title" />
+
+        <Preference
+            android:key="prefs_review_notifications_settings_drawer"
+            android:title="@string/prefs_review_notifications_settings_drawer_title" />
+
+    </PreferenceCategory>
+
+
     <PreferenceCategory
         android:key="pref_cat_advanced"
         android:title="@string/advanced">

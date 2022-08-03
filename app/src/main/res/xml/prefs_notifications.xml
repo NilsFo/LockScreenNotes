@@ -4,27 +4,20 @@
     <PreferenceCategory android:title="@string/pref_settings_display_style">
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="prefs_dismissable_notes"
-            android:summary="@string/settings_dismissable_notes_flavor"
+            android:key="prefs_dismissible_notes"
+            android:summary="@string/settings_dismissible_notes_flavor"
             android:title="@string/settings_dismissible_notes_title" />
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="prefs_seperate_notes"
-            android:summary="@string/prefs_seperate_notes_flavor"
+            android:key="prefs_separate_notes"
+            android:summary="@string/prefs_separate_notes_flavor"
             android:title="@string/prefs_separate_notes_title" />
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="prefs_reverse_displayed_notifications"
             android:title="@string/prefs_reverse_displayed_notifications_title" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/pref_settings_permissions">
-        <Preference
-            android:key="prefs_system_notifications"
-            android:title="@string/prefs_system_notifications_title" />
-
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_settings_display_priority">
@@ -46,3 +39,4 @@
     </PreferenceCategory>
 
 </PreferenceScreen>
+
