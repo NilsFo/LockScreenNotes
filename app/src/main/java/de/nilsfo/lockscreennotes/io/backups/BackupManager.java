@@ -19,6 +19,7 @@ import java.util.Comparator;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
@@ -96,6 +97,9 @@ public class BackupManager {
 	}
 
 	public boolean hasExternalStoragePermission() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			return ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+		}
 		return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 	}
 

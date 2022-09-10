@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -389,7 +390,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		BackupManager bcm = new BackupManager(this);
 		if (!bcm.hasExternalStoragePermission()) {
 			Toast.makeText(this, R.string.warning_no_storage_permission, Toast.LENGTH_LONG).show();
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
+			}else{
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
+			}
 			return;
 		}
 

@@ -1,12 +1,26 @@
-[![GitHub stars](https://img.shields.io/github/stars/NilsFo/LockScreenNotes.svg?style=social&label=Star)](https://github.com/NilsFo/LockScreenNotes) 
+[![GitHub stars](https://img.shields.io/github/stars/NilsFo/LockScreenNotes.svg?style=social&label=Star)](https://github.com/NilsFo/LockScreenNotes)
+&nbsp;
 [![GitHub forks](https://img.shields.io/github/forks/NilsFo/LockScreenNotes.svg?style=social&label=Fork)](https://github.com/NilsFo/LockScreenNotes)
 
 ***
 
 [![Generic badge](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](docs/contribute.md)
-[![License](https://img.shields.io/github/license/NilsFo/LockScreenNotes?color=green&style=plastic)](https://github.com/NilsFo/LockScreenNotes/LICENSE.txt)
-![Size](https://img.shields.io/github/repo-size/NilsFo/LockScreenNotes?style=plastic)
-[![Language](https://img.shields.io/github/languages/top/NilsFo/LockScreenNotes?style=plastic)](https://github.com/NilsFo/LockScreenNotes)
+&nbsp;
+[![Contributors](https://img.shields.io/github/contributors/NilsFo/LockScreenNotes?style=flat)](https://github.com/NilsFo/LockScreenNotes/graphs/contributors)
+&nbsp;
+[![License](https://img.shields.io/github/license/NilsFo/LockScreenNotes?color=green&style=flat)](https://github.com/NilsFo/LockScreenNotes/LICENSE)
+&nbsp;
+![Size](https://img.shields.io/github/repo-size/NilsFo/LockScreenNotes?style=flat)
+&nbsp;
+[![Issues](https://img.shields.io/github/issues/NilsFo/LockScreenNotes?style=flat)](https://github.com/NilsFo/LockScreenNotes/issues)
+&nbsp;
+[![Pull Requests](https://img.shields.io/github/issues-pr/NilsFo/LockScreenNotes?style=flat)](https://github.com/NilsFo/LockScreenNotes/pulls)
+&nbsp;
+[![Commits](https://img.shields.io/github/commit-activity/m/NilsFo/LockScreenNotes?style=flat)](https://github.com/NilsFo/LockScreenNotes/)
+&nbsp;
+[![Latest Release](https://img.shields.io/github/v/release/NilsFo/LockScreenNotes?style=flat)](https://github.com/NilsFo/LockScreenNotes/)
+&nbsp;
+[![Release Date](https://img.shields.io/github/release-date/NilsFo/LockScreenNotes?style=flat)](https://github.com/NilsFo/LockScreenNotes/releases)
 
 ***
 
