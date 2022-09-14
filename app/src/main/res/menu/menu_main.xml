@@ -6,12 +6,8 @@
     <item
         android:id="@+id/action_notification_permissions"
         android:icon="@drawable/baseline_notifications_active_black_24"
-        android:title="@string/action_review_notification_permissions"
+        android:title="@string/action_review_permissions"
         app:showAsAction="ifRoom" />
-    <!--
-    Action view available with this:
-    app:actionViewClass="android.widget.ImageButton"
-    -->
 
     <item
         android:id="@+id/action_delete_all"

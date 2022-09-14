@@ -15,8 +15,6 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.google.android.material.internal.ContextUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,12 +24,14 @@ import java.util.HashMap;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
 import de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
+import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver;
 import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
@@ -39,7 +39,6 @@ import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
-import static com.google.android.material.internal.ContextUtils.getActivity;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
 import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
 import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_MAIL;
@@ -373,13 +372,21 @@ public class NotesNotificationManager {
 
 	public void displayNotificationAutomaticBackup(boolean success, String contentText) {
 		BackupManager backupManager = new BackupManager(context);
-		int backupFileCount = backupManager.findBackupFiles().size();
+		String fileCountText = context.getString(R.string.info_number_not_available);
+		int backupFileCount = 0;
+		try {
+			backupFileCount = backupManager.findBackupFiles().size();
+			fileCountText = String.valueOf(backupFileCount);
+		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+			e.printStackTrace();
+			Timber.e(e);
+		}
 
 		String title;
 		String extraText;
 		if (success) {
 			title = context.getString(R.string.notification_auto_backup_success);
-			extraText = context.getString(R.string.notification_auto_backup_next_detail, contentText, String.valueOf(backupFileCount));
+			extraText = context.getString(R.string.notification_auto_backup_next_detail, contentText, fileCountText);
 		} else {
 			title = context.getString(R.string.notification_auto_backup_failed);
 			extraText = contentText;
@@ -390,12 +397,12 @@ public class NotesNotificationManager {
 		builder.setShowWhen(true);
 		builder.setWhen(new Date().getTime());
 		builder.setContentText(contentText);
-		builder.setNumber(backupFileCount);
+		if (backupFileCount > 0) builder.setNumber(backupFileCount);
 		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(extraText));
 
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		if (manager == null) {
-			Timber.e("Failed to hide all notifications. No mananager available.");
+			Timber.e("Failed to hide all notifications. No manager available.");
 			return;
 		}
 		manager.notify(NOTIFICATION_STATIC_ID_AUTOMATIC_BACKUP, builder.build());

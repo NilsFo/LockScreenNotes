@@ -21,16 +21,18 @@ import timber.log.Timber;
 public class FileManager {
 
 	public static final String NO_MEDIA = ".nomedia";
-	public static final String FOLDERNAME_BACKUP = "backups";
+	public static final String FOLDER_NAME_BACKUP = "backups";
 
 	public static final String FILENAME_BACKUP_BASE_NAME = "lsn_backup_";
 	public static final String FILENAME_TIMESTAMP_FORMATTER = "yyyy_MM_dd-hh_mm_ss";
 	public static final String FILENAME_BACKUP_EXTENSION = ".json";
 
-	private Context context;
+	private final Context context;
+	private final StoragePermissionManager storagePermissionManager;
 
 	public FileManager(Context context) {
 		this.context = context;
+		storagePermissionManager = new StoragePermissionManager(context);
 	}
 
 	public static String readFile(File file) throws IOException {
@@ -79,7 +81,7 @@ public class FileManager {
 	}
 
 	public File getNoteBackupDir() {
-		File f = new File(getExternalDir(), FOLDERNAME_BACKUP);
+		File f = new File(getExternalDir(), FOLDER_NAME_BACKUP);
 		createDirectory(f, true);
 		return f;
 	}

@@ -163,7 +163,7 @@
     <string name="info_channel_auto_backup_description">Alle Benachrichtigungen, welche aufgrund von automatischen Backups angezeigt werden.</string>
     <string name="notification_auto_backup_success">Automatisches Backup erstellt</string>
     <string name="notification_auto_backup_failed">Automatisches Backup fehlgeschlagen</string>
-    <string name="error_no_external_storage">Die App hat keinen Zugriff auf den externen Speicher.</string>
+    <string name="error_no_external_storage_permissions">Die App hat keinen Zugriff auf den externen Speicher.</string>
     <string name="error_no_old_backup_files_deleted">Aber es konnten keine alten Backups gelöscht werden!</string>
     <string name="delete_dialog_content_multiple">Sollen diese %1$s Notizen wirklich gelöscht werden?</string>
     <string name="notification_auto_backup_next_detail">%1$s\nBackups bisher angelegt: %2$s.</string>

@@ -1,9 +1,11 @@
 package de.nilsfo.lockscreennotes.io.backups;
 
-import android.Manifest;
+import static de.nilsfo.lockscreennotes.io.backups.NoteJSONUtils.VERSION_NOT_AVAILABLE;
+
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Build;
+
+import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,51 +19,55 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.FileManager;
+import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
+import de.nilsfo.lockscreennotes.io.StoragePermissionManager.InsufficientStoragePermissionException;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
-import static de.nilsfo.lockscreennotes.io.backups.NoteJSONUtils.VERSION_NOT_AVAILABLE;
-
 public class BackupManager {
 
 	public static final int AUTO_DELETE_MAX_FILE_COUNT = 20;
 
-	private Context context;
-	private FileManager manager;
+	private final Context context;
+	private final FileManager fileManager;
+	private final StoragePermissionManager storagePermissionManager;
 
 	public BackupManager(Context context) {
 		this.context = context;
-		manager = new FileManager(context);
+		fileManager = new FileManager(context);
+		storagePermissionManager = new StoragePermissionManager(context);
 	}
 
-	public File completeBackup() throws JSONException, IOException {
-		JSONObject data;
-		data = NoteJSONUtils.toJSON(context);
+	public File createAndWriteBackup() throws JSONException, IOException, InsufficientStoragePermissionException {
+		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
+		}
+
+		JSONObject data = NoteJSONUtils.toJSON(context);
 		Timber.i("Transforming notes to JSON: " + data.toString());
 
-		manager = new FileManager(context);
-		File f = new File(manager.getNoteBackupDir(), manager.getDynamicNoteBackupFilename());
+		File f = new File(fileManager.getNoteBackupDir(), fileManager.getDynamicNoteBackupFilename());
 		Timber.i("Exporting JSON notes to: " + f.getAbsolutePath());
 
 		FileWriter fw = new FileWriter(f);
 		fw.write(data.toString());
 		fw.close();
 
-		manager.notifyMediaScanner(f);
+		fileManager.notifyMediaScanner(f);
 		return f;
 	}
 
-	public ArrayList<File> findBackupFiles() {
+	public ArrayList<File> findBackupFiles() throws InsufficientStoragePermissionException {
+		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
+		}
 		ArrayList<File> list = new ArrayList<>();
 
-		File dir = manager.getNoteBackupDir();
+		File dir = fileManager.getNoteBackupDir();
 		File[] files = dir.listFiles();
 		if (files == null) {
 			return list;
@@ -79,16 +85,24 @@ public class BackupManager {
 		return list;
 	}
 
-	public boolean hasBackupsMade() {
+	public boolean hasBackupsMade() throws InsufficientStoragePermissionException {
 		return !findBackupFiles().isEmpty();
 	}
 
-	public BackupMetaData getMetaData(File file) throws IOException, JSONException {
+	public BackupMetaData getMetaData(File file) throws IOException, JSONException, InsufficientStoragePermissionException {
+		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
+		}
+
 		JSONObject data = new JSONObject(FileManager.readFile(file));
 		return new BackupMetaData(data, context);
 	}
 
-	public ArrayList<Note> readBackupFile(File file) throws IOException, JSONException {
+	public ArrayList<Note> readBackupFile(File file) throws IOException, JSONException, InsufficientStoragePermissionException {
+		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
+		}
+
 		JSONObject data = new JSONObject(FileManager.readFile(file));
 		BackupMetaData metaData = new BackupMetaData(data, context);
 
@@ -96,30 +110,20 @@ public class BackupManager {
 		return NoteJSONUtils.toNotes(notes, metaData.version, VersionManager.getCurrentVersion(context));
 	}
 
-	public boolean hasExternalStoragePermission() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			return ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-		}
-		return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-	}
-
 	@Nullable
-	public File getLatestBackupFile() {
+	public File getLatestBackupFile() throws InsufficientStoragePermissionException {
 		ArrayList<File> list = findBackupFiles();
-		Collections.sort(list, new Comparator<File>() {
-			@Override
-			public int compare(File f1, File f2) {
-				long lastModifiedF1 = f1.lastModified();
-				long lastModifiedF2 = f2.lastModified();
+		Collections.sort(list, (file1, file2) -> {
+			long lastModifiedF1 = file1.lastModified();
+			long lastModifiedF2 = file2.lastModified();
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-					return Long.compare(lastModifiedF2, lastModifiedF1);
-				}
-
-				String s1 = String.valueOf(f2);
-				String s2 = String.valueOf(f1);
-				return s1.compareTo(s2);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				return Long.compare(lastModifiedF2, lastModifiedF1);
 			}
+
+			String s1 = String.valueOf(file2);
+			String s2 = String.valueOf(file1);
+			return s1.compareTo(s2);
 		});
 
 		Timber.i("Here's the reversed list state:");
@@ -135,7 +139,7 @@ public class BackupManager {
 		return f;
 	}
 
-	public class BackupMetaData {
+	public static class BackupMetaData {
 		private long timestamp;
 		private String count;
 		private int version;

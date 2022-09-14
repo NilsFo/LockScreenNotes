@@ -177,7 +177,7 @@
     <string name="info_channel_auto_backup_description">All notifications that relate to automatic backups.</string>
     <string name="notification_auto_backup_success">Automatic backup created</string>
     <string name="notification_auto_backup_failed">Automatic backup failed</string>
-    <string name="error_no_external_storage">Failed to obtain permissions to access the external storage.</string>
+    <string name="error_no_external_storage_permissions">Failed to obtain permissions to access the external storage.</string>
     <string name="error_no_old_backup_files_deleted">But failed to delete old backup files!</string>
     <string name="notification_auto_backup_next_detail">%1$s\nTotal backups: %2$s.</string>
     <string name="notification_auto_backup_next">Next backup: %1$s.</string>
@@ -203,6 +203,7 @@
     <string name="date_preference_preview">Current time preview (Tap to update):</string>
     <string name="error_line_rendering_contact_dev">An error occurred while drawing the lines. Please contact the developer regarding this (if this keep happening).</string>
     <string name="action_review_notification_permissions">Review notification permissions</string>
+    <string name="action_review_permissions">Review permissions</string>
     <string name="warning_no_storage_permission">Cannot use backups without access to device storage. Please enable storage and try again.</string>
     <string name="action_review_notification_permissions_info">This app needs permissions to display notifications on the lock screen.\nThese are currently denied. Review notification settings on your device below.\n\nThe options available depend on your device and software version.</string>
     <string name="action_review_notification_permissions_enable_permissions">Check app permissions</string>
@@ -219,4 +220,6 @@
     <string name="prefs_review_notifications_settings_drawer_title">Review notification drawer</string>
     <string name="prefs_review_notifications_settings_header_summary_good">Okay</string>
     <string name="prefs_review_notifications_settings_header_summary_insufficient">Insufficient</string>
+    <string name="error_external_permissions_require_upgrade">"External storage permissions must be extended to allow access to all files."</string>
+    <string name="info_number_not_available">-</string>
 </resources>

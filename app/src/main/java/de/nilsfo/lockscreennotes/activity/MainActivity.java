@@ -1,16 +1,13 @@
 package de.nilsfo.lockscreennotes.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
@@ -49,9 +46,9 @@ import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
@@ -59,6 +56,7 @@ import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogMail
 import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogPhone;
 import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogURLs;
 import de.nilsfo.lockscreennotes.io.FileManager;
+import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NoteSharer;
@@ -71,7 +69,6 @@ import timber.log.Timber;
 
 import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
-import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_PERMISSION_STORAGE;
 
 public class MainActivity extends NotesActivity implements Observer, NotesRecyclerAdapter.NotesRecyclerAdapterListener {
 
@@ -299,6 +296,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				dialog.cancel();
 			}
 		});
+		// TODO check for dark mode
 		builder.setIcon(R.drawable.baseline_warning_black_48);
 		builder.show();
 	}
@@ -386,24 +384,48 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		builder.show();
 	}
 
+	private void requestExtendStoragePermissionsDialog() {
+
+	}
+
 	private void requestBackupMenu() {
-		BackupManager bcm = new BackupManager(this);
-		if (!bcm.hasExternalStoragePermission()) {
-			Toast.makeText(this, R.string.warning_no_storage_permission, Toast.LENGTH_LONG).show();
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
-			}else{
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
-			}
+		BackupManager backupManager = new BackupManager(this);
+		StoragePermissionManager storagePermissionManager = new StoragePermissionManager(this);
+		StoragePermissionManager.StoragePermissionState currentState = storagePermissionManager.getPermissionState();
+		boolean storageManager = storagePermissionManager.isExternalStorageManager();
+		Timber.i("Current permission state: " + currentState);
+		Timber.i("Is storage manager: " + storageManager);
+
+		// Checking if permissions are granted, but need upgrading
+		if (storagePermissionManager.requiresExtendedPermissions() && !storagePermissionManager.hasPermissionsTotallyDenied()) {
+			Toast.makeText(this, R.string.error_external_permissions_require_upgrade, Toast.LENGTH_LONG).show();
+			requestExtendStoragePermissionsDialog();
 			return;
 		}
 
-		String backupCount = "-";
-		String lastBackup = "-";
-		if (bcm.hasBackupsMade()) {
-			backupCount = String.valueOf(bcm.findBackupFiles().size());
-			long l = bcm.getLatestBackupFile().lastModified();
-			lastBackup = new TimeUtils(this).formatDateAccordingToPreferences(l);
+		// Checking if external permissions are granted
+		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+			Toast.makeText(this, R.string.warning_no_storage_permission, Toast.LENGTH_LONG).show();
+			storagePermissionManager.requestExternalStoragePermission(this);
+			return;
+		}
+
+		String backupCount = getString(R.string.info_number_not_available);
+		String lastBackup = getString(R.string.info_number_not_available);
+		try {
+			if (backupManager.hasBackupsMade()) {
+				File latestBackupFile = backupManager.getLatestBackupFile();
+
+				if (latestBackupFile != null) {
+					backupCount = String.valueOf(backupManager.findBackupFiles().size());
+					long l = latestBackupFile.lastModified();
+					lastBackup = new TimeUtils(this).formatDateAccordingToPreferences(l);
+				}
+			}
+		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+			Toast.makeText(this, R.string.error_external_permissions_require_upgrade, Toast.LENGTH_LONG).show();
+			storagePermissionManager.requestExternalStoragePermission(this);
+			return;
 		}
 
 		FileManager manager = new FileManager(this);
@@ -438,13 +460,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		BackupManager backupManager = new BackupManager(this);
 		File backupFile;
 		try {
-			backupFile = backupManager.completeBackup();
-		} catch (JSONException e) {
-			e.printStackTrace();
-			Timber.e(e);
-			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();
-			return;
-		} catch (IOException e) {
+			backupFile = backupManager.createAndWriteBackup();
+		} catch (JSONException | IOException | StoragePermissionManager.InsufficientStoragePermissionException e) {
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();
@@ -457,7 +474,15 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	public void requestBackupImportMenu() {
 		BackupManager manager = new BackupManager(this);
-		File f = manager.getLatestBackupFile();
+		File f = null;
+		try {
+			f = manager.getLatestBackupFile();
+		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
+			return;
+		}
 
 		if (f == null) {
 			Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
@@ -473,7 +498,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 	}
 
-	public void requestBackupImportMenuConfirmFile(final File file) throws IOException, JSONException {
+	public void requestBackupImportMenuConfirmFile(final File file) throws IOException, JSONException, StoragePermissionManager.InsufficientStoragePermissionException {
 		BackupManager manager = new BackupManager(this);
 		BackupManager.BackupMetaData metaData = manager.getMetaData(file);
 
@@ -526,6 +551,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
 			return;
+		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
+			return;
 		}
 
 		Timber.i("Found " + list.size() + " notes in file: " + Arrays.toString(list.toArray()));
@@ -569,7 +599,16 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	public void requestBackupImportChoose() {
 		BackupManager manager = new BackupManager(this);
-		ArrayList<File> list = manager.findBackupFiles();
+		ArrayList<File> list = null;
+		try {
+			list = manager.findBackupFiles();
+		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+			e.printStackTrace();
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		switch (list.size()) {
 			case 0:
 				Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
@@ -907,6 +946,9 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			case R.id.action_notification_permissions:
 				reviewNotificationPermissions();
 				return true;
+			default:
+				Timber.w("Unknown menu item pressed.");
+				Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 		}
 
 		return super.onOptionsItemSelected(item);

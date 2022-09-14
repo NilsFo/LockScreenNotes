@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
+import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
@@ -35,14 +36,14 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 			boolean deleteOld = preferences.getBoolean("pref_auto_backups_delete_old", true);
 			boolean showNotification = preferences.getBoolean("pref_auto_backups_notification_enabled", true);
-
 			Timber.i("LSNAutoBackupReceiver: Alarm received! [Confirmed AutoBackupIntent] - Params: deleteOld: " + deleteOld + " notification: " + showNotification);
 
 			BackupManager backupManager = new BackupManager(context);
-			if (backupManager.hasExternalStoragePermission()) {
+			StoragePermissionManager storagePermissionManager = new StoragePermissionManager(context);
+			if (storagePermissionManager.hasAllCorrectPermissions()) {
 				File f = null;
 				try {
-					f = backupManager.completeBackup();
+					f = backupManager.createAndWriteBackup();
 				} catch (Exception e) {
 					e.printStackTrace();
 					Timber.e(e);
@@ -57,7 +58,13 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 				}
 
 				if (deleteOld) {
-					ArrayList<File> backups = backupManager.findBackupFiles();
+					ArrayList<File> backups = new ArrayList<>();
+					try {
+						backups = backupManager.findBackupFiles();
+					} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+						e.printStackTrace();
+					}
+
 					Timber.i("Checking if old files should be deleted. File count: " + backups.size());
 					if (backups.size() > AUTO_DELETE_MAX_FILE_COUNT) {
 						Collections.sort(backups, new Comparator<File>() {
@@ -91,17 +98,24 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 						int days = Integer.valueOf(preferences.getString("pref_auto_backups_schedule_days", "3"));
 						days = Math.max(days, 1);
 						long interval = AlarmManager.INTERVAL_DAY * days;
-						Date d = new Date(new Date().getTime()+alarmManager.getTimeUntilNextNewAutoBackup()+interval);
+						Date d = new Date(new Date().getTime() + alarmManager.getTimeUntilNextNewAutoBackup() + interval);
 						String formatedDate = new TimeUtils(context).formatDateAbsolute(d, DateFormat.FULL);
 
-						String text =context.getString(R.string.notification_auto_backup_next,formatedDate);
+						String text = context.getString(R.string.notification_auto_backup_next, formatedDate);
 						notificationManager.displayNotificationAutomaticBackup(true, text);
 					}
 
-				} else {
-					Timber.w("Schedule recieved, but the user has not granted the permission to write the external storage!");
-					notificationManager.displayNotificationAutomaticBackup(false, context.getString(R.string.error_no_external_storage));
 				}
+			} else {
+				Timber.w("Schedule received, but the user has not granted the permission to write the external storage!");
+
+				String errorText = "";
+				if (storagePermissionManager.requiresExtendedPermissions()){
+					errorText = context.getString(R.string.error_no_external_storage_permissions);
+				}else{
+					errorText = context.getString(R.string.error_external_permissions_require_upgrade);
+				}
+				notificationManager.displayNotificationAutomaticBackup(false, errorText);
 			}
 
 			notificationManager.showNoteNotifications();
