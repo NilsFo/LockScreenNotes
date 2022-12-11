@@ -61,6 +61,7 @@ import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NoteSharer;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
+import de.nilsfo.lockscreennotes.util.PermissionBalloonTimer;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lockscreennotes.view.NotesRecyclerAdapter;
@@ -72,13 +73,11 @@ import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTE
 
 public class MainActivity extends NotesActivity implements Observer, NotesRecyclerAdapter.NotesRecyclerAdapterListener {
 
-	public static final int IMPORT_NOTE_PEWVIEW_SIZE = 35;
+	public static final int IMPORT_NOTE_PREVIEW_SIZE = 35;
 	public static final int ONE_SECOND_IN_MS = 1000;
 	public static final String PREFS_HIDE_TUTORIAL = "prefs_hide_tutorial";
-	public static final int DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT = 15;
+	public static final int DEFAULT_SNACK_BAR_PREVIEW_WORD_COUNT = 15;
 	public static final String PREFS_LAST_KNOWN_VERSION = PREFS_TAG + "last_known_version";
-
-	public static final long PERMISSION_BALLOON_DELAY = 250;
 
 	private DBAdapter databaseAdapter;
 	private NotesRecyclerAdapter noteRecyclerAdapter;
@@ -90,8 +89,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	// Permission Menu Item management
 	private MenuItem checkNotificationPermissionItem;
-	private boolean checkNotificationPermissionBalloonShownOnce = false;
 	private Balloon checkNotificationPermissionBalloon;
+	private PermissionBalloonTimer permissionBalloonTimer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +124,9 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		setShowNotifications(true);
 		loadNotesFromDB();
 		setupRelativeDateUpdater();
-		checkNotificationPermissionBalloonShownOnce = false;
+
+		// Balloon stuff
+		permissionBalloonTimer = new PermissionBalloonTimer(this);
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {
@@ -200,8 +201,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			});
 			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
-			View snackbarView = snackbar.getView();
-			TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+			View snackBarView = snackbar.getView();
+			TextView textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text);
 			textView.setMaxLines(2);
 			textView.setMinLines(2);
 			textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -256,6 +257,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				dialog.cancel();
 			}
 		});
+
+		// TODO take dark mode into account
 		builder.setIcon(R.drawable.baseline_warning_black_48);
 		builder.show();
 	}
@@ -296,7 +299,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				dialog.cancel();
 			}
 		});
-		// TODO check for dark mode
+
+		// TODO take dark mode into account
 		builder.setIcon(R.drawable.baseline_warning_black_48);
 		builder.show();
 	}
@@ -378,14 +382,14 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		if (checkNotificationPermissionBalloon != null && checkNotificationPermissionBalloon.isShowing()) {
 			checkNotificationPermissionBalloon.dismiss();
-			checkNotificationPermissionBalloonShownOnce = true;
+			permissionBalloonTimer.disable();
 		}
 
 		builder.show();
 	}
 
 	private void requestExtendStoragePermissionsDialog() {
-
+		// TODO implement
 	}
 
 	private void requestBackupMenu() {
@@ -567,7 +571,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		String summary = "";
 		for (Note n : list) {
-			summary = "-" + n.getTextPreview(IMPORT_NOTE_PEWVIEW_SIZE) + "\n" + summary;
+			summary = "-" + n.getTextPreview(IMPORT_NOTE_PREVIEW_SIZE) + "\n" + summary;
 		}
 		summary = summary.trim();
 
@@ -772,11 +776,10 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		// Checking on balloon
 		View checkNotificationPermissionItemView = findViewById(R.id.action_notification_permissions);
-		if (checkNotificationPermissionItemView != null && timeTiff > PERMISSION_BALLOON_DELAY
-				&& !checkNotificationPermissionBalloonShownOnce) {
+		if (checkNotificationPermissionItemView != null && timeTiff > PermissionBalloonTimer.PERMISSION_BALLOON_DELAY
+				&& !permissionBalloonTimer.hasBalloonShownOnce()) {
 			Timber.e("BOI! BALLOON TIME!");
-
-			if (displayPermissionBalloonCondition()) {
+			if (permissionBalloonTimer.checkPermissionBalloonCondition(checkNotificationPermissionItemView, checkNotificationPermissionItem)) {
 				requestDisplayPermissionBalloon();
 			}
 		}
@@ -812,7 +815,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	private String getNoteSnackBarPreview(Note note) {
 		double density = getResources().getDisplayMetrics().density;
-		int words = (int) (DEFAULT_SNACKBAR_PREVIEW_WORD_COUNT * density);
+		int words = (int) (DEFAULT_SNACK_BAR_PREVIEW_WORD_COUNT * density);
 		return note.getTextPreview(words);
 	}
 
@@ -850,12 +853,12 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	private void requestDisplayPermissionBalloon() {
 		Timber.i("Got request to show permission Balloon.");
-		if (!displayPermissionBalloonCondition()) {
+		View checkNotificationPermissionItemView = findViewById(R.id.action_notification_permissions);
+		if (!permissionBalloonTimer.checkPermissionBalloonCondition(checkNotificationPermissionItemView, checkNotificationPermissionItem)) {
 			Timber.i("Request denied. Condition not met.");
 			return;
 		}
 
-		View checkNotificationPermissionItemView = findViewById(R.id.action_notification_permissions);
 		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
 		if (!notesNotificationManager.hasUserPermissionToDisplayNotifications()) {
 			Timber.w("The user has not allowed permissions for push notifications!");
@@ -892,29 +895,12 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 					.setDismissWhenClicked(true)
 					.setLifecycleOwner(this)
 					.setDismissWhenTouchOutside(false)
-
-					// .setIsVisibleOverlay(true) // sets the visibility of the overlay for highlighting an anchor.
-					// .setOverlayColorResource(R.color.balloon_overlay) // background color of the overlay using a color resource.
-					// .setOverlayPadding(6f) // sets a padding value of the overlay shape internally.
-					// .setOverlayPaddingColorResource(R.color.colorPrimary) // sets color of the overlay padding using a color resource.
-					// .setBalloonOverlayAnimation(BalloonOverlayAnimation.FADE) // default is fade.
-					// .setDismissWhenOverlayClicked(false) // disable dismissing the balloon when the overlay is clicked.
-
 					.build();
 
 			Timber.e("SHOWING IT!");
-			checkNotificationPermissionBalloonShownOnce = true;
+			permissionBalloonTimer.disable();
 			checkNotificationPermissionBalloon.showAlignBottom(checkNotificationPermissionItemView);
 		}
-	}
-
-	private boolean displayPermissionBalloonCondition() {
-		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
-		View checkNotificationPermissionItemView = findViewById(R.id.action_notification_permissions);
-		return !checkNotificationPermissionBalloonShownOnce &&
-				!notesNotificationManager.hasUserPermissionToDisplayNotifications() &&
-				checkNotificationPermissionItemView != null &&
-				checkNotificationPermissionItem.isVisible();
 	}
 
 	@Override
@@ -1094,7 +1080,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				checkNotificationPermissionBalloon.dismiss();
 			}
 		}
-		// checkNotificationPermissionBalloonShownOnce = false;
 
 		Configuration configuration = getResources().getConfiguration();
 		Timber.i("Dark mode status: " + LockScreenNotes.isDarkMode(configuration));
