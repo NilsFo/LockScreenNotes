@@ -222,4 +222,9 @@
     <string name="prefs_review_notifications_settings_header_summary_insufficient">Insufficient</string>
     <string name="error_external_permissions_require_upgrade">"External storage permissions must be extended to allow access to all files."</string>
     <string name="info_number_not_available">-</string>
+    <string name="action_review_storage_upgrade_permissions_wrong_version">Internal Error! Storage permissions not available on your device.</string>
+    <string name="action_review_storage_upgrade_permissions">Review Storage Permission Upgrade</string>
+    <string name="action_review_storage_upgrade_permissions_info">Since Android Version 11, this app needs an upgrade to the already granted permissions to access your device\'s external storage.\nReview permission options below.\n\nYou can manually review system permissions.\nAlternatively you can try to auto resolve the issues, but this might not always work.\n\nThis permission upgrade is required to continue creating automated backups.</string>
+    <string name="action_review_storage_upgrade_permissions_enable_permissions">Attempt to auto resolve</string>
+
 </resources>

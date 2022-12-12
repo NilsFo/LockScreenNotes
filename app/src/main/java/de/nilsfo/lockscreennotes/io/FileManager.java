@@ -28,11 +28,9 @@ public class FileManager {
 	public static final String FILENAME_BACKUP_EXTENSION = ".json";
 
 	private final Context context;
-	private final StoragePermissionManager storagePermissionManager;
 
 	public FileManager(Context context) {
 		this.context = context;
-		storagePermissionManager = new StoragePermissionManager(context);
 	}
 
 	public static String readFile(File file) throws IOException {

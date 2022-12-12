@@ -3,11 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="de.nilsfo.lsn">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name="de.nilsfo.lockscreennotes.LockScreenNotes"
@@ -19,34 +21,32 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <meta-data android:name="android.max_aspect" android:value="2.1" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
 
         <receiver
-            android:exported="true"
             android:name="de.nilsfo.lockscreennotes.receiver.BootReceiver"
+            android:exported="true"
             android:label="StartMyServiceAtBootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationBrowseURLReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
 
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.LSNAutoBackupReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
 
         <!--
         TODO: This is an attempt at a "desktop" widget. Reuse this code if you ever want to pursue this idea again.
@@ -66,18 +66,18 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths"/>
+                android:resource="@xml/filepaths" />
         </provider>
 
         <activity
-            android:exported="true"
             android:name="de.nilsfo.lockscreennotes.activity.MainActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -88,26 +88,26 @@
             android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
+                android:value="de.nilsfo.lockscreennotes.activity.MainActivity" />
         </activity>
 
         <activity
-            android:exported="true"
             android:name="de.nilsfo.lockscreennotes.activity.NoteSharingListenerActivity"
+            android:exported="true"
             android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter android:label="@string/share_via_this_app">
-                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:mimeType="text/*"/>
+                <data android:mimeType="text/*" />
                 <!-- <data android:mimeType="text/plain" -->
             </intent-filter>
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
+                android:value="de.nilsfo.lockscreennotes.activity.MainActivity" />
         </activity>
 
         <activity
@@ -115,18 +115,16 @@
             android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.nilsfo.lockscreennotes.activity.MainActivity"/>
+                android:value="de.nilsfo.lockscreennotes.activity.MainActivity" />
         </activity>
 
         <activity
             android:name="de.nilsfo.lockscreennotes.activity.NotificationDeleteRecieverDialogActivity"
-            android:theme="@android:style/Theme.NoDisplay">
-        </activity>
+            android:theme="@android:style/Theme.NoDisplay"></activity>
 
         <activity
             android:name="de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity"
-            android:theme="@android:style/Theme.NoDisplay">
-        </activity>
+            android:theme="@android:style/Theme.NoDisplay"></activity>
     </application>
 
 </manifest>

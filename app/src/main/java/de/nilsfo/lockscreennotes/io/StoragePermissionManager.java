@@ -1,16 +1,26 @@
 package de.nilsfo.lockscreennotes.io;
 
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_PERMISSION_STORAGE;
+import static de.nilsfo.lockscreennotes.io.FileManager.FOLDER_NAME_BACKUP;
 
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.io.File;
+
+import de.nilsfo.lsn.R;
+import timber.log.Timber;
 
 public class StoragePermissionManager {
 
@@ -101,7 +111,35 @@ public class StoragePermissionManager {
 
 	public void requestExternalStoragePermission(Activity activity) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
+
+			// Setting up a dummy intent
+			boolean storageIntentSent = true;
+			Intent storageManagerIntent = null;
+			try {
+				storageManagerIntent = new Intent();
+				storageManagerIntent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+				Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+				storageManagerIntent.setData(uri);
+			} catch (Exception e) {
+				Timber.e(e);
+				Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			}
+
+			// Checking if the intent exists and firing it
+			if (storageManagerIntent != null) {
+				try {
+					activity.startActivity(storageManagerIntent);
+				} catch (Exception e) {
+					Timber.e(e);
+					Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					storageIntentSent = false;
+				}
+			} else storageIntentSent = false;
+
+			if (!storageIntentSent) {
+				// If the intent has not been sent, try to use the compat to request permission
+				ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
+			}
 		} else {
 			ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
 		}
@@ -113,4 +151,15 @@ public class StoragePermissionManager {
 		}
 		return true;
 	}
+
+	public String getDocumentsFilePath(Context context) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			return Environment.DIRECTORY_DOCUMENTS;
+		}
+
+		FileManager fileManager = new FileManager(context);
+		File f = new File(fileManager.getExternalDir(), FOLDER_NAME_BACKUP);
+		return f.getAbsolutePath();
+	}
+
 }

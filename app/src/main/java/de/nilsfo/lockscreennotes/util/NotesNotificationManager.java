@@ -511,8 +511,11 @@ public class NotesNotificationManager {
 	}
 
 	public void requestPermissionRationale(Activity activity) {
-		ActivityCompat.requestPermissions(activity,
-				new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+		if (Build.VERSION.SDK_INT >= 33) {
+			ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+		} else {
+			Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		}
 	}
 
 }
