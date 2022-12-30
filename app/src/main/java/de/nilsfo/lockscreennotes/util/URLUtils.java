@@ -1,8 +1,8 @@
 package de.nilsfo.lockscreennotes.util;
 
-import android.content.Context;
-
 import static de.nilsfo.lockscreennotes.util.RegexManager.URL_PATTERN;
+
+import android.content.Context;
 
 public class URLUtils {
 	public static final int URL_MIN_SIZE = 4;

@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.MenuItem;
 import android.view.View;
 
-import de.nilsfo.lsn.R;
-
 public class PermissionBalloonTimer {
 
 	public static final long PERMISSION_BALLOON_DELAY = 250;

@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.receiver;
 
+import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX_FILE_COUNT;
+
 import android.app.AlarmManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,8 +24,6 @@ import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
-import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX_FILE_COUNT;
-
 public class LSNAutoBackupReceiver extends BroadcastReceiver {
 
 	@Override
@@ -40,7 +40,7 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 
 			BackupManager backupManager = new BackupManager(context);
 			StoragePermissionManager storagePermissionManager = new StoragePermissionManager(context);
-			if (storagePermissionManager.hasAllCorrectPermissions()) {
+			if (storagePermissionManager.hasExternalStoragePermission()) {
 				File f = null;
 				try {
 					f = backupManager.createAndWriteBackup();
@@ -99,22 +99,15 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 						days = Math.max(days, 1);
 						long interval = AlarmManager.INTERVAL_DAY * days;
 						Date d = new Date(new Date().getTime() + alarmManager.getTimeUntilNextNewAutoBackup() + interval);
-						String formatedDate = new TimeUtils(context).formatDateAbsolute(d, DateFormat.FULL);
+						String formattedDate = new TimeUtils(context).formatDateAbsolute(d, DateFormat.FULL);
 
-						String text = context.getString(R.string.notification_auto_backup_next, formatedDate);
+						String text = context.getString(R.string.notification_auto_backup_next, formattedDate);
 						notificationManager.displayNotificationAutomaticBackup(true, text);
 					}
-
 				}
 			} else {
 				Timber.w("Schedule received, but the user has not granted the permission to write the external storage!");
-
-				String errorText = "";
-				if (storagePermissionManager.requiresExtendedPermissions()){
-					errorText = context.getString(R.string.error_no_external_storage_permissions);
-				}else{
-					errorText = context.getString(R.string.error_external_permissions_require_upgrade);
-				}
+				String errorText = context.getString(R.string.error_no_external_storage_permissions);
 				notificationManager.displayNotificationAutomaticBackup(false, errorText);
 			}
 

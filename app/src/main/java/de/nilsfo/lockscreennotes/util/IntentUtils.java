@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.util;
 
+import static de.nilsfo.lockscreennotes.util.NoteSharer.INTENT_TYPE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,11 +9,9 @@ import android.net.Uri;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
-import static de.nilsfo.lockscreennotes.util.NoteSharer.INTENT_TYPE;
-
 public class IntentUtils {
 
-	private Context context;
+	private final Context context;
 
 	public IntentUtils(Context context) {
 		this.context = context;

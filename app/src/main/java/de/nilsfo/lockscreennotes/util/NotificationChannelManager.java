@@ -1,5 +1,8 @@
 package de.nilsfo.lockscreennotes.util;
 
+import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
+import static de.nilsfo.lockscreennotes.LockScreenNotes.APP_TAG;
+
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
@@ -7,11 +10,9 @@ import android.content.Context;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
+
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
-import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
-import static de.nilsfo.lockscreennotes.LockScreenNotes.APP_TAG;
 
 public class NotificationChannelManager {
 

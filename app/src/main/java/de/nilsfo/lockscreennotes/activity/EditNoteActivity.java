@@ -19,6 +19,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NavUtils;
+import androidx.core.content.FileProvider;
+
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -26,10 +31,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NavUtils;
-import androidx.core.content.FileProvider;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
@@ -42,7 +43,6 @@ import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import de.nilsfo.lockscreennotes.view.QRCodeView;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
 
 public class EditNoteActivity extends NotesActivity {
 
@@ -92,6 +92,10 @@ public class EditNoteActivity extends NotesActivity {
 			myNote = Note.getNoteFromDB(id, databaseAdapter);
 		} catch (Exception e) {
 			Timber.w(e, "Failed to edit note ID: " + id + ". It is not in the DB.");
+			handleIllegalNote();
+			return;
+		}
+		if (myNote == null) {
 			handleIllegalNote();
 			return;
 		}

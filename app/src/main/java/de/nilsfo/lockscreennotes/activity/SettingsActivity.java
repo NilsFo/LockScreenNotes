@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.activity;
 
+import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX_FILE_COUNT;
+
 import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -17,15 +19,15 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
 
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import androidx.appcompat.app.ActionBar;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
@@ -35,8 +37,6 @@ import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lockscreennotes.util.listener.SettingsBindPreferenceSummaryToValueListener;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
-import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX_FILE_COUNT;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 

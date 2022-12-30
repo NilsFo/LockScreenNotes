@@ -3,11 +3,12 @@ package de.nilsfo.lockscreennotes.data;
 import android.database.Cursor;
 import android.text.format.DateUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Date;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
 import timber.log.Timber;
@@ -38,7 +39,12 @@ public class Note implements Comparable<Note> {
 
 	@Nullable
 	public static Note getNoteFromDB(long id, DBAdapter adapter) {
-		Cursor cursor = adapter.getRow(id);
+		Cursor cursor = null;
+		try {
+			cursor = adapter.getRow(id);
+		} catch (IllegalStateException e) {
+			Timber.e(e);
+		}
 		if (cursor == null) {
 			return null;
 		}
@@ -66,8 +72,12 @@ public class Note implements Comparable<Note> {
 				long id = cursor.getLong(DBAdapter.COL_ROWID);
 				Note note = Note.getNoteFromDB(id, adapter);
 
-				Timber.i("Adding note with ID: " + id);
-				list.add(note);
+				if (note == null) {
+					Timber.e("Cannot find a note with ID: " + id);
+				} else {
+					Timber.i("Adding note with ID: " + id);
+					list.add(note);
+				}
 			} while (cursor.moveToNext());
 		}
 

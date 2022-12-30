@@ -189,4 +189,23 @@
     <string name="info_choose_mail">Wählen Sie eine Adresse aus, an die eine Mail geschickt werden soll:</string>
     <string name="action_dial">Wählen</string>
     <string name="date_preference_preview">Vorschau: Aktuelle Zeit (Tippen zum aktualisieren)</string>
+    <string name="error_line_rendering_contact_dev">Ein Fehler ist aufgetreten bei dem Versuch den Notiz Hintergrund darzustellen. Bitte kontaktieren Sie das Entwicklungsteam, wenn dies (öfters) auftritt!</string>
+    <string name="action_review_permissions">Berechtigungen überprüfen</string>
+    <string name="warning_no_storage_permission">Kann keine Backups erstellen ohne Zugriff auf den Speicher des Geräts. Bitte schalten Sie die entsprechenden Berechtigungen ein und versuchen Sie es erneut.</string>
+    <string name="action_review_notification_permissions_info">Diese App braucht Berechtigungen um Benachrichtigungen auf dem Sperrbildschirm anzuzeigen. Diese sind derzeit deaktiviert. Überprüfen Sie die Benachrichtigungs-Einstellungen unten. Die angezeigten Optionen varriieren, je nach Gerät und Software Version.</string>
+    <string name="action_review_notification_permissions_enable_permissions">App Berechtigungen überprüfen</string>
+    <string name="action_review_notification_permissions_enable_notification_center">Mitteilungszentrale überprüfen</string>
+    <string name="action_review_notification_permissions_review_permissions">Berechtigungen überprüfen</string>
+    <string name="info_review_notification_permissions_granted">Alle Berechtigungen erteilt. Danke.</string>
+    <string name="error_not_displaying_notifications_no_permissions">%1$s: Kann keine Notizen anzeigen. Ungenügende App Berechtigungen.</string>
+    <string name="info_review_notification_permissions_balloon_text">Ungenügende App Berechtigungen. Überprüfen Sie sie hier.</string>
+    <string name="prefs_review_notifications_settings_header_summary">Derzeitiger <b>Stand der Berechtigungen um Benachrichtigungen anzuzeigen: %1$s.</b> Überprüfen Sie die Benachrichtigungs-Einstellungen unten. Die angezeigten Optionen varriieren, je nach Gerät und Software Version.</string>
+    <string name="pref_settings_permissions">Berechtigungen</string>
+    <string name="prefs_review_notifications_settings_header_title">App Berechtigungen</string>
+    <string name="prefs_review_notifications_settings_system_title">System Berechtigungen überprüfen</string>
+    <string name="prefs_review_notifications_settings_drawer_title">Mitteilungszentrale überprüfen</string>
+    <string name="prefs_review_notifications_settings_header_summary_good">Okay</string>
+    <string name="prefs_review_notifications_settings_header_summary_insufficient">Unzureichend</string>
+    <string name="error_external_permissions_require_upgrade">Zugriff auf den externen Speicher muss erweitert werden um den Zugriff auf alle Dateien zu erlauben.</string>
+    <string name="action_review_notification_permissions">Berechtigungen der Benachrichtigungen überprüfen</string>
 </resources>

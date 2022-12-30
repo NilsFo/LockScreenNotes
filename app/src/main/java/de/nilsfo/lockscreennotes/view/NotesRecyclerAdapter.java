@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.view;
 
+import static de.nilsfo.lockscreennotes.util.NotesNotificationManager.PREFERENCE_REVERSE_ORDERING;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -12,15 +14,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
@@ -30,8 +34,6 @@ import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
-import static de.nilsfo.lockscreennotes.util.NotesNotificationManager.PREFERENCE_REVERSE_ORDERING;
 
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder> {
 
@@ -66,7 +68,14 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 	public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
 		long id = noteIDs.get(i);
 		Timber.i("Binding viewHolder for index " + i + " -> Note ID: " + id);
-		Note note = Note.getNoteFromDB(id, adapter);
+
+		Note note = null;
+		try {
+			note = Note.getNoteFromDB(id, adapter);
+		} catch (Exception e) {
+			Timber.e(e);
+			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		}
 
 		if (note == null) {
 			Timber.e("Failed to retrieve a note with ID " + id);

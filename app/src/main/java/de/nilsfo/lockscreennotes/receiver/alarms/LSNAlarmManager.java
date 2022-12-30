@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.receiver.alarms;
 
+import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -12,8 +14,6 @@ import java.util.Calendar;
 import de.nilsfo.lockscreennotes.receiver.LSNAutoBackupReceiver;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import timber.log.Timber;
-
-import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM;
 
 public class LSNAlarmManager {
 

@@ -5,9 +5,10 @@ import android.content.DialogInterface;
 import android.util.SparseBooleanArray;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import java.util.ArrayList;
 
-import androidx.appcompat.app.AlertDialog;
 import de.nilsfo.lockscreennotes.data.Note;
 import timber.log.Timber;
 

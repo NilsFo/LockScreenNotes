@@ -1,14 +1,14 @@
 package de.nilsfo.lockscreennotes.data.content;
 
+import static de.nilsfo.lockscreennotes.util.RegexManager.MAIL_PATTERN;
+import static de.nilsfo.lockscreennotes.util.RegexManager.PHONE_NUMBER_PATTERN;
+
 import java.util.ArrayList;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.util.RegexManager;
 import de.nilsfo.lockscreennotes.util.URLUtils;
 import timber.log.Timber;
-
-import static de.nilsfo.lockscreennotes.util.RegexManager.MAIL_PATTERN;
-import static de.nilsfo.lockscreennotes.util.RegexManager.PHONE_NUMBER_PATTERN;
 
 public class NoteContentAnalyzer {
 

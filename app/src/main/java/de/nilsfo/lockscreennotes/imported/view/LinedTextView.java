@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatTextView;
+
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 

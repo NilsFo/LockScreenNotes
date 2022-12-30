@@ -1,5 +1,13 @@
 package de.nilsfo.lockscreennotes.util;
 
+import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
+import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_MAIL;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_PHONE_NUMBER;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_URL;
+import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.INTENT_EXTRA_NOTE_CONTENT_TYPE;
+import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Notification;
@@ -15,15 +23,15 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.activity.EditNoteActivity;
@@ -38,14 +46,6 @@ import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
-import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP;
-import static de.nilsfo.lockscreennotes.activity.EditNoteActivity.EXTRA_NOTE_ACTIVITY_NOTE_ID;
-import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_MAIL;
-import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_PHONE_NUMBER;
-import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.CONTENT_TYPE_URL;
-import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity.INTENT_EXTRA_NOTE_CONTENT_TYPE;
-import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
 
 /**
  * Created by Nils on 16.08.2016.

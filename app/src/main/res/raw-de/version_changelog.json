@@ -1,4 +1,9 @@
 {
+  "12": {
+    "date": "30.12.2022",
+    "version": "1.10",
+    "text": "-Wenn Sie keine Berechtigungen für Benachrichtigungen erteilt haben, wird die App Sie darüber informieren und Möglichkeiten anbieten, sie von dem Hauptbildschirm aus zu erteilen\n-Aktualisierte Berechtigungen und Zugriff auf externen Speicher\n-Berechtigungsüberprüfungsoptionen in den 'Allgemeinen'-Abschnitt des Einstellungsmenüs verschoben\n-Stabilität der App verbessert\n-Rechtschreibfehler behoben\n-Sprachdateien aktualisiert"
+  },
   "11": {
     "date": "03.01.2020",
     "version": "1.09",

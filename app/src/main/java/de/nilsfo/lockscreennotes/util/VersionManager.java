@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,12 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
-import androidx.appcompat.app.AlertDialog;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
-
-import static de.nilsfo.lockscreennotes.util.NotesNotificationManager.PREFERENCE_REVERSE_ORDERING;
 
 /**
  * Created by Nils on 13.05.2017.
@@ -60,14 +59,14 @@ public abstract class VersionManager {
 
 		// (Re-) setting some preferences
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		int launchedCountAllTime = preferences.getInt(PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
-		int launchedCountThisVersion = preferences.getInt(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+		long launchedCountAllTime = preferences.getLong(PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
+		long launchedCountThisVersion = preferences.getLong(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
 		Timber.i("App launched count all time: " + launchedCountAllTime + ".");
 		Timber.i("App launched count this version: " + launchedCountThisVersion + ". (will be reset)");
 
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putInt(PREFERENCE_APP_LAUNCHED_ALL_TIME, launchedCountAllTime);
-		editor.putInt(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+		editor.putLong(PREFERENCE_APP_LAUNCHED_ALL_TIME, launchedCountAllTime);
+		editor.putLong(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
 		editor.apply();
 
 		// Showing the version update changes as a dialog window

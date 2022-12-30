@@ -1,4 +1,9 @@
 {
+  "12": {
+    "date": "30.12.2022",
+    "version": "1.10",
+    "text": "-If you lack notification permissions, the app will let you know and provide ways to grant them from the main screen\n-Updated external storage permissions and access\n-Moved permission review options to the 'general' section of settings menu\n-Improved app stability\n-Fixed typos\n-Updated localization files"
+  },
   "11": {
     "date": "03.01.2020",
     "version": "1.09",

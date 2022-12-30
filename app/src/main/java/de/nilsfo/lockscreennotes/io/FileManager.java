@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 
 import java.io.BufferedReader;
@@ -197,4 +198,15 @@ public class FileManager {
 
 		return null;
 	}
+
+
+	public String getDocumentsFilePath(Context context) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			return Environment.DIRECTORY_DOCUMENTS;
+		}
+
+		File f = new File(getExternalDir(), FOLDER_NAME_BACKUP);
+		return f.getAbsolutePath();
+	}
+
 }

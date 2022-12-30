@@ -1,12 +1,14 @@
 package de.nilsfo.lockscreennotes.activity;
 
+import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
+import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -19,6 +21,11 @@ import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -45,11 +52,6 @@ import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.RelativeTimeTextfieldContainer;
@@ -69,10 +71,6 @@ import de.nilsfo.lockscreennotes.view.NotesRecyclerAdapter;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
-import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
-import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
-import static de.nilsfo.lockscreennotes.io.StoragePermissionManager.StoragePermissionState.STATE_MEDIA_ONLY;
-
 public class MainActivity extends NotesActivity implements Observer, NotesRecyclerAdapter.NotesRecyclerAdapterListener {
 
 	public static final int IMPORT_NOTE_PREVIEW_SIZE = 35;
@@ -85,7 +83,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	private NotesRecyclerAdapter noteRecyclerAdapter;
 	private RecyclerView notesRecyclerView;
 	private ScrollView tutorialView;
-	private CheckBox tutorialDontShowAgainCB;
+	private CheckBox tutorialDoNotShowAgainCB;
 	private TextView nothingToDisplayLB;
 	private ExecutorService executorService;
 
@@ -102,8 +100,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		tutorialView = (ScrollView) findViewById(R.id.tutorial_view);
 		nothingToDisplayLB = (TextView) findViewById(R.id.nothing_to_display);
 
-		tutorialDontShowAgainCB = (CheckBox) findViewById(R.id.tutorial_do_not_show_again_cb);
-		tutorialDontShowAgainCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		tutorialDoNotShowAgainCB = (CheckBox) findViewById(R.id.tutorial_do_not_show_again_cb);
+		tutorialDoNotShowAgainCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				onTutorialCBclicked(isChecked);
@@ -190,6 +188,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	public void requestDeleteNote(long databaseID) {
 		final Note note = Note.getNoteFromDB(databaseID, databaseAdapter);
+		if (note == null) {
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		Timber.i("Request to delete note: '" + note.getText() + "'");
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("prefs_quick_delete", true)) {
 			deleteNote(note.getDatabaseID());
@@ -325,63 +328,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			return;
 		}
 
-		if (storagePermissionManager.getPermissionState() == STATE_MEDIA_ONLY) {
-			// The item is visible because the user needs to update their storage permissions
-			showPermissionDialogStorageUpgrade();
-			return;
-		}
-
 		// All permissions granted.
 		Toast.makeText(this, R.string.info_review_notification_permissions_granted, Toast.LENGTH_LONG).show();
-	}
-
-	public void showPermissionDialogStorageUpgrade() {
-		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
-		final Activity activity = this;
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-			// The user's device is too old. This should not affect them!
-			Toast.makeText(activity, R.string.action_review_storage_upgrade_permissions_wrong_version, Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setTitle(R.string.action_review_storage_upgrade_permissions);
-		builder.setIcon(R.mipmap.ic_launcher);
-		builder.setMessage(getString(R.string.action_review_storage_upgrade_permissions_info));
-
-		builder.setNeutralButton(R.string.prefs_review_notifications_settings_system_title, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				try {
-					Intent intent = LockScreenNotes.BuildPermissionIntentSystemSettings(activity);
-					startActivity(intent);
-				} catch (Exception e) {
-					Timber.e(e);
-					Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-				}
-			}
-		});
-		builder.setPositiveButton(R.string.action_review_storage_upgrade_permissions_enable_permissions, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				StoragePermissionManager storagePermissionManager = new StoragePermissionManager(activity);
-				try {
-					storagePermissionManager.requestExternalStoragePermission(activity);
-				} catch (Exception e) {
-					Timber.e(e);
-					Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-				}
-			}
-		});
-		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-		builder.show();
 	}
 
 	public void showPermissionDialogNotification() {
@@ -454,27 +402,14 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 	}
 
-	private void requestExtendStoragePermissionsDialog() {
-		// TODO implement
-	}
-
 	private void requestBackupMenu() {
 		BackupManager backupManager = new BackupManager(this);
 		StoragePermissionManager storagePermissionManager = new StoragePermissionManager(this);
-		StoragePermissionManager.StoragePermissionState currentState = storagePermissionManager.getPermissionState();
-		boolean storageManager = storagePermissionManager.isExternalStorageManager();
-		Timber.i("Current permission state: " + currentState);
-		Timber.i("Is storage manager: " + storageManager);
-
-		// Checking if permissions are granted, but need upgrading
-		if (storagePermissionManager.requiresExtendedPermissions() && !storagePermissionManager.hasPermissionsTotallyDenied()) {
-			Toast.makeText(this, R.string.error_external_permissions_require_upgrade, Toast.LENGTH_LONG).show();
-			requestExtendStoragePermissionsDialog();
-			return;
-		}
+		boolean hasExternalStoragePermission = storagePermissionManager.hasExternalStoragePermission();
+		Timber.i("Has external Storage Permission: " + hasExternalStoragePermission);
 
 		// Checking if external permissions are granted
-		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+		if (!hasExternalStoragePermission) {
 			Toast.makeText(this, R.string.warning_no_storage_permission, Toast.LENGTH_LONG).show();
 			storagePermissionManager.requestExternalStoragePermission(this);
 			return;
@@ -918,12 +853,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			Timber.i("Setting the permission item to visible, because NO NOTIFICATION PERMISSIONS");
 			checkAppPermissionItem.setVisible(true);
 		}
-
-		if (storagePermissionManager.getPermissionState() == STATE_MEDIA_ONLY) {
-			// The item is visible because the user needs to update their storage permissions
-			Timber.i("Setting the permission item to visible, because STORAGE PERMISSION UPDATE NEEDED");
-			checkAppPermissionItem.setVisible(true);
-		}
 	}
 
 	private void requestDisplayPermissionBalloon() {
@@ -1022,21 +951,41 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 					Uri uri = data.getData();
 					Timber.i("File Uri: " + uri.toString());
 					String path = null;
+					boolean fileSelectionSuccess = true;
 					try {
 						path = new FileManager(this).getPath(uri);
 						Timber.i("File Path: " + path);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 						Timber.e(e);
-						return;
+						fileSelectionSuccess = false;
 					}
-					try {
-						requestBackupImportMenuConfirmFile(new File(path));
-					} catch (Exception e) {
-						e.printStackTrace();
-						Timber.e(e);
-						Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
+
+					if (!fileSelectionSuccess) {
+						// TOOD handle this
 					}
+
+					if (path == null && fileSelectionSuccess) {
+						// Path is null. Looks like the file was not found?
+						Timber.e("Error! The file path is NULL!");
+						//TODO handle this!
+						break;
+					}
+
+					if (fileSelectionSuccess) {
+						try {
+							requestBackupImportMenuConfirmFile(new File(path));
+						} catch (Exception e) {
+							e.printStackTrace();
+							Timber.e(e);
+							Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
+						}
+					} else {
+						// File selector failed
+						// TODO Handle this
+					}
+				} else {
+					// TODO what if not OK?
 				}
 				break;
 		}
@@ -1139,7 +1088,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		databaseAdapter.open();
 		loadNotesFromDB();
 
-		tutorialDontShowAgainCB.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREFS_HIDE_TUTORIAL, false));
+		tutorialDoNotShowAgainCB.setChecked(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREFS_HIDE_TUTORIAL, false));
 		setupRelativeDateUpdater();
 
 		Timber.i("MainActivity: onResume()");

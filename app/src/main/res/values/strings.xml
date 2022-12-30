@@ -56,7 +56,7 @@
     <string name="prefs_separate_notes_title">Separate notifications</string>
     <string name="prefs_separate_notes_flavor">While enabled, every notification you create will create its own notification in the lockscreen.\nOtherwise they are summarized into a combined notification.\nDepending on your device, too many notifications may be automatically grouped together by the system.</string>
     <string name="error_invalid_value">Could not handle that value. Resetting to default.</string>
-    <string name="pref_view_on_github_summary">This app is free, open source and does not contain ads. This will not change in the future. You can view and contribute to this app\'s sourcecode online if you tap here.\nTranslations are always welcome.</string>
+    <string name="pref_view_on_github_summary">This app is free, open source and does not contain ads. This will not change in the future. You can view and contribute to this app\'s source code online if you tap here.\nTranslations are always welcome.</string>
     <string name="settings_auto_enable_new_notes_title">Auto-enable new notes</string>
     <string name="settings_auto_enable_new_notes_flavor">When you add a new note it will automatically be enabled.</string>
     <string name="tutorial_welcome">Let\'s get started!</string>
@@ -77,7 +77,7 @@
     <string name="prefs_time_relative_title">Use relative date and time</string>
     <string name="prefs_time_relative_summary">If enabled dates will be displayed relative to the current time (e.g. \'5 minutes ago\').\nOtherwise absolute dates will be used (e.g. \'May 20, 2017\').</string>
     <string name="prefs_time_locale_default_value" translatable="false">default locale</string>
-    <string name="pref_credits" translatable="false">Credits</string>
+    <string name="pref_credits" translatable="false">Credits and external libraries used</string>
     <string name="prefs_credits_text_drawable" translatable="false"><i>Text Drawable</i> by Wireless Designs, LLC.</string>
     <string name="prefs_credits_timber" translatable="false"><i>Timber</i> by Jake Wharton.</string>
     <string name="prefs_credits_leakcanary" translatable="false"><i>LeakCanary</i> by Square, Inc.</string>
@@ -201,30 +201,24 @@
     <string name="info_choose_mail">Select mail address to write to:</string>
     <string name="action_dial">Dial</string>
     <string name="date_preference_preview">Current time preview (Tap to update):</string>
-    <string name="error_line_rendering_contact_dev">An error occurred while drawing the lines. Please contact the developer regarding this (if this keep happening).</string>
+    <string name="error_line_rendering_contact_dev">An error occurred while drawing note lines. Please contact the developer regarding this (if this keep happening).</string>
     <string name="action_review_notification_permissions">Review notification permissions</string>
     <string name="action_review_permissions">Review permissions</string>
     <string name="warning_no_storage_permission">Cannot use backups without access to device storage. Please enable storage and try again.</string>
     <string name="action_review_notification_permissions_info">This app needs permissions to display notifications on the lock screen.\nThese are currently denied. Review notification settings on your device below.\n\nThe options available depend on your device and software version.</string>
     <string name="action_review_notification_permissions_enable_permissions">Check app permissions</string>
     <string name="action_review_notification_permissions_enable_notification_center">Check notification center</string>
-    <string name="error_no_notification_permission_options">No notification permissions available to be changes on this device. Try granting permissions manually.</string>
     <string name="action_review_notification_permissions_review_permissions">Review permissions</string>
     <string name="info_review_notification_permissions_granted">All permissions granted. Thank you.</string>
     <string name="error_not_displaying_notifications_no_permissions">%1$s: Cannot show notes. Insufficient app permissions.</string>
     <string name="info_review_notification_permissions_balloon_text">Insufficient App permissions.\nReview them here.</string>
     <string name="pref_settings_permissions">Permissions</string>
-    <string name="prefs_review_notifications_settings_header_summary">Current <b>permission state to display notifications: %1$s.</b>\nReview permissions below. Not all settings are available on all devices and Android versions.</string>
+    <string name="prefs_review_notifications_settings_header_summary">Current <b>permission state to display notifications: %1$s.</b> Review permissions below. Not all settings are available on all devices and Android versions.</string>
     <string name="prefs_review_notifications_settings_header_title">App Permissions</string>
     <string name="prefs_review_notifications_settings_system_title">Review system permissions</string>
-    <string name="prefs_review_notifications_settings_drawer_title">Review notification drawer</string>
+    <string name="prefs_review_notifications_settings_drawer_title">Review notification center</string>
     <string name="prefs_review_notifications_settings_header_summary_good">Okay</string>
     <string name="prefs_review_notifications_settings_header_summary_insufficient">Insufficient</string>
     <string name="error_external_permissions_require_upgrade">"External storage permissions must be extended to allow access to all files."</string>
-    <string name="info_number_not_available">-</string>
-    <string name="action_review_storage_upgrade_permissions_wrong_version">Internal Error! Storage permissions not available on your device.</string>
-    <string name="action_review_storage_upgrade_permissions">Review Storage Permission Upgrade</string>
-    <string name="action_review_storage_upgrade_permissions_info">Since Android Version 11, this app needs an upgrade to the already granted permissions to access your device\'s external storage.\nReview permission options below.\n\nYou can manually review system permissions.\nAlternatively you can try to auto resolve the issues, but this might not always work.\n\nThis permission upgrade is required to continue creating automated backups.</string>
-    <string name="action_review_storage_upgrade_permissions_enable_permissions">Attempt to auto resolve</string>
-
+    <string name="info_number_not_available" translatable="false">-</string>
 </resources>

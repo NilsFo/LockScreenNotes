@@ -5,9 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
+
 import timber.log.Timber;
 
 /**

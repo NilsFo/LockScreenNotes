@@ -15,9 +15,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import de.nilsfo.lockscreennotes.activity.MainActivity;
 import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;

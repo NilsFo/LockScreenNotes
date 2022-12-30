@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.io.FileManager;
@@ -43,7 +42,7 @@ public class BackupManager {
 	}
 
 	public File createAndWriteBackup() throws JSONException, IOException, InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+		if (!storagePermissionManager.hasExternalStoragePermission()) {
 			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
 		}
 
@@ -62,7 +61,7 @@ public class BackupManager {
 	}
 
 	public ArrayList<File> findBackupFiles() throws InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+		if (!storagePermissionManager.hasExternalStoragePermission()) {
 			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
 		}
 		ArrayList<File> list = new ArrayList<>();
@@ -90,7 +89,7 @@ public class BackupManager {
 	}
 
 	public BackupMetaData getMetaData(File file) throws IOException, JSONException, InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+		if (!storagePermissionManager.hasExternalStoragePermission()) {
 			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
 		}
 
@@ -99,7 +98,7 @@ public class BackupManager {
 	}
 
 	public ArrayList<Note> readBackupFile(File file) throws IOException, JSONException, InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasAllCorrectPermissions()) {
+		if (!storagePermissionManager.hasExternalStoragePermission()) {
 			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
 		}
 

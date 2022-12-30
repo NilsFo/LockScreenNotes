@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 
-import androidx.appcompat.app.AlertDialog;
 import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
@@ -36,10 +38,22 @@ public class NotificationDeleteRecieverDialogActivity extends Activity {
 			Timber.i("That was no known ID, so just hide them all.");
 		} else {
 			Note note = Note.getNoteFromDB(notificationId, databaseAdapter);
-			notes.add(note);
-			Timber.i("Found the right note with matching ID in the database.");
+			if (note != null) {
+				notes.add(note);
+				Timber.i("Found the right note with matching ID in the database.");
+			} else {
+				Timber.e("Failed to get note from DB with ID: " + notificationId);
+			}
 		}
 		databaseAdapter.close();
+
+		if (notes.isEmpty()) {
+			// ERROR: Notes to be deleted are empty!
+			Timber.e("Cannot delete notes! None found!");
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG)
+					.show();
+			return;
+		}
 
 		String msgText;
 		if (notes.size() == 1) {
