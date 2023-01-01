@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -49,9 +50,11 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 	public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 		LayoutInflater inflater = LayoutInflater.from(getContext());
 		Note note = getItem(position);
-		@SuppressLint("ViewHolder") View view = inflater.inflate(R.layout.note_row, parent, false);
+		if (note == null) {
+			Toast.makeText(getContext(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
+		}
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		@SuppressLint("ViewHolder") View view = inflater.inflate(R.layout.note_row, parent, false);
 		TextView timestampTF = (TextView) view.findViewById(R.id.note_row_timestamp);
 		TextView positionTF = (TextView) view.findViewById(R.id.note_row_position);
 		ImageButton enabledBT = (ImageButton) view.findViewById(R.id.note_row_image_bt);
@@ -122,8 +125,10 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		});
 
 		TimeUtils utils = new TimeUtils(getContext());
-
-		long time = note.getTimestamp();
+		long time = Note.DEFAULT_TIMESTAMP;
+		if (note != null) {
+			time = note.getTimestamp();
+		}
 		if (utils.isRelativeTimePrefered()) {
 			timestampTF.setText(getContext().getString(R.string.last_edited, utils.formatRelative(time)));
 			RelativeTimeTextfieldContainer.getContainer().add(timestampTF, time);

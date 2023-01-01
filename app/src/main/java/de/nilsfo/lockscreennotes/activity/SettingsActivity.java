@@ -427,34 +427,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			updateTimeAndDatePreference();
 		}
 
-		/**
-		 * @Override public void onStart() {
-		 * super.onStart();
-		 * Timber.i("TimeAndDate: Start");
-		 * updateTimeAndDatePreference();
-		 * service = Executors.newFixedThreadPool(1);
-		 * <p>
-		 * service.submit(new Runnable() {
-		 * @Override public void run() {
-		 * while (true) {
-		 * Timber.i("Running in parallel: Update Preview");
-		 * try {
-		 * //updateTimeAndDatePreference();
-		 * Thread.sleep(1000);
-		 * } catch (InterruptedException e) {
-		 * Timber.e(e);
-		 * }
-		 * }
-		 * }
-		 * });
-		 * }
-		 * @Override public void onPause() {
-		 * super.onPause();
-		 * Timber.i("TimeAndDate: Pause");
-		 * service.shutdown();
-		 * }
-		 **/
-
 		public void updateTimeAndDatePreference() {
 			Timber.i("Updating Time and Date preview.");
 			Preference preview = findPreference("prefs_time_preview");

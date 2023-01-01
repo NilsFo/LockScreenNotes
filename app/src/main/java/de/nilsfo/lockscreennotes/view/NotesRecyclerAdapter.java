@@ -151,13 +151,13 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 	}
 
 	public interface NotesRecyclerAdapterListener {
-		public void onCardNotePressed(long noteID);
+		void onCardNotePressed(long noteID);
 
-		public void onCardNotePressedLong(long noteID);
+		void onCardNotePressedLong(long noteID);
 
-		public void onCardNoteMenuPressed(long noteID, MenuItem itemID);
+		void onCardNoteMenuPressed(long noteID, MenuItem itemID);
 
-		public void onCardNoteToggleImagePressed(long noteID);
+		void onCardNoteToggleImagePressed(long noteID);
 	}
 
 	class ViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener {

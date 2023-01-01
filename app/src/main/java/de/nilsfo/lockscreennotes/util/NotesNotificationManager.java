@@ -160,8 +160,8 @@ public class NotesNotificationManager {
 			}
 
 			//Version 6 or lower: Summarized, single notification that displays all notes in a single notification!
-
-			text = String.format(context.getString(R.string.notification_multiple_notes), String.valueOf(getNoteNotificationCount()));
+			String noteNotificationCount = String.valueOf(getNoteNotificationCount());
+			text = String.format(context.getString(R.string.notification_multiple_notes), noteNotificationCount);
 			builder.setNumber(getNoteNotificationCount());
 			bigText = "";
 			for (int i = 0; i < notesList.size(); i++) {
@@ -172,9 +172,15 @@ public class NotesNotificationManager {
 
 		builder.setContentText(text);
 		builder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
-		builder.setDeleteIntent(createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
-		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
 		builder.setCategory(NotificationCompat.CATEGORY_REMINDER);
+
+		PendingIntent dismissIntent = createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE);
+		if (dismissIntent == null) {
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
+		} else {
+			builder.setDeleteIntent(dismissIntent);
+			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
+		}
 
 		NotificationManager manager = getNotificationManagerService();
 		Notification notification = builder.build();
@@ -285,20 +291,49 @@ public class NotesNotificationManager {
 		manager.notify(DEFAULT_NOTIFICATION_ID, notification);
 	}
 
-	private void applyActionsToIndividualNote(NotificationCompat.Builder builder, Note note) {
-		builder.setDeleteIntent(createOnNoteDismissIntent((int) note.getDatabaseID()));
-		builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled), createOnNoteDismissIntent((int) note.getDatabaseID()));
+	private boolean applyActionsToIndividualNote(NotificationCompat.Builder builder, Note note) {
+		if (note == null) {
+			return false;
+		}
+
+		PendingIntent dismissIntent = createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE);
+		if (dismissIntent == null) {
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
+		} else {
+			builder.setDeleteIntent(dismissIntent);
+			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
+		}
 
 		Timber.i("Setting up notification actions for note ID " + note.getDatabaseID() + " (" + note.getTextPreview() + ").");
-		builder.setContentIntent(getIntentToNote(note));
+		PendingIntent intentToNote = getIntentToNote(note);
+		if (intentToNote == null) {
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
+		} else {
+			builder.setContentIntent(intentToNote);
+		}
 		createOnNoteContentIntent(builder, note);
+
+		return true;
 	}
 
 	private PendingIntent createOnNoteDismissIntent(int notificationId) {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
 		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
 		Timber.i("Creating a dismiss intent. ID: " + notificationId);
-		return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		PendingIntent broadcast = null;
+		try {
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+				broadcast = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+			} else {
+				broadcast = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			}
+		} catch (Exception e) {
+			Timber.e(e);
+			Timber.e("Failed to create on Dismissed event!");
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
+		}
+		return broadcast;
 	}
 
 	private void createOnNoteContentIntent(NotificationCompat.Builder builder, Note note) {
@@ -340,16 +375,22 @@ public class NotesNotificationManager {
 			return;
 		}
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) note.getDatabaseID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		builder.addAction(iconID, context.getString(textID), pendingIntent);
-	}
+		PendingIntent pendingIntent = null;
+		try {
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+				pendingIntent = PendingIntent.getActivity(context, (int) note.getDatabaseID(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+			} else {
+				pendingIntent = PendingIntent.getActivity(context, (int) note.getDatabaseID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			}
+		}catch (Exception e){
+			Timber.e(e);
+			Timber.e("Error! Could not set up note context specific intent!");
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure,Toast.LENGTH_LONG).show();
+		}
 
-	@Deprecated
-	private PendingIntent createOnNoteDeleteIntent(int notificationId) {
-		Intent intent = new Intent(context, NotificationDeleteReceiver.class);
-		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
-		Timber.i("Creating a delete intent. ID: " + notificationId);
-		return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		if (pendingIntent != null) {
+			builder.addAction(iconID, context.getString(textID), pendingIntent);
+		}
 	}
 
 	private NotificationCompat.Builder getGenericNotificationBuilder(String tickerMessage, boolean ongoing, int priority, String channelID) {
@@ -368,7 +409,18 @@ public class NotesNotificationManager {
 		intent.putExtra(EditNoteActivity.EXTRA_ACTIVITY_STANDALONE, true);
 
 		int requestCode = (int) (REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE_DYNAMIC_BASE + note.getDatabaseID());
-		return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = null;
+		try {
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+				pendingIntent = PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+			} else {
+				pendingIntent = PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			}
+		} catch (Exception e) {
+			Timber.e(e);
+			Timber.e("Error! Could not set up intent for Note!");
+		}
+		return pendingIntent;
 	}
 
 	public void displayNotificationAutomaticBackup(boolean success, String contentText) {
@@ -452,8 +504,10 @@ public class NotesNotificationManager {
 		PendingIntent pendingIntent = getIntentToMainActivity();
 		if (pendingIntent != null) {
 			builder.setContentIntent(pendingIntent);
+		} else {
 			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
 		}
+
 		return builder;
 	}
 
