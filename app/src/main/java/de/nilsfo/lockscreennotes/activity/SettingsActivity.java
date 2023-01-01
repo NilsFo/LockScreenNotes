@@ -344,19 +344,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			super.onPause();
 			Timber.i("Stopping the Backup preference activity. Let's see if a alarm will be scheduled...");
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
 			LSNAlarmManager manager = new LSNAlarmManager(getActivity());
 			if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
-				//if (scheduleChanged) {
 				Timber.i("Changes detected. Requesting a new backup timer!");
-				manager.cancelNextAutoBackup();
-				manager.scheduleNextAutoBackup();
-				//} else {
-				//	Timber.i("Backups are enabled, but the schedule didn't change. So no new schedule is requested.");
-				//}
+				manager.requestCancelAndReScheduleNextAutoBackup();
 			} else {
-				manager.cancelNextAutoBackup();
-				Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
+				boolean nextBackupCanceled = manager.cancelNextAutoBackup();
+				if (nextBackupCanceled) {
+					Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
+				} else {
+					Timber.e("Failed to cancel next alarm!");
+					Toast.makeText(getActivity(), R.string.error_failed_to_cancel_backup_alarm, Toast.LENGTH_LONG).show();
+				}
 			}
 		}
 

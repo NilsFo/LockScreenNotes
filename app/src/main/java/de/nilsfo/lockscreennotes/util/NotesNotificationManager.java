@@ -9,6 +9,7 @@ import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContent
 import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -448,14 +449,31 @@ public class NotesNotificationManager {
 			builder.setContentTitle(context.getString(R.string.app_name));
 		}
 
-		builder.setContentIntent(getIntentToMainActivity());
+		PendingIntent pendingIntent = getIntentToMainActivity();
+		if (pendingIntent != null) {
+			builder.setContentIntent(pendingIntent);
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
+		}
 		return builder;
 	}
 
 	private PendingIntent getIntentToMainActivity() {
 		Intent intent = new Intent(context, MainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		return PendingIntent.getActivity(context, REQUEST_CODE_INTENT_OPEN_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = null;
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				pendingIntent = PendingIntent.getActivity(context,
+						REQUEST_CODE_INTENT_OPEN_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+			} else {
+				pendingIntent = PendingIntent.getActivity(context,
+						REQUEST_CODE_INTENT_OPEN_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			}
+		} catch (RuntimeException e) {
+			Timber.e(e);
+			Timber.e("Failed to set up intent for notification!");
+		}
+		return pendingIntent;
 	}
 
 	private int getNoteNotificationPriority() {

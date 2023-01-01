@@ -66,6 +66,12 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+		if (noteIDs == null) {
+			viewHolder.setDefault();
+			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		long id = noteIDs.get(i);
 		Timber.i("Binding viewHolder for index " + i + " -> Note ID: " + id);
 
@@ -73,6 +79,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 		try {
 			note = Note.getNoteFromDB(id, adapter);
 		} catch (Exception e) {
+			note = null;
 			Timber.e(e);
 			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 		}

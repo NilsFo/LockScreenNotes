@@ -23,8 +23,7 @@ public class BootReceiver extends BroadcastReceiver {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 			LSNAlarmManager alarmManager = new LSNAlarmManager(context);
 			if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
-				alarmManager.cancelNextAutoBackup();
-				alarmManager.scheduleNextAutoBackup();
+				alarmManager.requestCancelAndReScheduleNextAutoBackup();
 			}
 		}
 	}

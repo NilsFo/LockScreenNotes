@@ -57,6 +57,10 @@ public abstract class VersionManager {
 				break;
 		}
 
+		// Validating 'launch' count preferences. These could be broken in release 11 to 12.
+		// Fixing them here, just in case!
+		validateLaunchCountSharedPreferences(context);
+
 		// (Re-) setting some preferences
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		long launchedCountAllTime = preferences.getLong(PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
@@ -75,9 +79,40 @@ public abstract class VersionManager {
 		// Resetting the timer for the next local update
 		LSNAlarmManager alarmManager = new LSNAlarmManager(context);
 		if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
-			alarmManager.cancelNextAutoBackup();
-			alarmManager.scheduleNextAutoBackup();
+			alarmManager.requestCancelAndReScheduleNextAutoBackup();
 		}
+	}
+
+	private static int validateLaunchCountSharedPreferences(Context context) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		int errors = 0;
+
+		// Checking value for launches at all times!
+		try {
+			preferences.getLong(PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
+		} catch (Exception e) {
+			Timber.e(e);
+			Timber.e("Failed to get pref: '" + PREFERENCE_APP_LAUNCHED_ALL_TIME + "'! RESETTING!");
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.remove(PREFERENCE_APP_LAUNCHED_ALL_TIME);
+			editor.apply();
+
+			errors++;
+		}
+
+		// Checking for launches at this version
+		try {
+			preferences.getLong(PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+		} catch (Exception e) {
+			Timber.e(e);
+			Timber.e("Failed to get pref: '" + PREFERENCE_APP_LAUNCHED_THIS_VERSION + "'! RESETTING!");
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.remove(PREFERENCE_APP_LAUNCHED_THIS_VERSION);
+			editor.apply();
+
+			errors++;
+		}
+		return errors;
 	}
 
 	public static void displayVersionUpdateNews(final Context context, final int version) {

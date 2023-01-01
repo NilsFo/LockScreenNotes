@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -31,42 +32,61 @@ public class NoteSharingListenerActivity extends Activity {
 		String receivedAction = receivedIntent.getAction();
 		String receivedType = receivedIntent.getType();
 		Timber.i("I opened via intent. Action: '" + receivedAction + "' Type: '" + receivedType + "'");
-		boolean error = true;
+		boolean intentError = true;
+		boolean noteCreatedWithoutError = true;
 
 		if (receivedAction != null && receivedAction.equals(Intent.ACTION_SEND)) {
 			if (receivedType != null && receivedType.startsWith("text/")) {
 				String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
 				if (receivedText != null) {
-					error = false;
+					intentError = false;
 					receivedIntent.setAction(Intent.ACTION_DEFAULT);
 					//Toast.makeText(this, "I got a text intent: " + receivedText, Toast.LENGTH_LONG).show();
-					addNewNote(receivedText);
+					noteCreatedWithoutError = addNewNote(receivedText);
 				}
 			}
 		}
 
-		if (error) {
+		Timber.i("Note share intent received.");
+		Timber.i("Intent error: " + intentError);
+		Timber.i("Note creation and DB without error: " + noteCreatedWithoutError);
+
+		if (intentError || !noteCreatedWithoutError) {
 			Toast.makeText(this, R.string.error_note_sharing_listener, Toast.LENGTH_LONG).show();
 		}
 
 		finish();
 	}
 
-	private void addNewNote(String receivedText) {
+	private boolean addNewNote(String receivedText) {
 		DBAdapter databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		boolean enabled = sharedPreferences.getBoolean("prefs_auto_enable_new_notes", true);
 		Note note = new Note(receivedText, enabled, new Date().getTime());
-		databaseAdapter.insertRow(note.getText(), note.isEnabledSQL(), note.getTimestamp());
 
-		databaseAdapter.close();
+		boolean successfullyCreated = true;
+		try {
+			databaseAdapter.insertRow(note.getText(), note.isEnabledSQL(), note.getTimestamp());
+		} catch (IllegalStateException e) {
+			Timber.e(e);
+			Timber.e("Failed to insert new Note '" + note.getText() + "'!");
+			successfullyCreated = false;
+		} finally {
+			databaseAdapter.close();
+		}
 
 		NotesNotificationManager notesNotificationManager = new NotesNotificationManager(this);
 		notesNotificationManager.hideAllNotifications();
 		notesNotificationManager.showNoteNotifications();
 
-		Toast.makeText(this, R.string.success_note_sharing_listener, Toast.LENGTH_LONG).show();
+		if (successfullyCreated) {
+			Toast.makeText(this, R.string.success_note_sharing_listener, Toast.LENGTH_LONG).show();
+			return true;
+		} else {
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return false;
+		}
 	}
 }

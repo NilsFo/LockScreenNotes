@@ -221,4 +221,7 @@
     <string name="prefs_review_notifications_settings_header_summary_insufficient">Insufficient</string>
     <string name="error_external_permissions_require_upgrade">"External storage permissions must be extended to allow access to all files."</string>
     <string name="info_number_not_available" translatable="false">-</string>
+    <string name="error_notification_pending_intent_failure">Could not set up notifications correctly. Navigating from the notification to the app may not work correctly.</string>
+    <string name="error_failed_to_cancel_backup_alarm">Failed to stop / disable the backup schedule. This is a severe error. If this keeps happening, please contact the developer!</string>
+    <string name="error_failed_to_setup_backup_alarm">Failed to set up the backup schedule. This is a severe error. If this keeps happening, please contact the developer!</string>
 </resources>

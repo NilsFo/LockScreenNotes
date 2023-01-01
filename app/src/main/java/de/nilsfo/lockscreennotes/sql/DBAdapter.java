@@ -93,18 +93,13 @@ public class DBAdapter extends Observable {
 
 	// Add a new set of values to the database.
 	public long insertRow(String text, int enabled, long timestamp) {
-		/*
-		 * CHANGE 3:
-		 */
-		// TODO: Update data in the row with new fields.
-		// TODO: Also change the function's arguments to be what you need!
 		// Create row's data:
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(KEY_NOTE_TEXT, text);
 		initialValues.put(KEY_NOTE_ENABLED, enabled);
 		initialValues.put(KEY_TIMESTAMP, timestamp);
-		// Insert it into the database.
 
+		// Insert it into the database.
 		long l = db.insert(DATABASE_TABLE, null, initialValues);
 
 		setChanged();
