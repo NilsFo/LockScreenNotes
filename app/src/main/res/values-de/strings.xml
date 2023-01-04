@@ -194,8 +194,8 @@
     <string name="warning_no_storage_permission">Kann keine Backups erstellen ohne Zugriff auf den Speicher des Geräts. Bitte schalten Sie die entsprechenden Berechtigungen ein und versuchen Sie es erneut.</string>
     <string name="action_review_notification_permissions_info">Diese App braucht Berechtigungen um Benachrichtigungen auf dem Sperrbildschirm anzuzeigen. Diese sind derzeit deaktiviert. Überprüfen Sie die Benachrichtigungs-Einstellungen unten. Die angezeigten Optionen varriieren, je nach Gerät und Software Version.</string>
     <string name="action_review_notification_permissions_enable_permissions">App Berechtigungen überprüfen</string>
-    <string name="action_review_notification_permissions_enable_notification_center">Mitteilungszentrale überprüfen</string>
-    <string name="action_review_notification_permissions_review_permissions">Berechtigungen überprüfen</string>
+    <string name="action_review_notification_permissions_enable_notification_center">Mitteilungszentrale öffnen</string>
+    <string name="action_review_notification_permissions_review_permissions">Berechtigungen öffnen</string>
     <string name="info_review_notification_permissions_granted">Alle Berechtigungen erteilt. Danke.</string>
     <string name="error_not_displaying_notifications_no_permissions">%1$s: Kann keine Notizen anzeigen. Ungenügende App Berechtigungen.</string>
     <string name="info_review_notification_permissions_balloon_text">Ungenügende App Berechtigungen. Überprüfen Sie sie hier.</string>
@@ -208,4 +208,7 @@
     <string name="prefs_review_notifications_settings_header_summary_insufficient">Unzureichend</string>
     <string name="error_external_permissions_require_upgrade">Zugriff auf den externen Speicher muss erweitert werden um den Zugriff auf alle Dateien zu erlauben.</string>
     <string name="action_review_notification_permissions">Berechtigungen der Benachrichtigungen überprüfen</string>
+    <string name="error_notification_pending_intent_failure">Konnte Benachrichtigungen nicht korrekt erstellen. Von der Benachrichtigung kann es unter Umständen nicht mehr möglich sein zur App zurück zu kehren.</string>
+    <string name="error_failed_to_cancel_backup_alarm">Konnte den aktuellen Backup Zeitplan nicht korrekt stoppen. Dies ist ein schwerwiegender Fehler. Wenn dies öfters auftritt, bitte Kontaktieren Sie den Entwickler!</string>
+    <string name="error_failed_to_setup_backup_alarm">Konnte den neuen Backup Zeitplan nicht korrekt starten. Dies ist ein schwerwiegender Fehler. Wenn dies öfters auftritt, bitte Kontaktieren Sie den Entwickler!</string>
 </resources>

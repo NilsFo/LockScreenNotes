@@ -24,21 +24,50 @@ public class NotificationDismissedReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Bundle extras = intent.getExtras();
 		if (extras == null) {
-			Timber.e("I just got a 'NoitificationDismissed' intent! But there were no extras! Could not perform any actions!");
+			Timber.e("I just got a 'NotificationDismissed' intent! But there were no extras! Could not perform any actions!");
 			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 			return;
 		}
 
+		long notificationId = NotesNotificationManager.INTENT_EXTRA_NOTE_ID_NONE;
+		if (extras.containsKey(NotesNotificationManager.INTENT_EXTRA_NOTE_ID)) {
+			notificationId = extras.getLong(NotesNotificationManager.INTENT_EXTRA_NOTE_ID);
+
+			// #######################
+			// TODO THIS IS A BIG ONE: THE NOTIFICATION ID ALWAYS RESOLVES TO THE ID OF THE FIRST NOTE WHY?
+			// #######################
+		} else {
+			Timber.e("FAILED TO GET INTENT EXTRA FOR THE NOTIFICATION ID!!");
+			Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		// TODO REMOVE THIS LINE BELOW, but only if you have resolved the issue stated above
+		// This is a backup case where all notifications will be disabled regardless
+		notificationId = NotesNotificationManager.INTENT_EXTRA_NOTE_ID_NONE;
+
+		// Opening the DB to fetch notes
 		DBAdapter databaseAdapter = new DBAdapter(context);
 		databaseAdapter.open();
 
-		long notificationId = extras.getInt(NotesNotificationManager.INTENT_EXTRA_NOTE_ID);
 		ArrayList<Note> notes = new ArrayList<>();
 		if (notificationId == NotesNotificationManager.INTENT_EXTRA_NOTE_ID_NONE) {
-			notes = Note.getAllNotesFromDB(databaseAdapter);
+			try {
+				notes = Note.getAllNotesFromDB(databaseAdapter);
+			} catch (Exception e) {
+				Timber.e(e);
+				Timber.e("Failed to get all notes from database!");
+				Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			}
 			Timber.i("That was no known ID, so just hide them all.");
 		} else {
-			notes.add(Note.getNoteFromDB(notificationId, databaseAdapter));
+			try {
+				notes.add(Note.getNoteFromDB(notificationId, databaseAdapter));
+			} catch (Exception e) {
+				Timber.e(e);
+				Timber.e("Failed to get Note from Database with ID: " + notificationId);
+				Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			}
 			Timber.i("Found the right note with matching ID in the database.");
 		}
 

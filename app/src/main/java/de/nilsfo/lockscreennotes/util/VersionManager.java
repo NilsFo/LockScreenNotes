@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.util;
 
+import static de.nilsfo.lockscreennotes.util.NotesNotificationManager.PREFERENCE_HIGH_PRIORITY_NOTE;
+
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;

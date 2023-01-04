@@ -2,6 +2,7 @@ package de.nilsfo.lockscreennotes.data;
 
 import android.content.Context;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,15 +67,19 @@ public class RelativeTimeTextfieldContainer {
 				continue;
 			}
 			boolean contains = timestampMap.containsKey(v);
-
 			if (contains) {
-				long timestamp = timestampMap.get(v);
+				long timestamp = Note.DEFAULT_TIMESTAMP;
+				try {
+					timestamp = timestampMap.get(v);
+				} catch (Exception e) {
+					Timber.e(e);
+					Timber.e("Failed to get timestamp for: " + v);
+					Toast.makeText(context, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+				}
 
 				if (v.isShown()) {
 					v.setText(context.getString(R.string.last_edited, new TimeUtils(context).formatRelative(timestamp)));
-				} //else {
-				//	deleteList.add(v);
-				//}
+				}
 			} else {
 				v.setText(context.getString(R.string.last_edited, context.getText(R.string.error_internal_error)));
 				Timber.e("The timestamp map did a big oof.");

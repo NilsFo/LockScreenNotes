@@ -9,7 +9,6 @@ import static de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContent
 import static de.nilsfo.lockscreennotes.util.NotificationChannelManager.CHANNEL_ID_AUTO_BACKUP_CHANNEL;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -42,7 +41,6 @@ import de.nilsfo.lockscreennotes.data.Note;
 import de.nilsfo.lockscreennotes.data.content.NoteContentAnalyzer;
 import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
-import de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver;
 import de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lsn.R;
@@ -64,6 +62,7 @@ public class NotesNotificationManager {
 
 	public static final int REQUEST_CODE_INTENT_OPEN_APP_DYNAMIC_BASE = LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP * 10000;
 	public static final int REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE_DYNAMIC_BASE = LockScreenNotes.REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE * 10000;
+	public static final int REQUEST_CODE_INTENT_DISMISS_NOTE_DYNAMIC_BASE = LockScreenNotes.REQUEST_CODE_INTENT_DISMISS_NOTE * 10000;
 
 	@Deprecated
 	public static final String INTENT_EXTRA_DELETE = LockScreenNotes.APP_TAG + "delete_mode";
@@ -75,7 +74,7 @@ public class NotesNotificationManager {
 
 	public static final int DEFAULT_NOTIFICATION_ID = 100;
 	public static final int NOTE_PREVIEW_SIZE = -1;
-	public static final int INTENT_EXTRA_NOTE_ID_NONE = -1;
+	public static final long INTENT_EXTRA_NOTE_ID_NONE = -1;
 	private Context context;
 	private ArrayList<Note> notesList;
 	private boolean reversed;
@@ -296,12 +295,13 @@ public class NotesNotificationManager {
 			return false;
 		}
 
-		PendingIntent dismissIntent = createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE);
+		long noteID = note.getDatabaseID();
+		PendingIntent dismissIntent = createOnNoteDismissIntent(noteID);
 		if (dismissIntent == null) {
 			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
 		} else {
 			builder.setDeleteIntent(dismissIntent);
-			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(INTENT_EXTRA_NOTE_ID_NONE));
+			builder.addAction(R.drawable.baseline_notifications_off_black_24, context.getString(R.string.action_mark_disabled_all), createOnNoteDismissIntent(noteID));
 		}
 
 		Timber.i("Setting up notification actions for note ID " + note.getDatabaseID() + " (" + note.getTextPreview() + ").");
@@ -316,17 +316,18 @@ public class NotesNotificationManager {
 		return true;
 	}
 
-	private PendingIntent createOnNoteDismissIntent(int notificationId) {
+	private PendingIntent createOnNoteDismissIntent(long noteID) {
 		Intent intent = new Intent(context, NotificationDismissedReceiver.class);
-		intent.putExtra(INTENT_EXTRA_NOTE_ID, notificationId);
-		Timber.i("Creating a dismiss intent. ID: " + notificationId);
+		intent.putExtra(INTENT_EXTRA_NOTE_ID, noteID);
+		Timber.i("Creating a dismiss intent. ID: " + REQUEST_CODE_INTENT_DISMISS_NOTE_DYNAMIC_BASE);
+		Timber.i("This intent has note ID: " + noteID);
 
 		PendingIntent broadcast = null;
 		try {
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-				broadcast = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+				broadcast = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_DISMISS_NOTE_DYNAMIC_BASE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			} else {
-				broadcast = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				broadcast = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_DISMISS_NOTE_DYNAMIC_BASE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			}
 		} catch (Exception e) {
 			Timber.e(e);
@@ -382,10 +383,10 @@ public class NotesNotificationManager {
 			} else {
 				pendingIntent = PendingIntent.getActivity(context, (int) note.getDatabaseID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			Timber.e(e);
 			Timber.e("Error! Could not set up note context specific intent!");
-			Toast.makeText(context, R.string.error_notification_pending_intent_failure,Toast.LENGTH_LONG).show();
+			Toast.makeText(context, R.string.error_notification_pending_intent_failure, Toast.LENGTH_LONG).show();
 		}
 
 		if (pendingIntent != null) {

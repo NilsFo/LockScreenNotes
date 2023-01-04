@@ -1,42 +1,47 @@
 {
+  "13": {
+    "date": "02.01.2023",
+    "version": "1.0.11",
+    "text": "-The app now counts how often it has been launched since the last update, and since install\n-Fixed unintended crashes on newer Android versions, introduced in the previous update. Thanks to everyone reporting the errors and submitting crash reports!\n-Fixed typos\n-Updated localization files"
+  },
   "12": {
     "date": "30.12.2022",
-    "version": "1.10",
+    "version": "1.0.10",
     "text": "-If you lack notification permissions, the app will let you know and provide ways to grant them from the main screen\n-Updated external storage permissions and access\n-Moved permission review options to the 'general' section of settings menu\n-Improved app stability\n-Fixed typos\n-Updated localization files"
   },
   "11": {
     "date": "03.01.2020",
-    "version": "1.09",
+    "version": "1.0.09",
     "text": "-Supported Night mode (when supported and enabled by your device)\n-Added a preview to the date formation settings\n-Fixed typos\n-Updated localization files"
   },
   "10": {
     "date": "12.07.2019",
-    "version": "1.08",
+    "version": "1.0.08",
     "text": "-New look for the main menu! Replaced the old list structure with a card design\n-Delete notes via the note's menu or long-press it\n-More note context actions: Browse URLs, dial phone numbers and send mails\n-Those actions are also available from within notifications\n-Fixed a bug when reversing notifications\n-Fixed a bug when detecting the lastest backup file\n-Updated icons\n-Updated credits\n-Bugfixes and performance improvements\n-Fixed typos\n-Updated localization files"
   },
   "9": {
     "date": "21.10.2018",
-    "version": "1.07",
+    "version": "1.0.07",
     "text": "-[Android 7+] Added support for Android 7 notification channels\n-Tapping on a notification now opens the assigned note\n-If a note contains a single weblink, it can now be opened from the notification\n-Backups can now be scheduled automatically (via the settings menu)\n-Updated some texts in the settings menu\n-Updated targeted Android version\n-Updated dialog icons\n-Updated localization files"
   },
   "8": {
     "date": "19.08.2018",
-    "version": "1.06",
+    "version": "1.0.06",
     "text": "-[Android 7+] Added support for Android 7 notification styles. Try it out by using grouped notifications and expand one at a time.\nAdded a 'disable note' button for notifications\n-Added an external update feed, in case you don't want to get update news from Google Play. See the 'About' section in the settings for details.\n-Added a counter that counts the days since the last update\n-System notification settings available from within the app\n-Backups can be made and restored from within the main screen\n-Updated localization files"
   },
   "7": {
     "date": "06.12.2017",
-    "version": "1.05",
+    "version": "1.0.05",
     "text": "-Arrangement of notes in the notification and app now match correctly\n-Weblinks and URLs within notes can now be browsed from within this app\n-Updated notification bar icon\n-Fixed a crash when trying to generate QR codes from empty notes"
   },
   "6": {
     "date": "27.07.2017",
-    "version": "1.04",
+    "version": "1.0.04",
     "text": "-Notes displayed as QR codes can now be shared with other apps\n-Added this dialog to keep you informed about changes and new features. You can view this changelog again in the 'about' section in the app settings!\n-The order of all displayed notifications can reversed\n-Minor improvements and bug fixes"
   },
   "5": {
     "date": "17.05.2017",
-    "version": "1.03",
+    "version": "1.0.03",
     "text": "-Replaced 'fontawesome'-icons with material-design icons\n-Added more icons to the options menu\n-Notes can now be displayed as a QR Code\n-Minor improvements and bug fixes"
   }
 }

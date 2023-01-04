@@ -657,6 +657,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 					}
 				}
 				Timber.i("On accept: " + sequence);
+				if (sequence == null) {
+					Toast.makeText(builder.getContext(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					return;
+				}
+
 				File file = new File(new FileManager(MainActivity.this).getNoteBackupDir(), sequence.toString());
 				Timber.i("Assumed backup File: " + file.getAbsolutePath() + " - Exists: " + file.exists());
 

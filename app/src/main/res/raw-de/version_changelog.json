@@ -1,42 +1,47 @@
 {
+  "13": {
+    "date": "02.01.2023",
+    "version": "1.0.11",
+    "text": "-Die App zählt nun mit wie oft sie gestartet wurde seit dem letzten Update und der Installation\n-Ungewollte Abstürze, welche seit dem letzten Update auf neueren Android Versionen auftraten, wurden repariert. Danke an alle, die Absturzberichte eingereicht haben!\n-Rechtschreibfehler behoben\n-Sprachdateien aktualisiert"
+  },
   "12": {
     "date": "30.12.2022",
-    "version": "1.10",
+    "version": "1.0.10",
     "text": "-Wenn Sie keine Berechtigungen für Benachrichtigungen erteilt haben, wird die App Sie darüber informieren und Möglichkeiten anbieten, sie von dem Hauptbildschirm aus zu erteilen\n-Aktualisierte Berechtigungen und Zugriff auf externen Speicher\n-Berechtigungsüberprüfungsoptionen in den 'Allgemeinen'-Abschnitt des Einstellungsmenüs verschoben\n-Stabilität der App verbessert\n-Rechtschreibfehler behoben\n-Sprachdateien aktualisiert"
   },
   "11": {
     "date": "03.01.2020",
-    "version": "1.09",
+    "version": "1.0.09",
     "text": "-Nachtmodus unterstützt (Sofern vom Gerät unterstützt und eingeschaltet)\n-Die Einstellungen für die Zeit- und Datumsformatierung haben jetzt eine Vorschau\n-Sprachdateien aktualisiert und Rechtschreibfehler behoben"
   },
   "10": {
     "date": "12.07.2019",
-    "version": "1.08",
+    "version": "1.0.08",
     "text": "-Neuer Look für das Hauptmenü! Die alte Listen-Struktur wurde durch ein Karten Design ersetzt\n-Löschen einer Notiz nun möglich über die einzelnen Menüs einer Notiz. Oder diese lange gedrückt halten.\n-Mehr Aktionen basierend auf dem Inhalt von Notizen: Links öffnen, Telefonnummern wählen und E-Mails verschicken\n-Diese Aktionen sind auch über die Benachrichtigungen verfügbar\n-Ein Fehler wurde behoben, wenn Notizen in umgekehrter Reihenfolge angezeigt werden\n-Ein Fehler wurde behoben wenn das zuletzt erstellte Backup importiert werden sollte\n-Icons aktualisiert\n-Danksagungen aktualisiert\n-Kleinere Fehlerbehebungen und verbesserte Leistung\n-Sprachdateien aktualisiert"
   },
   "9": {
     "date": "21.10.2018",
-    "version": "1.07",
+    "version": "1.0.07",
     "text": "-[Android 7+] Android 7 Benachrichtigungs-Kanäle werden nun unterstützt\n-Tippen auf Benachrichtigungen einzelner Notizen öffnet die App um diese zu bearbeiten\n-Wenn eine Notiz einen einzelnen Link enthält, kann dieser direkt aus der Benachrichtigung geöffnet werden\n-Backups können nun (via Einstellungen) in regelmäßigen Zeitabständen automatisiert durchgeführt werden\n-Texte in den Einstellungen überarbeitet\n-Angepeilte Android version aktualisiert\n-Dialog Icons aktualisiert\n-Sprachdateien aktualisiert"
   },
   "8": {
     "date": "19.08.2018",
-    "version": "1.06",
+    "version": "1.0.06",
     "text": "-[Android 7+] Android 7 Benachrichtigungs-Stil wird nun unterstützt.\n-Notizen können nun über die Benachrichtigungen deaktiviert werden\n-Externen Aktualisierungs-Feed hinzugefügt, für den Fall, dass Sie Ihre Aktualisierungen nicht über Google Play beziehen möchten. Details in dem 'Über' Bereich in den Einstellungen.\n-Ein Zähler zeigt an wie lange das letzte Update her ist\n-System Einstellungen für Benachrichtigungen nun über die App verfügbar\n-Backups können nun über das Hauptmenü erstellt und importiert werden\n-Sprachdateien aktualisiert"
   },
   "7": {
     "date": "06.12.2017",
-    "version": "1.05",
+    "version": "1.0.05",
     "text": "-Reihenfolge der Notizen stimmt mit der der App überein\n-Weblinks und URLs in einer Notiz können nun von der App aus geöffnet werden\n-Verbesserungen an den Icons\n-App stürzt nicht mehr ab wenn QR-Codes von leeren Notizen erstellt werden"
   },
   "6": {
     "date": "27.07.2017",
-    "version": "1.04",
+    "version": "1.0.04",
     "text": "-Als QR-Code dargestellte Notizen können nun mit anderen Apps geteilt werden\n-Diesen Dialog hinzugefügt um über Updates & Verbesserungen zu informieren. Dieser Changelog kann in der 'Über'-Sektion der Einstellungen erneut angesehen werden\n-Die Reihenfolge in der Erinnerungen angezeigt werden kann nun umgekehrt werden\nIn den Einstellungen: Die Kategorie 'Benachrichtigungen' heißt nun 'Erinnerungen'\n-Kleinere Verbesserungen und Fehlerbehebungen"
   },
   "5": {
     "date": "17.05.2017",
-    "version": "1.03",
+    "version": "1.0.03",
     "text": "-'fontawesome'-Icons ersetzt mit Material-Design-Icons\n-Mehr Icons im Options-Menü\n-Notizen können nun als QR Code angezeigt werden\n-Kleinere Verbesserungen und Fehlerbehebungen"
   }
 }

@@ -45,6 +45,7 @@ public class RegexManager {
 			for (String s : list) {
 				if (s.equals(match)) {
 					add = false;
+					break;
 				}
 			}
 

@@ -1,6 +1,5 @@
 package de.nilsfo.lockscreennotes.receiver.widget;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 
 import java.util.Arrays;
 
-import de.nilsfo.lockscreennotes.activity.MainActivity;
 import timber.log.Timber;
 
 @Deprecated

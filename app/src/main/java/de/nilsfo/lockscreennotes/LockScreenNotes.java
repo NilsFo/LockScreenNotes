@@ -12,6 +12,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import java.util.Locale;
 
 import de.nilsfo.lockscreennotes.util.VersionManager;
@@ -41,6 +43,7 @@ public class LockScreenNotes extends Application {
 	public static final int REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM = 3;
 	public static final int REQUEST_CODE_INTENT_OPEN_APP = 4;
 	public static final int REQUEST_CODE_INTENT_OPEN_APP_EDIT_NOTE = 5;
+	public static final int REQUEST_CODE_INTENT_DISMISS_NOTE = 6;
 
 	public static boolean isDarkMode(Context context) {
 		return isDarkMode(context.getResources().getConfiguration());
@@ -142,7 +145,7 @@ public class LockScreenNotes extends Application {
 
 	private class DebugTree extends Timber.DebugTree {
 		@Override
-		protected String createStackElementTag(StackTraceElement element) {
+		protected String createStackElementTag(@NonNull StackTraceElement element) {
 			return LOG_TAG + super.createStackElementTag(element) + ":" + element.getLineNumber();
 		}
 	}

@@ -148,10 +148,12 @@ public class FileManager {
 	public boolean deleteDir(File dir) {
 		if (dir != null && dir.isDirectory()) {
 			String[] children = dir.list();
-			for (String aChildren : children) {
-				boolean success = deleteDir(new File(dir, aChildren));
-				if (!success) {
-					return false;
+			if (children != null) {
+				for (String aChildren : children) {
+					boolean success = deleteDir(new File(dir, aChildren));
+					if (!success) {
+						return false;
+					}
 				}
 			}
 			return dir.delete();
