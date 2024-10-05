@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="de.nilsfo.lsn">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -33,17 +32,16 @@
 
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationDismissedReceiver"
-            android:exported="false"></receiver>
+            android:exported="false" />
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationDeleteReceiver"
-            android:exported="false"></receiver>
+            android:exported="false" />
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.NotificationBrowseURLReceiver"
-            android:exported="false"></receiver>
-
+            android:exported="false" />
         <receiver
             android:name="de.nilsfo.lockscreennotes.receiver.LSNAutoBackupReceiver"
-            android:exported="false"></receiver>
+            android:exported="false" />
 
         <!--
         TODO: This is an attempt at a "desktop" widget. Reuse this code if you ever want to pursue this idea again.
@@ -117,11 +115,10 @@
 
         <activity
             android:name="de.nilsfo.lockscreennotes.activity.NotificationDeleteRecieverDialogActivity"
-            android:theme="@android:style/Theme.NoDisplay"></activity>
-
+            android:theme="@android:style/Theme.NoDisplay" />
         <activity
             android:name="de.nilsfo.lockscreennotes.activity.dummy.NotificationBrowseContentActivity"
-            android:theme="@android:style/Theme.NoDisplay"></activity>
+            android:theme="@android:style/Theme.NoDisplay" />
     </application>
 
 </manifest>

@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
-    // compileSdkPreview "Tiramisu"
+    compileSdk  34
 
     defaultConfig {
         applicationId "de.nilsfo.lsn"
-        minSdkVersion 17
-        targetSdkVersion 33
+        minSdk 21
+        targetSdk 34
         // targetSdkPreview "Tiramisu"
         versionCode 13
         versionName "1.0.11"
@@ -19,6 +18,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'de.nilsfo.lsn'
+    buildToolsVersion '30.0.3'
 }
 
 dependencies {
@@ -28,8 +29,8 @@ dependencies {
     })
 
     implementation "com.github.skydoves:balloon:1.4.6"
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.jakewharton.timber:timber:4.7.0'
     implementation 'com.google.zxing:core:3.2.0'
 
