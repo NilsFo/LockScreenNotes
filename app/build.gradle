@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk  34
+    compileSdk  37
 
     defaultConfig {
         applicationId "de.nilsfo.lsn"
-        minSdk 21
-        targetSdk 34
-        // targetSdkPreview "Tiramisu"
+        minSdk 23
+        targetSdk 37
         versionCode 13
         versionName "1.0.11"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -15,11 +14,17 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     namespace 'de.nilsfo.lsn'
     buildToolsVersion '30.0.3'
+
+    buildFeatures {
+        // This replaces the same-name property in "gradle.properties" file.
+        // To keep parity weather the app is in "production" / "debug" mode.
+        buildConfig true
+    }
 }
 
 dependencies {
@@ -28,18 +33,47 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    implementation "com.github.skydoves:balloon:1.4.6"
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'com.google.android.material:material:1.12.0'
-    implementation 'com.jakewharton.timber:timber:4.7.0'
-    implementation 'com.google.zxing:core:3.2.0'
+    implementation "com.github.skydoves:balloon:1.7.6"
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation 'com.google.zxing:core:3.5.4'
 
-    annotationProcessor 'org.jetbrains:annotations-java5:15.0'
+    annotationProcessor 'org.jetbrains:annotations-java5:24.1.0'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 
     //debugImplementation 'com.amitshekhar.android:debug-db:1.0.0'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
     //compile group: 'org.json', name: 'json', version: '20090211'
+}
+
+// ##########################################################################################
+// Running a python script to generate scaled .png drawables from svg logo.
+// This sets up a .venv because external libraries are needed.
+// ##########################################################################################
+
+// This runs during Gradle Sync (Configuration Phase)
+// It will set up the .venv if missing and then execute the script.
+def venvDir = file("${projectDir}/.venv")
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+def pythonExec = isWindows ? file("${venvDir}/Scripts/python.exe") : file("${venvDir}/bin/python")
+
+if (!venvDir.exists()) {
+    providers.exec {
+        workingDir projectDir
+        if (isWindows) {
+            commandLine 'cmd', '/c', 'python -m venv .venv && .venv\\Scripts\\pip install -r requirements.txt'
+        } else {
+            commandLine 'sh', '-c', 'python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt'
+        }
+    }.result.get()
+}
+
+if (pythonExec.exists()) {
+    providers.exec {
+        workingDir projectDir
+        commandLine pythonExec.absolutePath, 'generate_app_icon.py'
+    }.result.get()
 }

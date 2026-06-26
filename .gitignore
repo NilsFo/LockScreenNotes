@@ -1,9 +1,12 @@
-##Project specifics
+## Project specifics
 *.apk
 /app/src/main/assets/fonts/*
 /app/release/*
 
-##Android studio defaults
+### Hiding .venv created during gradle sync
+app/.venv
+
+## Android studio defaults
 *.iml
 .gradle
 /local.properties
@@ -15,7 +18,7 @@
 .externalNativeBuild
 /.idea/*
 
-##Android Gitignore
+## Android Gitignore
 # Built application files
 *.apk
 *.ap_

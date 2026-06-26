@@ -247,9 +247,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			return;
 		}
 
+		int noteCount = Note.getAllNotesFromDB(databaseAdapter).size();
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.delete_all_dialog_title);
-		builder.setMessage(R.string.delete_all_dialog_text);
+		builder.setMessage(String.format(getString(R.string.delete_all_dialog_text), noteCount));
 		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				for (Note n : Note.getAllNotesFromDB(databaseAdapter)) {
@@ -466,7 +468,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		File backupFile;
 		try {
 			backupFile = backupManager.createAndWriteBackup();
-		} catch (JSONException | IOException | StoragePermissionManager.InsufficientStoragePermissionException e) {
+		} catch (JSONException | IOException |
+				 StoragePermissionManager.InsufficientStoragePermissionException e) {
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();

@@ -1,0 +1,4 @@
+cairosvg
+numpy
+pillow
+lxml

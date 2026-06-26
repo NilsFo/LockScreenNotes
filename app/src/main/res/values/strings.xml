@@ -39,8 +39,8 @@
     <string name="action_delete_all">Delete all notes</string>
     <string name="action_disable_all">Disable all notes</string>
     <string name="delete_all_dialog_title">Delete all notes</string>
-    <string name="delete_all_dialog_text">Are you sure you want to delete all notes currently saved?</string>
-    <string name="delete_all_disabled_dialog_text">Are you sure you want to delete %1$d out of the %2$d notes currently saved?</string>
+    <string name="delete_all_dialog_text">Are you sure you want to delete all notes?\n\nIf you continue, %1$d note(s) will be deleted.\nThis cannot be undone!</string>
+    <string name="delete_all_disabled_dialog_text">Are you sure you want to delete all disabled notes?\n\nIf you continue %1$d out of the %2$d note(s) will be deleted.\nThis cannot be undone!</string>
     <string name="action_clear">Clear</string>
     <string name="action_move_to_bottom">Move cursor to bottom</string>
     <string name="action_share">Share</string>
@@ -108,7 +108,7 @@
     <string name="settings_high_priority_note_title">High priority notifications</string>
     <string name="settings_high_priority_note_flavor">Notifications are displayed high on the notifications list.</string>
     <string name="error_qr_generation_failed">Failed to create the QR code!</string>
-    <string name="error_qr_not_rendered">QR Code isn\'t created yet!</string>
+    <string name="error_qr_not_rendered">QR Code isn’t created yet!</string>
     <string name="update_news">Update news</string>
     <string name="action_feedback">Rate &amp; Feedback</string>
     <string name="thanks_for_using_this_app">Thanks for using Lock Screen Notes!</string>
@@ -131,7 +131,7 @@
     <string name="action_create_backup">Create backup</string>
     <string name="action_import_backup">Import backup</string>
     <string name="action_import">Import</string>
-    <string name="action_backup_info">You can backup your notes to save them for later or import them on a different device.\nThe backup will not include your preferences.\n\nBackups are stored here:\n%1$s\n\nBackups made: %2$s\nLast: %3$s</string>
+    <string name="action_backup_info">You can back up your notes to save them for later or import them on a different device.\nThe backup will not include your preferences.\n\nBackups are stored here:\n%1$s\n\nBackups made: %2$s\nLast: %3$s</string>
     <string name="error_action_export">Failed to collect data and store it on your device!</string>
     <string name="action_export_success">Backup has been created.</string>
     <string name="pref_updates">Updates</string>

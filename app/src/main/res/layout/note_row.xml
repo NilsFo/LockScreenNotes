@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="horizontal">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_notes_margin"
-        android:layout_marginBottom="@dimen/activity_notes_margin"
-        >
+        android:layout_marginBottom="@dimen/activity_notes_margin">
 
         <TableRow
             android:layout_width="wrap_content"
@@ -24,28 +22,27 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/enabled"
                 android:focusable="false"
-                app:srcCompat="@mipmap/ic_launcher"/>
+                app:srcCompat="@mipmap/ic_launcher" />
 
             <de.nilsfo.lockscreennotes.imported.view.LinedEditText
                 android:id="@+id/note_row_text_tf"
                 android:layout_width="0dp"
+                android:layout_weight="1"
                 android:ems="10"
                 android:gravity="top"
                 android:inputType="textMultiLine"
-                android:minHeight="125dp"
                 android:minWidth="10dp"
+                android:minHeight="125dp"
                 android:textIsSelectable="true"
-                android:layout_weight="1"
-                android:windowSoftInputMode="stateHidden|adjustPan"
-                />
+                android:windowSoftInputMode="stateHidden|adjustPan" />
 
             <ImageButton
                 android:id="@+id/image_row_deleteBT"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/delete"
                 android:focusable="false"
-                app:srcCompat="@drawable/ic_delete_black_36dp"
-                android:layout_width="wrap_content"/>
+                app:srcCompat="@drawable/ic_delete_black_36dp" />
         </TableRow>
 
         <TableRow
@@ -57,11 +54,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_span="2"
+                android:layout_weight="1"
                 android:ellipsize="none"
                 android:focusable="false"
-                android:layout_weight="1"
                 android:scrollHorizontally="false"
-                android:text="@string/timestamp"/>
+                android:text="@string/timestamp" />
 
             <TextView
                 android:id="@+id/note_row_position"
@@ -70,7 +67,7 @@
                 android:layout_gravity="bottom"
                 android:focusable="false"
                 android:gravity="end"
-                android:text="@string/position"/>
+                android:text="@string/position" />
         </TableRow>
 
     </TableLayout>

@@ -19,10 +19,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NavUtils;
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -63,6 +67,18 @@ public class EditNoteActivity extends NotesActivity {
 		super.onCreate(savedInstanceState);
 		canceled = false;
 		setContentView(R.layout.activity_edit_note);
+
+		View root = findViewById(R.id.edit_note_root);
+		ViewCompat.setOnApplyWindowInsetsListener(root, new androidx.core.view.OnApplyWindowInsetsListener() {
+			@NonNull
+			@Override
+			public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
+				Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+				v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+				return insets;
+			}
+		});
+
 		Bundle extras = getIntent().getExtras();
 		ActionBar bar = getSupportActionBar();
 		SharedPreferences preferencses = PreferenceManager.getDefaultSharedPreferences(this);
@@ -169,6 +185,8 @@ public class EditNoteActivity extends NotesActivity {
 				dialog.cancel();
 			}
 		});
+
+		// TODO pick icon based on dark / light mode
 		builder.setIcon(R.drawable.baseline_warning_black_48);
 		builder.show();
 	}
