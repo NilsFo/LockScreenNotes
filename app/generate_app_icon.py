@@ -24,7 +24,8 @@ DENSITY_BUCKETS = {
     "drawable-hdpi": 1.5,
     "drawable-xhdpi": 2.0,
     "drawable-xxhdpi": 3.0,
-    "drawable-xxxhdpi": 4.0
+    "drawable-xxxhdpi": 4.0,
+    "raw": 20.0,
 }
 
 # ============================================================
@@ -187,7 +188,7 @@ def main() -> None:
 
         merged = np.where(alpha == 255, avg_colors, alpha).astype(np.uint8)
         rgba_image = np.ones(shape=(alpha.shape[0], alpha.shape[1], 4), dtype=np.uint8) * 255
-        rgba_image[:,:,3]=merged
+        rgba_image[:, :, 3] = merged
         rgba_image = Image.fromarray(rgba_image)
         rgba_image.save(output_path)
 

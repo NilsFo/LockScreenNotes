@@ -14,6 +14,8 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -23,10 +25,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NavUtils;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -384,6 +389,8 @@ public class EditNoteActivity extends NotesActivity {
 				dialog.cancel();
 			}
 		});
+
+		// TODO select icon dynamically if in dark mode
 		builder.setIcon(R.drawable.baseline_warning_black_48);
 		builder.show();
 	}

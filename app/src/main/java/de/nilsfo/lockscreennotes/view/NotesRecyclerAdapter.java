@@ -281,6 +281,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			itemView.setClickable(false);
 			contentAnalyzer = null;
 
+			// TODO select icon based on night mode
 			noteImageIM.setImageResource(R.drawable.baseline_error_outline_black_18);
 			statusbarLB.setText(R.string.error_internal_error);
 			timestampLB.setText(R.string.error_internal_error);
