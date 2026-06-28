@@ -8,8 +8,6 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
-import timber.log.Timber;
-
 /**
  * Created by Nils on 14.08.2016.
  */
@@ -26,18 +24,17 @@ public class LinedEditText extends AppCompatEditText {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		//int count = getLineCount();
 		int height = getHeight();
 		int line_height = getLineHeight();
-		int count = height / line_height;
+		int count = (height - getPaddingTop() - getPaddingBottom()) / line_height;
 
 		if (getLineCount() > count) {
-			count = getLineCount();//for long text with scrolling
+			count = getLineCount();
 		}
 
 		Rect r = helper.getRect();
 		Paint paint = helper.getPaint();
-		int baseline = getLineBounds(0, r);//first line
+		int baseline = getLineBounds(0, r); //first line
 
 		for (int i = 0; i < count; i++) {
 			canvas.drawLine(r.left, baseline + 1, r.right, baseline + 1, paint);
@@ -45,15 +42,6 @@ public class LinedEditText extends AppCompatEditText {
 		}
 
 		super.onDraw(canvas);
-	}
-
-	@Override
-	public boolean isInEditMode() {
-		if (helper == null) {
-			Timber.e("NO LinedTextHelper DECLARED!");
-			return false;
-		}
-		return helper.isInEditMode();
 	}
 
 	@Override

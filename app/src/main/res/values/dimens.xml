@@ -14,4 +14,7 @@
     <dimen name="card_padding">4dp</dimen>
     <dimen name="card_margin">3dp</dimen>
     <dimen name="card_elevation">3dp</dimen>
+
+    <dimen name="note_editing_margin_sides">6dp</dimen>
+
 </resources>

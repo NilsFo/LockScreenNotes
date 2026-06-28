@@ -68,6 +68,7 @@
             android:name="de.nilsfo.lockscreennotes.activity.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -80,6 +81,7 @@
             android:name="de.nilsfo.lockscreennotes.activity.EditNoteActivity"
             android:label="@string/app_name"
             android:parentActivityName="de.nilsfo.lockscreennotes.activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

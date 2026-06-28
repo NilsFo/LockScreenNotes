@@ -4,6 +4,13 @@ import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
 
 import android.app.Activity;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import android.view.ViewGroup.MarginLayoutParams;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -97,6 +104,9 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+
 		tutorialView = (ScrollView) findViewById(R.id.tutorial_view);
 		nothingToDisplayLB = (TextView) findViewById(R.id.nothing_to_display);
 
@@ -121,6 +131,26 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 		notesRecyclerView.setAdapter(noteRecyclerAdapter);
 
+		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+		ViewCompat.setOnApplyWindowInsetsListener(notesRecyclerView, (v, insets) -> {
+			Insets systemBars = insets.getInsets(
+					WindowInsetsCompat.Type.systemBars()
+							|
+							WindowInsetsCompat.Type.displayCutout()
+							|
+							WindowInsetsCompat.Type.ime()
+			);
+			v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+
+			MarginLayoutParams mlp = (MarginLayoutParams) fab.getLayoutParams();
+			mlp.leftMargin = systemBars.left + (int) getResources().getDimension(R.dimen.fab_margin);
+			mlp.rightMargin = systemBars.right + (int) getResources().getDimension(R.dimen.fab_margin);
+			mlp.bottomMargin = systemBars.bottom + (int) getResources().getDimension(R.dimen.fab_margin);
+			fab.setLayoutParams(mlp);
+
+			return insets;
+		});
+
 		setShowNotifications(true);
 		loadNotesFromDB();
 		setupRelativeDateUpdater();
@@ -128,7 +158,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		// Balloon stuff
 		permissionBalloonTimer = new PermissionBalloonTimer(this);
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {

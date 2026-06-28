@@ -53,15 +53,6 @@ public class LinedTextView extends AppCompatTextView {
 	}
 
 	@Override
-	public boolean isInEditMode() {
-		if (helper == null) {
-			Timber.e("NO LinedTextHelper DECLARED!");
-			return false;
-		}
-		return helper.isInEditMode();
-	}
-
-	@Override
 	public int getMinimumWidth() {
 		if (helper == null) {
 			return 1;

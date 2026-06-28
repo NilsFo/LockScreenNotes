@@ -14,24 +14,19 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -73,15 +68,20 @@ public class EditNoteActivity extends NotesActivity {
 		canceled = false;
 		setContentView(R.layout.activity_edit_note);
 
-		View root = findViewById(R.id.edit_note_root);
-		ViewCompat.setOnApplyWindowInsetsListener(root, new androidx.core.view.OnApplyWindowInsetsListener() {
-			@NonNull
-			@Override
-			public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
-				Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-				v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-				return insets;
-			}
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+
+		noteTF = findViewById(R.id.editNoteFullscreenTF);
+		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.edit_note_root), (v, insets) -> {
+			Insets systemBars = insets.getInsets(
+					WindowInsetsCompat.Type.systemBars()
+							|
+							WindowInsetsCompat.Type.displayCutout()
+							|
+							WindowInsetsCompat.Type.ime()
+			);
+			v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+			return insets;
 		});
 
 		Bundle extras = getIntent().getExtras();
@@ -122,7 +122,7 @@ public class EditNoteActivity extends NotesActivity {
 		}
 
 		setShowNotifications(true);
-		noteTF = (EditText) findViewById(R.id.enditNoteFullscreenTF);
+		noteTF = (EditText) findViewById(R.id.editNoteFullscreenTF);
 		noteTF.setText(myNote.getText());
 		noteTF.addTextChangedListener(new TextWatcher() {
 			@Override

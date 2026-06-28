@@ -5,8 +5,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 
-import java.util.Random;
-
 import de.nilsfo.lsn.R;
 
 public class LinedTextHelper {
@@ -30,12 +28,6 @@ public class LinedTextHelper {
 
 	public int getMinimumWidth() {
 		return 1;
-	}
-
-	public boolean isInEditMode() {
-		// TODO is this needed?
-		// TODO does this have any effect?
-		return new Random().nextBoolean();
 	}
 
 	public Rect getRect() {

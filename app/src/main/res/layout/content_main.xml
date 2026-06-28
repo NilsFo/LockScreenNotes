@@ -39,6 +39,7 @@
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/activity_notes_margin"
         android:layout_marginEnd="@dimen/activity_notes_margin"
+        android:clipToPadding="true"
         android:descendantFocusability="beforeDescendants"
         android:scrollbars="horizontal"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"

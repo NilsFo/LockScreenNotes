@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/edit_note_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context="de.nilsfo.lockscreennotes.activity.EditNoteActivity">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <de.nilsfo.lockscreennotes.imported.view.LinedEditText
-        android:id="@+id/enditNoteFullscreenTF"
+        android:id="@+id/editNoteFullscreenTF"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top"
+        android:layout_marginStart="@dimen/note_editing_margin_sides"
+        android:layout_marginEnd="@dimen/note_editing_margin_sides"
         android:ems="10"
         android:gravity="top"
         android:imeOptions="flagNoExtractUi"
-        android:inputType="textCapSentences|textMultiLine" />
+        android:inputType="textCapSentences|textMultiLine"
+        android:scrollbars="vertical" />
 </LinearLayout>

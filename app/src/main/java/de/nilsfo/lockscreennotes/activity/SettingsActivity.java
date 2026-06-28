@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.core.view.WindowCompat;
 
 import java.util.Date;
 import java.util.List;
@@ -122,7 +123,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		WindowCompat.enableEdgeToEdge(getWindow());
 		setShowNotifications(true);
+
 		setupActionBar();
 	}
 
