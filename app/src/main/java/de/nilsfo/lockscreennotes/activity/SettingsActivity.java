@@ -46,6 +46,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	private boolean showNotifications;
 	private List<PreferenceActivity.Header> bufferedHeaders;
 
+
+	/// ////////////////////////////////////////////////////////////////
+	///
+	/// Static helper functions
+	///
+	/// ////////////////////////////////////////////////////////////////
+
+
 	private static boolean isXLargeTablet(Context context) {
 		return (context.getResources().getConfiguration().screenLayout
 				& Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
@@ -119,6 +127,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		long diffDays = diffTime / (1000 * 60 * 60 * 24);
 		return (int) diffDays;
 	}
+
+
+	/// ////////////////////////////////////////////////////////////////
+	///
+	/// Home function
+	///
+	/// ////////////////////////////////////////////////////////////////
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -234,6 +250,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	public void setShowNotifications(boolean showNotifications) {
 		this.showNotifications = showNotifications;
 	}
+
+
+	/// ////////////////////////////////////////////////////////////////
+	///
+	/// Specialized preferences
+	///
+	/// ////////////////////////////////////////////////////////////////
+
 
 	public static class GeneralPreferenceFragment extends PreferenceFragment {
 		@Override
