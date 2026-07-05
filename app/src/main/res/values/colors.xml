@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorPrimaryLight">#FCF39F</color>
     <color name="colorAccent">#536DFE</color>
+    <color name="colorFab">#536DFE</color>
 
     <color name="edit_note_line">#83DAF7</color>
     <color name="colorNotificationLight">@color/colorPrimary</color>

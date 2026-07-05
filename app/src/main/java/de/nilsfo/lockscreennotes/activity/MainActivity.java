@@ -10,7 +10,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import android.view.ViewGroup.MarginLayoutParams;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -131,7 +130,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 		notesRecyclerView.setAdapter(noteRecyclerAdapter);
 
-		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		ViewCompat.setOnApplyWindowInsetsListener(notesRecyclerView, (v, insets) -> {
 			Insets systemBars = insets.getInsets(
 					WindowInsetsCompat.Type.systemBars()
@@ -141,12 +139,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 							WindowInsetsCompat.Type.ime()
 			);
 			v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
-
-			MarginLayoutParams mlp = (MarginLayoutParams) fab.getLayoutParams();
-			mlp.leftMargin = systemBars.left + (int) getResources().getDimension(R.dimen.fab_margin);
-			mlp.rightMargin = systemBars.right + (int) getResources().getDimension(R.dimen.fab_margin);
-			mlp.bottomMargin = systemBars.bottom + (int) getResources().getDimension(R.dimen.fab_margin);
-			fab.setLayoutParams(mlp);
 
 			return insets;
 		});
@@ -158,6 +150,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		// Balloon stuff
 		permissionBalloonTimer = new PermissionBalloonTimer(this);
 
+		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -803,7 +796,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		Timber.v("Running in the background for: " + timeTiff + " ms.");
 
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!sharedPref.getBoolean("prefs_time_relative", true)) {
+		if (sharedPref.getBoolean("prefs_time_relative", true)) {
 			// Updating note creation text
 			RelativeTimeTextfieldContainer container = RelativeTimeTextfieldContainer.getContainer();
 			container.updateText(MainActivity.this);

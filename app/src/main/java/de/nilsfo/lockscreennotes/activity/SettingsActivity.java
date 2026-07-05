@@ -149,7 +149,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings), (v, insets) -> {
+		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings_root_layout), (v, insets) -> {
 			Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
 			v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
 			return insets;
