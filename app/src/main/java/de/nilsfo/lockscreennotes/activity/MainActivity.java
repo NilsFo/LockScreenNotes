@@ -236,9 +236,9 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
 			View snackBarView = snackbar.getView();
-			TextView textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text);
+			TextView textView = snackBarView.findViewById(R.id.snackbar_text);
 			textView.setMaxLines(2);
-			textView.setMinLines(2);
+			textView.setMinLines(1);
 			textView.setEllipsize(TextUtils.TruncateAt.END);
 
 			snackbar.show();
@@ -762,12 +762,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	}
 
 	private void setupRelativeDateUpdater() {
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!sharedPref.getBoolean("prefs_time_relative", true)) {
-			executorService = null;
-			return;
-		}
-
 		if (executorService != null) {
 			executorService.shutdownNow();
 		}
@@ -808,9 +802,12 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		long timeTiff = currentTime - startTime;
 		Timber.v("Running in the background for: " + timeTiff + " ms.");
 
-		// Updating note creation text
-		RelativeTimeTextfieldContainer container = RelativeTimeTextfieldContainer.getContainer();
-		container.updateText(MainActivity.this);
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		if (!sharedPref.getBoolean("prefs_time_relative", true)) {
+			// Updating note creation text
+			RelativeTimeTextfieldContainer container = RelativeTimeTextfieldContainer.getContainer();
+			container.updateText(MainActivity.this);
+		}
 
 		// Checking on balloon
 		View checkNotificationPermissionItemView = findViewById(R.id.action_notification_permissions);

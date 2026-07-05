@@ -1,18 +1,12 @@
 package de.nilsfo.lockscreennotes.activity;
 
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
-import de.nilsfo.lsn.R;
 
 /**
  * Created by Nils on 16.08.2016.

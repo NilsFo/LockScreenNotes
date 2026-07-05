@@ -1,8 +1,10 @@
 package de.nilsfo.lockscreennotes.util.listener;
 
 import android.content.Context;
-import android.preference.ListPreference;
-import android.preference.Preference;
+
+import androidx.annotation.NonNull;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
 
 import de.nilsfo.lsn.R;
 
@@ -23,8 +25,8 @@ public class SettingsBindPreferenceSummaryToValueListener implements Preference.
 	}
 
 	@Override
-	public boolean onPreferenceChange(Preference preference, Object value) {
-		String stringValue = value.toString();
+	public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+		String stringValue = newValue.toString();
 		Context context = preference.getContext();
 
 		if (preference instanceof ListPreference) {
@@ -69,4 +71,5 @@ public class SettingsBindPreferenceSummaryToValueListener implements Preference.
 	public void setAdditionalAction(Runnable additionalAction) {
 		this.additionalAction = additionalAction;
 	}
+
 }

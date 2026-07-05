@@ -18,7 +18,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -71,7 +73,6 @@ public class EditNoteActivity extends NotesActivity {
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		noteTF = findViewById(R.id.editNoteFullscreenTF);
 		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.edit_note_root), (v, insets) -> {
 			Insets systemBars = insets.getInsets(
 					WindowInsetsCompat.Type.systemBars()
@@ -122,6 +123,7 @@ public class EditNoteActivity extends NotesActivity {
 		}
 
 		setShowNotifications(true);
+		noteTF = findViewById(R.id.editNoteFullscreenTF);
 		noteTF = (EditText) findViewById(R.id.editNoteFullscreenTF);
 		noteTF.setText(myNote.getText());
 		noteTF.addTextChangedListener(new TextWatcher() {
@@ -157,9 +159,9 @@ public class EditNoteActivity extends NotesActivity {
 			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
 			View snackbarView = snackbar.getView();
-			TextView textView = (TextView) snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+			TextView textView = snackbarView.findViewById(R.id.snackbar_text);
 			textView.setMaxLines(4);
-			textView.setMinLines(2);
+			textView.setMinLines(1);
 
 			snackbar.show();
 		}

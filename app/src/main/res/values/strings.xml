@@ -1,5 +1,8 @@
 <resources>
+    <!-- App Name -->
     <string name="app_name">Lock Screen Notes</string>
+
+    <!-- All the rest -->
     <string name="qr_cache_name" translatable="false">lock_screen_notes_qr</string>
     <string name="action_settings">Settings</string>
     <string name="concat_dash" translatable="false">%1$s - %2$s</string>
@@ -224,4 +227,5 @@
     <string name="error_notification_pending_intent_failure">Could not set up notifications correctly. Navigating from the notification to the app may not work correctly.</string>
     <string name="error_failed_to_cancel_backup_alarm">Failed to stop / disable the backup schedule. This is a severe error. If this keeps happening, please contact the developer!</string>
     <string name="error_failed_to_setup_backup_alarm">Failed to set up the backup schedule. This is a severe error. If this keeps happening, please contact the developer!</string>
+    <string name="content_description_activity_main_fab">Create new note</string>
 </resources>
