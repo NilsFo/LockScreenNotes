@@ -29,7 +29,7 @@ public abstract class NotesActivity extends AppCompatActivity {
 		// Ensure system bar icons have enough contrast
 		WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
 		boolean isDarkMode = LockScreenNotes.isDarkMode(this);
-		controller.setAppearanceLightStatusBars(false); // We have a dark/yellow Toolbar, so always use light status bar icons
+		controller.setAppearanceLightStatusBars(!isDarkMode); // Dark icons in light mode (on yellow bg), Light icons in dark mode
 		controller.setAppearanceLightNavigationBars(!isDarkMode); // Dark icons in light mode (on white bg), Light icons in dark mode
 	}
 

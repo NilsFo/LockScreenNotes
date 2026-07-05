@@ -16,8 +16,8 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -121,12 +121,27 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		} else {
 			setTitle(savedInstanceState.getCharSequence(TITLE_TAG));
 		}
-		getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+		getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+			int count = getSupportFragmentManager().getBackStackEntryCount();
+			Timber.i("BackStack has changed! Current count: %d", count);
+			if (count == 0) {
+				updateTitle(getString(R.string.action_settings));
+			} else {
+				FragmentManager.BackStackEntry entry = getSupportFragmentManager().getBackStackEntryAt(count - 1);
+				if (entry.getName() != null) {
+					updateTitle(entry.getName());
+				}
+			}
+		});
+
+		getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
 			@Override
-			public void onBackStackChanged() {
-				Timber.i("BackStack has changed!");
-				if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-					setTitle(R.string.action_settings);
+			public void handleOnBackPressed() {
+				Timber.i("System back button pressed.");
+				if (!getSupportFragmentManager().popBackStackImmediate()) {
+					Timber.i("Nothing to pop from back stack. Finishing activity.");
+					setEnabled(false);
+					getOnBackPressedDispatcher().onBackPressed();
 				}
 			}
 		});
@@ -146,9 +161,13 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
+	private void updateTitle(CharSequence title) {
+		Timber.i("Updating title to: %s", title);
+		setTitle(title);
+		ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setTitle(title);
+		}
 	}
 
 	@Override
@@ -189,8 +208,9 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		fragment.setTargetFragment(caller, 0);
 
 		// Replace the existing Fragment with the new Fragment
-		getSupportFragmentManager().beginTransaction().replace(R.id.settings, fragment).addToBackStack(null).commit();
-		setTitle(pref.getTitle());
+		String title = pref.getTitle() != null ? pref.getTitle().toString() : null;
+		getSupportFragmentManager().beginTransaction().replace(R.id.settings, fragment).addToBackStack(title).commit();
+		updateTitle(pref.getTitle());
 		return true;
 	}
 
@@ -464,7 +484,6 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 				preview.setSummary(summary);
 			}
 		}
-
 	}
 
 	public static class InfoAndAboutPreferenceFragment extends PreferenceFragmentCompat {
