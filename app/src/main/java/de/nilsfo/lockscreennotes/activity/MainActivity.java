@@ -22,6 +22,7 @@ import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ScrollView;
@@ -130,19 +131,6 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 		notesRecyclerView.setAdapter(noteRecyclerAdapter);
 
-		ViewCompat.setOnApplyWindowInsetsListener(notesRecyclerView, (v, insets) -> {
-			Insets systemBars = insets.getInsets(
-					WindowInsetsCompat.Type.systemBars()
-							|
-							WindowInsetsCompat.Type.displayCutout()
-							|
-							WindowInsetsCompat.Type.ime()
-			);
-			v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
-
-			return insets;
-		});
-
 		setShowNotifications(true);
 		loadNotesFromDB();
 		setupRelativeDateUpdater();
@@ -156,6 +144,27 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			public void onClick(View view) {
 				onFABClicked();
 			}
+		});
+
+		View rootLayout = findViewById(R.id.main_activity_root_layout);
+		ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
+			Insets systemBars = insets.getInsets(
+					WindowInsetsCompat.Type.systemBars()
+							|
+							WindowInsetsCompat.Type.displayCutout()
+							|
+							WindowInsetsCompat.Type.ime()
+			);
+
+			notesRecyclerView.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+
+			ViewGroup.MarginLayoutParams fabLp = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
+			int fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
+			fabLp.bottomMargin = systemBars.bottom + fabMargin;
+			fabLp.rightMargin = systemBars.right + fabMargin;
+			fab.setLayoutParams(fabLp);
+
+			return insets;
 		});
 
 		if (noteRecyclerAdapter.isEmpty()) {
@@ -219,7 +228,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("prefs_quick_delete", true)) {
 			deleteNote(note.getDatabaseID());
 
-			Snackbar snackbar = Snackbar.make(notesRecyclerView, getString(R.string.info_note_deleted, note.getTextPreview()), Snackbar.LENGTH_LONG);
+			Snackbar snackbar = Snackbar.make(findViewById(R.id.main_activity_root_layout), getString(R.string.info_note_deleted, note.getTextPreview()), Snackbar.LENGTH_LONG);
+			snackbar.setAnchorView(findViewById(R.id.fab));
 			snackbar.setAction(R.string.action_undo, new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -229,6 +239,12 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
 			View snackBarView = snackbar.getView();
+			if (snackBarView.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+				ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) snackBarView.getLayoutParams();
+				params.bottomMargin = getResources().getDimensionPixelSize(R.dimen.activity_notes_margin);
+				snackBarView.setLayoutParams(params);
+			}
+
 			TextView textView = snackBarView.findViewById(R.id.snackbar_text);
 			textView.setMaxLines(2);
 			textView.setMinLines(1);
