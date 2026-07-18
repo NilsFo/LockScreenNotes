@@ -2,6 +2,7 @@ package de.nilsfo.lockscreennotes.activity;
 
 import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
+import static de.nilsfo.lockscreennotes.LockScreenNotes.isDarkMode;
 
 import android.app.Activity;
 
@@ -303,8 +304,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			}
 		});
 
-		// TODO take dark mode into account
-		builder.setIcon(R.drawable.baseline_warning_black_48);
+		int icon = R.drawable.warning_black_48;
+		if (isDarkMode(this)) {
+			icon = R.drawable.warning_white_48;
+		}
+		builder.setIcon(icon);
 		builder.show();
 	}
 
@@ -345,8 +349,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			}
 		});
 
-		// TODO take dark mode into account
-		builder.setIcon(R.drawable.baseline_warning_black_48);
+		int icon = R.drawable.warning_black_48;
+		if (isDarkMode(this)) {
+			icon = R.drawable.warning_white_48;
+		}
+		builder.setIcon(icon);
 		builder.show();
 	}
 

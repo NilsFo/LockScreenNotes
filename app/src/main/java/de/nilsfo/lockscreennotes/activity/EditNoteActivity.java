@@ -1,5 +1,7 @@
 package de.nilsfo.lockscreennotes.activity;
 
+import static de.nilsfo.lockscreennotes.LockScreenNotes.isDarkMode;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
@@ -23,6 +25,7 @@ import android.window.OnBackInvokedDispatcher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
 import androidx.core.content.FileProvider;
@@ -143,7 +146,7 @@ public class EditNoteActivity extends NotesActivity {
 				updateContentMenuItems(s.toString());
 			}
 		});
-		Timber.i("Recieved this text from the DB: " + myNote.getText());
+		Timber.i("Received this text from the DB: %s", myNote.getText());
 
 		if (!preferencses.getBoolean("prefs_ignore_tutorial_autosave", false)) {
 			Timber.i("Displaying the auto-save tutorial now.");
@@ -193,8 +196,11 @@ public class EditNoteActivity extends NotesActivity {
 			}
 		});
 
-		// TODO pick icon based on dark / light mode
-		builder.setIcon(R.drawable.baseline_warning_black_48);
+		int icon = R.drawable.warning_black_48;
+		if (isDarkMode(this)) {
+			icon = R.drawable.warning_white_48;
+		}
+		builder.setIcon(icon);
 		builder.show();
 	}
 
@@ -274,9 +280,9 @@ public class EditNoteActivity extends NotesActivity {
 		menuMail = menu.findItem(R.id.action_open_mail);
 
 		if (LockScreenNotes.isDarkMode(this)) {
-			menu.findItem(R.id.action_clear).setIcon(getResources().getDrawable(R.drawable.ic_clear_white_24dp));
-			menu.findItem(R.id.action_share).setIcon(getResources().getDrawable(R.drawable.ic_share_white_24dp));
-			menu.findItem(R.id.action_copy_note).setIcon(getResources().getDrawable(R.drawable.outline_file_copy_white_24));
+			menu.findItem(R.id.action_clear).setIcon(AppCompatResources.getDrawable(this, R.drawable.ic_clear_white_24dp));
+			menu.findItem(R.id.action_share).setIcon(AppCompatResources.getDrawable(this, R.drawable.ic_share_white_24dp));
+			menu.findItem(R.id.action_copy_note).setIcon(AppCompatResources.getDrawable(this, R.drawable.outline_file_copy_white_24));
 		}
 
 		updateContentMenuItems(myNote.getText());
@@ -354,7 +360,7 @@ public class EditNoteActivity extends NotesActivity {
 		String text = noteTF.getText().toString();
 		boolean changed = !oldText.equals(text);
 
-		Timber.i("EditNoteFrame: Saving the note. Has something changed? " + changed);
+		Timber.i("EditNoteFrame: Saving the note. Has something changed? %s", changed);
 
 		if (changed) {
 			Timber.i("Text changed: -> " + oldText + " -> " + text);
@@ -392,8 +398,11 @@ public class EditNoteActivity extends NotesActivity {
 			}
 		});
 
-		// TODO select icon dynamically if in dark mode
-		builder.setIcon(R.drawable.baseline_warning_black_48);
+		int icon = R.drawable.warning_black_48;
+		if (isDarkMode(this)) {
+			icon = R.drawable.warning_white_48;
+		}
+		builder.setIcon(icon);
 		builder.show();
 	}
 
@@ -462,7 +471,7 @@ public class EditNoteActivity extends NotesActivity {
 			return;
 		}
 
-		Timber.i("Shared QR-Imagefile info: " + imageFile);
+		Timber.i("Shared QR-Imagefile info: %s", imageFile);
 		Uri contentUri = FileProvider.getUriForFile(this, "de.nilsfo.lockscreennotes.LockScreenNotes.fileprovider", imageFile);
 
 		if (contentUri != null) {
@@ -496,7 +505,7 @@ public class EditNoteActivity extends NotesActivity {
 	}
 
 	private void handleIllegalNote() {
-		Timber.w("Needing to take care of illiegal note! Action taken: finish activity!");
+		Timber.w("Needing to take care of illegal note! Action taken: finish activity!");
 		Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 		finish();
 	}

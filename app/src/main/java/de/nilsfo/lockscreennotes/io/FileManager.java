@@ -47,9 +47,7 @@ public class FileManager {
 		File f = Environment.getExternalStorageDirectory();
 		//TODO does this parent file thing work?
 
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-			f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-		}
+		f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
 		f = new File(f, context.getString(R.string.app_name));
 
 		Timber.i("Requested external home directory. Location: " + f.getAbsolutePath());

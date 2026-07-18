@@ -20,8 +20,8 @@ import timber.log.Timber;
 public class LSNAlarmManager {
 
 	public static final int AUTO_BACKUP_SCHEDULE_HOUR = 3;
-	private Context context;
-	private AlarmManager alarmManager;
+	private final Context context;
+	private final AlarmManager alarmManager;
 
 	public LSNAlarmManager(Context context) {
 		this.context = context;
@@ -94,15 +94,16 @@ public class LSNAlarmManager {
 		PendingIntent broadcast = null;
 
 		try {
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-				broadcast = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM, myIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-			} else {
-				broadcast = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM, myIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-			}
+			broadcast = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_AUTO_BACKUP_ALARM, myIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			Timber.e(e);
-			Timber.e("Failed to create broadcast Intent: " + e);
+			Timber.e("Failed to create broadcast Intent: %s", e);
 		}
+
+		if (broadcast != null) {
+			Timber.i("Successfully created broadcast Intent: %s", broadcast.toString());
+		}
+
 		return broadcast;
 	}
 

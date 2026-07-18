@@ -15,8 +15,8 @@ import timber.log.Timber;
 public class TimeUtils {
 
 	private static final int DEFAULT_LEVEL_OF_DETAIL = DateFormat.MEDIUM;
-	private SharedPreferences preferences;
-	private Context context;
+	private final SharedPreferences preferences;
+	private final Context context;
 
 	public TimeUtils(Context context) {
 		this.context = context;
@@ -28,7 +28,7 @@ public class TimeUtils {
 	}
 
 	public String formatDateAccordingToPreferences(long time) {
-		if (isRelativeTimePrefered()) {
+		if (isRelativeTimePreferred()) {
 			return formatRelative(time);
 		} else {
 			return formatAbsolute(time);
@@ -94,7 +94,7 @@ public class TimeUtils {
 		try {
 			i = Integer.parseInt(lod);
 		} catch (NumberFormatException e) {
-			Timber.i("Warning: Could not interpret this as a number: " + lod);
+			Timber.i("Warning: Could not interpret this as a number: %s", lod);
 		}
 
 		switch (i) {
@@ -108,11 +108,11 @@ public class TimeUtils {
 				return DateFormat.SHORT;
 		}
 
-		Timber.i("Warning: Level of Detail not found, reverting to default. Input: " + lod);
+		Timber.i("Warning: Level of Detail not found, reverting to default. Input: %s", lod);
 		return DEFAULT_LEVEL_OF_DETAIL;
 	}
 
-	public boolean isRelativeTimePrefered() {
+	public boolean isRelativeTimePreferred() {
 		return preferences.getBoolean("prefs_time_relative", true);
 	}
 

@@ -30,6 +30,12 @@ public class NotificationDeleteRecieverDialogActivity extends Activity {
 		DBAdapter databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
 
+		if (extras == null) {
+			Timber.e("No 'extras' packaged with the delete intent!");
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		long notificationId = extras.getInt(NotesNotificationManager.INTENT_EXTRA_NOTE_ID);
 		notes = new ArrayList<>();
 
@@ -42,7 +48,7 @@ public class NotificationDeleteRecieverDialogActivity extends Activity {
 				notes.add(note);
 				Timber.i("Found the right note with matching ID in the database.");
 			} else {
-				Timber.e("Failed to get note from DB with ID: " + notificationId);
+				Timber.e("Failed to get note from DB with ID: %s", notificationId);
 			}
 		}
 		databaseAdapter.close();
@@ -50,8 +56,7 @@ public class NotificationDeleteRecieverDialogActivity extends Activity {
 		if (notes.isEmpty()) {
 			// ERROR: Notes to be deleted are empty!
 			Timber.e("Cannot delete notes! None found!");
-			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 			return;
 		}
 

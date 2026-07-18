@@ -47,8 +47,8 @@ public class NoteSharingListenerActivity extends Activity {
 		}
 
 		Timber.i("Note share intent received.");
-		Timber.i("Intent error: " + intentError);
-		Timber.i("Note creation and DB without error: " + noteCreatedWithoutError);
+		Timber.i("Intent error: %s", intentError);
+		Timber.i("Note creation and DB without error: %s", noteCreatedWithoutError);
 
 		if (intentError || !noteCreatedWithoutError) {
 			Toast.makeText(this, R.string.error_note_sharing_listener, Toast.LENGTH_LONG).show();

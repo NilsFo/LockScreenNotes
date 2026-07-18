@@ -264,7 +264,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			noteText.setText(note.getText().trim());
 
 			long time = note.getTimestamp();
-			if (utils.isRelativeTimePrefered()) {
+			if (utils.isRelativeTimePreferred()) {
 				timestampLB.setText(context.getString(R.string.last_edited, utils.formatRelative(time)));
 				RelativeTimeTextfieldContainer.getContainer().add(timestampLB, time);
 			} else {

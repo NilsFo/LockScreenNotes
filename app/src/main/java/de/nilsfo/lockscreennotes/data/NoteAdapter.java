@@ -2,7 +2,6 @@ package de.nilsfo.lockscreennotes.data;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -129,7 +128,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 		if (note != null) {
 			time = note.getTimestamp();
 		}
-		if (utils.isRelativeTimePrefered()) {
+		if (utils.isRelativeTimePreferred()) {
 			timestampTF.setText(getContext().getString(R.string.last_edited, utils.formatRelative(time)));
 			RelativeTimeTextfieldContainer.getContainer().add(timestampTF, time);
 		} else

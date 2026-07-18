@@ -2,6 +2,7 @@ package de.nilsfo.lockscreennotes.activity;
 
 import static de.nilsfo.lockscreennotes.io.backups.BackupManager.AUTO_DELETE_MAX_FILE_COUNT;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -25,6 +26,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -59,6 +61,10 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 	/// ////////////////////////////////////////////////////////////////
 
 	public static void bindPreferenceURLAsAction(Preference preference, final Uri uri, final boolean chooser) {
+		if (preference == null) {
+			return;
+		}
+
 		preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
@@ -78,6 +84,10 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 	}
 
 	public static void bindPreferenceURLAsAction(Preference preference) {
+		if (preference == null) {
+			return;
+		}
+
 		String summary = preference.getSummary().toString();
 		bindPreferenceURLAsAction(preference, Uri.parse(summary));
 	}
@@ -185,7 +195,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
 		// Save current activity title so we can set it again after a configuration change
 		outState.putCharSequence(TITLE_TAG, getTitle());
@@ -200,7 +210,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 	}
 
 	@Override
-	public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, androidx.preference.Preference pref) {
+	public boolean onPreferenceStartFragment(@NonNull PreferenceFragmentCompat caller, androidx.preference.Preference pref) {
 		// Instantiate the new Fragment
 		final Bundle args = pref.getExtras();
 		final Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(getClassLoader(), pref.getFragment());
@@ -244,6 +254,13 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		}
 
 		private void requestDarkThemeToBufferedHeaders() {
+			Context context = getContext();
+			if (context == null) {
+				Timber.e("Failed to get context for dark mode headers." +
+						"This does not affect user experience too much." +
+						"But should be investigated!");
+				return;
+			}
 			if (LockScreenNotes.isDarkMode(getContext())) {
 				applyDarkThemeToBufferedHeaders();
 			}
@@ -389,49 +406,82 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		@Override
 		public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 			setPreferencesFromResource(R.xml.prefs_auto_backup, rootKey);
+			FragmentActivity activity = getActivity();
 
-			FileManager manager = new FileManager(getActivity());
-			SharedPreferences preferences = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
+			FileManager manager = new FileManager(activity);
+			SharedPreferences preferences = android.preference.PreferenceManager.getDefaultSharedPreferences(activity);
 
-			findPreference("pref_auto_backup_info").setSummary(getString(R.string.pref_auto_backup_info_summary, manager.getNoteBackupDir()));
-			findPreference("pref_auto_backups_delete_old").setSummary(getString(R.string.pref_auto_backups_delete_old_summary, String.valueOf(AUTO_DELETE_MAX_FILE_COUNT)));
-			findPreference("pref_auto_backups_enabled").setOnPreferenceChangeListener((preference, newValue) -> {
-				boolean isEnabled = (Boolean) newValue;
-				Timber.i("'auto backups' new value: " + isEnabled);
-				return true;
-			});
+			Preference pref_auto_backup_info = findPreference("pref_auto_backup_info");
+			Preference pref_auto_backups_delete_old = findPreference("pref_auto_backups_delete_old");
+			Preference pref_auto_backups_enabled = findPreference("pref_auto_backups_enabled");
+
+			if (pref_auto_backup_info == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_auto_backup_info'!");
+			} else {
+				pref_auto_backup_info.setSummary(getString(R.string.pref_auto_backup_info_summary, manager.getNoteBackupDir()));
+			}
+			if (pref_auto_backups_delete_old == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_auto_backups_delete_old'!");
+			} else {
+				pref_auto_backups_delete_old.setSummary(getString(R.string.pref_auto_backups_delete_old_summary, String.valueOf(AUTO_DELETE_MAX_FILE_COUNT)));
+			}
+			if (pref_auto_backups_enabled == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_auto_backups_enabled'!");
+			} else {
+				pref_auto_backups_enabled.setOnPreferenceChangeListener((preference, newValue) -> {
+					boolean isEnabled = (Boolean) newValue;
+					Timber.i("'auto backups' new value: %s", isEnabled);
+					return true;
+				});
+			}
 
 			Preference autoBackupInfo = findPreference("pref_auto_backup_info");
-			autoBackupInfo.setSelectable(false);
+			if (autoBackupInfo == null) {
+				Timber.e("Failed to get Preference tagged as 'autoBackupInfo'!");
+			} else {
+				autoBackupInfo.setSelectable(false);
+			}
 
 			Preference schedulePreference = findPreference("pref_auto_backups_schedule_days");
-			schedulePreference.setOnPreferenceChangeListener((preference, newValue) -> {
-				String s = newValue.toString();
-				Timber.i("Schedule of days changed. New value: " + s);
-				preference.setSummary(preference.getContext().getString(R.string.pref_auto_backups_schedule_days_summary, s));
+			if (schedulePreference == null) {
+				Timber.e("Failed to get Preference tagged as 'schedulePreference'!");
+			} else {
+				schedulePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+					String s = newValue.toString();
+					Timber.i("Schedule of days changed. New value: %s", s);
+					preference.setSummary(preference.getContext().getString(R.string.pref_auto_backups_schedule_days_summary, s));
 
-				return true;
-			});
-			schedulePreference.setSummary(getActivity().getString(R.string.pref_auto_backups_schedule_days_summary, preferences.getString("pref_auto_backups_schedule_days", "3")));
+					return true;
+				});
+
+				schedulePreference.setSummary(getString(R.string.pref_auto_backups_schedule_days_summary, preferences.getString("pref_auto_backups_schedule_days", "3")));
+			}
 		}
 
 		@Override
 		public void onPause() {
 			super.onPause();
+			Activity activity = getActivity();
 
 			Timber.i("Stopping the Backup preference activity. Let's see if a alarm will be scheduled...");
-			SharedPreferences preferences = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
-			LSNAlarmManager manager = new LSNAlarmManager(getActivity());
-			if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
-				Timber.i("Changes detected. Requesting a new backup timer!");
-				manager.requestCancelAndReScheduleNextAutoBackup();
+			SharedPreferences preferences = android.preference.PreferenceManager.getDefaultSharedPreferences(activity);
+
+			if (activity == null) {
+				Timber.e("Failed to set up LSNAlarmManager. Context is missing.");
+				Toast.makeText(getContext(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
 			} else {
-				boolean nextBackupCanceled = manager.cancelNextAutoBackup();
-				if (nextBackupCanceled) {
-					Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
+				LSNAlarmManager manager = new LSNAlarmManager(activity);
+				if (preferences.getBoolean("pref_auto_backups_enabled", false)) {
+					Timber.i("Changes detected. Requesting a new backup timer!");
+					manager.requestCancelAndReScheduleNextAutoBackup();
 				} else {
-					Timber.e("Failed to cancel next alarm!");
-					Toast.makeText(getActivity(), R.string.error_failed_to_cancel_backup_alarm, Toast.LENGTH_LONG).show();
+					boolean nextBackupCanceled = manager.cancelNextAutoBackup();
+					if (nextBackupCanceled) {
+						Timber.i("A next auto backup alarm will not be scheduled and any old ones will be disabled.");
+					} else {
+						Timber.e("Failed to cancel next alarm!");
+						Toast.makeText(getContext(), R.string.error_failed_to_cancel_backup_alarm, Toast.LENGTH_LONG).show();
+					}
 				}
 			}
 		}
@@ -455,10 +505,15 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 			bindPreferenceSummaryToValue(findPreference("prefs_time_detail"), dateAndTimeUpdater);
 			bindPreferenceSummaryToValue(findPreference("prefs_date_detail"), dateAndTimeUpdater);
 
-			findPreference("prefs_time_preview").setOnPreferenceClickListener(preference -> {
-				updateTimeAndDatePreference();
-				return true;
-			});
+			Preference prefs_time_preview = findPreference("prefs_time_preview");
+			if (prefs_time_preview == null) {
+				Timber.e("Failed to get Preference tagged as 'prefs_time_preview'!");
+			} else {
+				prefs_time_preview.setOnPreferenceClickListener(preference -> {
+					updateTimeAndDatePreference();
+					return true;
+				});
+			}
 		}
 
 		public void updateTimeAndDatePreference() {
@@ -466,21 +521,26 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 			Preference preview = findPreference("prefs_time_preview");
 			TimeUtils utils = new TimeUtils(getActivity());
 
+			if (preview == null) {
+				Timber.e("Failed to get 'prefs_time_preview' Fragment!");
+				return;
+			}
+
 			synchronized (preview) {
-				String summary = getActivity().getString(R.string.error_unknown);
+				String summary = getString(R.string.error_unknown);
 				try {
 					int levelOfDetailDate = utils.getLoDviaPreference(((ListPreference) (findPreference("prefs_date_detail"))).getValue());
 					int levelOfDetailTime = utils.getLoDviaPreference(((ListPreference) (findPreference("prefs_time_detail"))).getValue());
 
-					Timber.i("Current Level of Detail Date: " + levelOfDetailDate);
-					Timber.i("Current Level of Detail Time: " + levelOfDetailTime);
+					Timber.i("Current Level of Detail Date: %s", levelOfDetailDate);
+					Timber.i("Current Level of Detail Time: %s", levelOfDetailTime);
 
 					summary = utils.formatDateAbsolute(new Date(), levelOfDetailTime, levelOfDetailDate);
 				} catch (Exception e) {
 					Timber.e(e);
 				}
 
-				Timber.i("Summary: " + summary);
+				Timber.i("Summary: %s", summary);
 				preview.setSummary(summary);
 			}
 		}
@@ -496,8 +556,8 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 			String versionName = getString(R.string.error_unknown);
 			String appName = getString(R.string.app_name);
 
-			PackageManager manager = getActivity().getPackageManager();
 			try {
+				PackageManager manager = getActivity().getPackageManager();
 				PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
 				versionName = info.versionName;
 				versionCode = info.versionCode;
@@ -515,22 +575,30 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 			};
 
 			Preference aboutPreference = findPreference("pref_about");
-			aboutPreference.setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
-			aboutPreference.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
+			if (aboutPreference == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_about'!");
+			} else {
+				aboutPreference.setSummary(String.format(getString(R.string.prefs_about_summary), appName, versionName));
+				aboutPreference.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
+			}
 
 			Preference externalFeedPreference = findPreference("pref_github_releases_feed");
-			externalFeedPreference.setSummary(getString(R.string.pref_github_releases_summary) + "\n" + getString(R.string.const_github_update_feed_url));
-			externalFeedPreference.setOnPreferenceClickListener(preference -> {
-				ClipboardManager clipboard = (ClipboardManager) preference.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-				ClipData clip = ClipData.newPlainText(getString(R.string.app_name), getString(R.string.const_github_update_feed_url));
-				if (clipboard != null) {
-					clipboard.setPrimaryClip(clip);
-					Toast.makeText(preference.getContext(), R.string.action_github_url_success, Toast.LENGTH_LONG).show();
-				} else {
-					Toast.makeText(preference.getContext(), R.string.error_clipboard_unavailable, Toast.LENGTH_LONG).show();
-				}
-				return true;
-			});
+			if (externalFeedPreference == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_github_releases_feed'!");
+			} else {
+				externalFeedPreference.setSummary(getString(R.string.pref_github_releases_summary) + "\n" + getString(R.string.const_github_update_feed_url));
+				externalFeedPreference.setOnPreferenceClickListener(preference -> {
+					ClipboardManager clipboard = (ClipboardManager) preference.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+					ClipData clip = ClipData.newPlainText(getString(R.string.app_name), getString(R.string.const_github_update_feed_url));
+					if (clipboard != null) {
+						clipboard.setPrimaryClip(clip);
+						Toast.makeText(preference.getContext(), R.string.action_github_url_success, Toast.LENGTH_LONG).show();
+					} else {
+						Toast.makeText(preference.getContext(), R.string.error_clipboard_unavailable, Toast.LENGTH_LONG).show();
+					}
+					return true;
+				});
+			}
 
 			bindPreferenceURLAsAction(findPreference("pref_view_on_github"), Uri.parse(getString(R.string.const_github_url)));
 			bindPreferenceURLAsAction(findPreference("prefs_credits_text_drawable"));
@@ -541,30 +609,39 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 			bindPreferenceURLAsAction(findPreference("prefs_credits_leakcanary"));
 			bindPreferenceURLAsAction(findPreference("pref_view_on_play_store"), Uri.parse(getString(R.string.const_google_play_url)));
 
-			findPreference("pref_share_app").setOnPreferenceClickListener(preference -> {
-				String text = getString(R.string.pref_share_app_text, getString(R.string.app_name), getString(R.string.const_google_play_url));
+			Preference pref_share_app = findPreference("pref_share_app");
+			if (pref_share_app == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_share_app'!");
+			} else {
+				pref_share_app.setOnPreferenceClickListener(preference -> {
+					String text = getString(R.string.pref_share_app_text, getString(R.string.app_name), getString(R.string.const_google_play_url));
 
-				Intent sendIntent = new Intent();
-				sendIntent.setAction(Intent.ACTION_SEND);
-				sendIntent.putExtra(Intent.EXTRA_TEXT, text);
-				sendIntent.setType("text/plain");
-				startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.action_share)));
-				return true;
-			});
+					Intent sendIntent = new Intent();
+					sendIntent.setAction(Intent.ACTION_SEND);
+					sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+					sendIntent.setType("text/plain");
+					startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.action_share)));
+					return true;
+				});
+			}
 
 			Preference updateDayCounter = findPreference("pref_update_day_counter");
-			int lastUpdateDays = getUpdateDays(getActivity());
-			if (lastUpdateDays == LAST_UPDATE_DATE_UNKNOWN) {
-				Timber.w("Failed to get the last date this app was updated! Doing nothing, as this will result in the text that an error occurred!");
+			if (updateDayCounter == null) {
+				Timber.e("Failed to get Preference tagged as 'pref_update_day_counter'!");
 			} else {
-				SharedPreferences preferences = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
-				long launchedCountAllTime = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
-				long launchedCountThisVersion = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
+				int lastUpdateDays = getUpdateDays(getActivity());
+				if (lastUpdateDays == LAST_UPDATE_DATE_UNKNOWN) {
+					Timber.w("Failed to get the last date this app was updated! Doing nothing, as this will result in the text that an error occurred!");
+				} else {
+					SharedPreferences preferences = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
+					long launchedCountAllTime = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_ALL_TIME, 0);
+					long launchedCountThisVersion = preferences.getLong(VersionManager.PREFERENCE_APP_LAUNCHED_THIS_VERSION, 0);
 
-				String displayedText = getString(R.string.pref_update_day_counter_summary, String.valueOf(lastUpdateDays), String.valueOf(launchedCountThisVersion), String.valueOf(launchedCountAllTime));
-				updateDayCounter.setSummary(displayedText);
+					String displayedText = getString(R.string.pref_update_day_counter_summary, String.valueOf(lastUpdateDays), String.valueOf(launchedCountThisVersion), String.valueOf(launchedCountAllTime));
+					updateDayCounter.setSummary(displayedText);
+				}
+				updateDayCounter.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
 			}
-			updateDayCounter.setOnPreferenceClickListener(displayVersionUpdateNewsAction);
 		}
 	}
 

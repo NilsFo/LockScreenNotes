@@ -18,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
  * A {@link PreferenceActivity} which implements and proxies the necessary calls
  * to be used with AppCompat.
  */
+@Deprecated
 public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
 
 	private AppCompatDelegate mDelegate;

@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
+
 import java.util.Locale;
 
 import de.nilsfo.lockscreennotes.util.VersionManager;
@@ -57,6 +59,11 @@ public class LockScreenNotes extends Application {
 			case Configuration.UI_MODE_NIGHT_YES:
 				return true;
 		}
+
+		Timber.e("Failed to obtain the state of the dark mode!");
+
+		// TODO allow fail here?
+		// is it better to just return "false"?
 		throw new IllegalStateException("Failed to obtain the state of the dark mode");
 	}
 
@@ -77,7 +84,7 @@ public class LockScreenNotes extends Application {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if (prefs.getString("prefs_time_locale_default_value", getString(R.string.error_unknown)).equals(getString(R.string.prefs_time_locale_default_value))) {
 			String iso = locale.getISO3Country();
-			Timber.i("Turns out the user wants the default time locale to be the current locale: " + iso);
+			Timber.i("Turns out the user wants the default time locale to be the current locale: %s", iso);
 			prefs.edit().putString("prefs_time_locale_default_value", iso).apply();
 		}
 
@@ -143,17 +150,17 @@ public class LockScreenNotes extends Application {
 		return BuildConfig.DEBUG;
 	}
 
-	private class DebugTree extends Timber.DebugTree {
+	private static class DebugTree extends Timber.DebugTree {
 		@Override
 		protected String createStackElementTag(@NonNull StackTraceElement element) {
 			return LOG_TAG + super.createStackElementTag(element) + ":" + element.getLineNumber();
 		}
 	}
 
-	private class ReleaseTree extends DebugTree {
+	private static class ReleaseTree extends DebugTree {
 		@Override
-		protected boolean isLoggable(String tag, int priority) {
-			return !(priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO);
+		protected boolean isLoggable(@Nullable String tag, int priority) {
+			return priority >= Log.WARN;
 		}
 	}
 
