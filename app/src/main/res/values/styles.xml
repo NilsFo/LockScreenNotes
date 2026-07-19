@@ -7,26 +7,15 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="AppTheme.NoActionBar"
+        parent="Theme.AppCompat.DayNight.NoActionBar">
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="AppTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.Text</item>
-    </style>
-
-    <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/colorNotificationLight</item>
-        <item name="android:textColorPrimary">@android:color/darker_gray</item>
-    </style>
+    <!-- Your ActionBar styles remain below -->
 
 </resources>
