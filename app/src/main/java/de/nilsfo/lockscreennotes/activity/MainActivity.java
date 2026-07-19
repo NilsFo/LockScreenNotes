@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,33 +103,59 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// Setting up action bar
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		tutorialView = (ScrollView) findViewById(R.id.tutorial_view);
-		nothingToDisplayLB = (TextView) findViewById(R.id.nothing_to_display);
+		// Setting up tutorial
+		tutorialView = findViewById(R.id.tutorial_view);
+		nothingToDisplayLB = findViewById(R.id.nothing_to_display);
 
-		tutorialDoNotShowAgainCB = (CheckBox) findViewById(R.id.tutorial_do_not_show_again_cb);
-		tutorialDoNotShowAgainCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				onTutorialCBclicked(isChecked);
-			}
-		});
+		tutorialDoNotShowAgainCB = findViewById(R.id.tutorial_do_not_show_again_cb);
+		tutorialDoNotShowAgainCB.setOnCheckedChangeListener(
+				(buttonView, isChecked) -> onTutorialCBclicked(isChecked)
+		);
 
+		// Accessing notes database
 		databaseAdapter = new DBAdapter(this);
 		databaseAdapter.open();
 		databaseAdapter.addObserver(this);
-
 		Timber.i("Database opened.");
 
+		// Setting up notes adapter
 		noteRecyclerAdapter = new NotesRecyclerAdapter(databaseAdapter, this);
 		noteRecyclerAdapter.setListener(this);
 
-		notesRecyclerView = (RecyclerView) findViewById(R.id.notes_recycler_view);
+		// Adding content to notes recycler
+		notesRecyclerView = findViewById(R.id.notes_recycler_view);
 		notesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 		notesRecyclerView.setAdapter(noteRecyclerAdapter);
 
+		// Adding padding (named "clearance") to below the RecyclerView.
+		int bottomClearance = getResources().getDimensionPixelSize(R.dimen.recycler_fab_clearance);
+		notesRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+			@Override
+			public void getItemOffsets(
+					@NonNull Rect outRect,
+					@NonNull View view,
+					@NonNull RecyclerView parent,
+					@NonNull RecyclerView.State state
+			) {
+				RecyclerView.Adapter<?> adapter = parent.getAdapter();
+
+				if (adapter == null || adapter.getItemCount() == 0) {
+					return;
+				}
+
+				int position = parent.getChildAdapterPosition(view);
+
+				if (position == adapter.getItemCount() - 1) {
+					outRect.bottom = bottomClearance;
+				}
+			}
+		});
+
+		// Loading notes and filling recycler view
 		setShowNotifications(true);
 		loadNotesFromDB();
 		setupRelativeDateUpdater();
@@ -137,14 +163,11 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		// Balloon stuff
 		permissionBalloonTimer = new PermissionBalloonTimer(this);
 
-		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				onFABClicked();
-			}
-		});
+		// Setting up FAB
+		final FloatingActionButton fab = findViewById(R.id.fab);
+		fab.setOnClickListener(view -> onFABClicked());
 
+		// Setting up window insets
 		View rootLayout = findViewById(R.id.main_activity_root_layout);
 		ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
 			Insets systemBars = insets.getInsets(
@@ -166,6 +189,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			return insets;
 		});
 
+		// Animating the tutorial view
 		if (noteRecyclerAdapter.isEmpty()) {
 			tutorialView.animate().alpha(1f).setDuration(2000);
 		}
@@ -178,12 +202,15 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			VersionManager.onVersionChange(this, lastVer, currentVer);
 		}
 
+		// Forgot what is happening here. Whoops.
 		FileManager fm = new FileManager(this);
-		//fm.notifyDirectoryChange(fm.getInternalDir().getAbsolutePath());
 		fm.notifyMediaScanner(fm.getInternalDir());
 
+		// Putting the current prefs back into the preferences. So they are synced.
 		prefs.edit().putInt(PREFS_LAST_KNOWN_VERSION, currentVer).apply();
-		Timber.i("Application started. App version: " + currentVer);
+
+		// All done. Letting the dev know.
+		Timber.i("Application started. App version: %s", currentVer);
 	}
 
 	@Override
@@ -229,12 +256,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 			Snackbar snackbar = Snackbar.make(findViewById(R.id.main_activity_root_layout), getString(R.string.info_note_deleted, note.getTextPreview()), Snackbar.LENGTH_LONG);
 			snackbar.setAnchorView(findViewById(R.id.fab));
-			snackbar.setAction(R.string.action_undo, new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					requestRecoverNote(note);
-				}
-			});
+			snackbar.setAction(R.string.action_undo, v -> requestRecoverNote(note));
 			snackbar.setActionTextColor(getResources().getColor(R.color.snackbar_accent));
 
 			View snackBarView = snackbar.getView();
@@ -415,22 +437,20 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			});
 		}
 
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
-			builder.setPositiveButton(R.string.action_review_notification_permissions_enable_notification_center, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
+		builder.setPositiveButton(R.string.action_review_notification_permissions_enable_notification_center, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
 
-					Intent intent = LockScreenNotes.BuildPermissionIntentNotificationDrawer(MainActivity.this);
-					try {
-						startActivity(intent);
-					} catch (Exception e) {
-						Timber.e(e);
-						Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-					}
+				Intent intent = LockScreenNotes.BuildPermissionIntentNotificationDrawer(MainActivity.this);
+				try {
+					startActivity(intent);
+				} catch (Exception e) {
+					Timber.e(e);
+					Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
 				}
-			});
-		}
+			}
+		});
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -451,7 +471,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		BackupManager backupManager = new BackupManager(this);
 		StoragePermissionManager storagePermissionManager = new StoragePermissionManager(this);
 		boolean hasExternalStoragePermission = storagePermissionManager.hasExternalStoragePermission();
-		Timber.i("Has external Storage Permission: " + hasExternalStoragePermission);
+		Timber.i("Has external Storage Permission: %s", hasExternalStoragePermission);
 
 		// Checking if external permissions are granted
 		if (!hasExternalStoragePermission) {
@@ -519,7 +539,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			return;
 		}
 
-		Timber.i("Everything saved! -> " + backupFile.getAbsolutePath());
+		Timber.i("Everything saved! -> %s", backupFile.getAbsolutePath());
 		Toast.makeText(this, R.string.action_export_success, Toast.LENGTH_LONG).show();
 	}
 
@@ -1064,13 +1084,13 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	@Override
 	public void onCardNotePressed(long noteID) {
-		Timber.i("Main: Note was pressed: " + noteID);
+		Timber.i("Main: Note was pressed: %s", noteID);
 		requestEditNote(noteID);
 	}
 
 	@Override
 	public void onCardNotePressedLong(long noteID) {
-		Timber.i("Main: Note was long pressed: " + noteID);
+		Timber.i("Main: Note was long pressed: %s", noteID);
 	}
 
 	@Override
@@ -1151,7 +1171,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 
 		Configuration configuration = getResources().getConfiguration();
-		Timber.i("Dark mode status: " + LockScreenNotes.isDarkMode(configuration));
+		Timber.i("Dark mode status: %s", LockScreenNotes.isDarkMode(configuration));
 
 		noteRecyclerAdapter.refreshNotesList();
 	}
