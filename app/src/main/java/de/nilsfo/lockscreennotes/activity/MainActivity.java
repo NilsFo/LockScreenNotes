@@ -172,18 +172,25 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
 			Insets systemBars = insets.getInsets(
 					WindowInsetsCompat.Type.systemBars()
-							|
-							WindowInsetsCompat.Type.displayCutout()
-							|
-							WindowInsetsCompat.Type.ime()
+							| WindowInsetsCompat.Type.displayCutout()
+							| WindowInsetsCompat.Type.ime()
 			);
 
-			notesRecyclerView.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+			// Apply horizontal padding to the root layout to match EditNoteActivity's behavior.
+			// This ensures the AppBarLayout and its Toolbar are inset from the side navigation bars.
+			v.setPadding(systemBars.left, 0, systemBars.right, 0);
+
+			// RecyclerView horizontal padding is now handled by the root layout's padding.
+			// We only need to maintain the bottom padding for the list content.
+			notesRecyclerView.setPadding(0, 0, 0, systemBars.bottom);
 
 			ViewGroup.MarginLayoutParams fabLp = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
 			int fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
 			fabLp.bottomMargin = systemBars.bottom + fabMargin;
-			fabLp.rightMargin = systemBars.right + fabMargin;
+
+			// Since the root layout now has horizontal padding, the FAB's right margin
+			// should just be the standard margin, not plus systemBars.right.
+			fabLp.rightMargin = fabMargin;
 			fab.setLayoutParams(fabLp);
 
 			return insets;
