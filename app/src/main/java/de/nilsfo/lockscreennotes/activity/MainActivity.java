@@ -12,6 +12,8 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -55,8 +57,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import de.nilsfo.lockscreennotes.LockScreenNotes;
 import de.nilsfo.lockscreennotes.data.Note;
@@ -91,7 +91,15 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	private ScrollView tutorialView;
 	private CheckBox tutorialDoNotShowAgainCB;
 	private TextView nothingToDisplayLB;
-	private ExecutorService executorService;
+	private final Handler tickerHandler = new Handler(Looper.getMainLooper());
+	private long tickerStartTime;
+	private final Runnable tickerRunnable = new Runnable() {
+		@Override
+		public void run() {
+			onPeriodicBackgroundTask(tickerStartTime, System.currentTimeMillis());
+			tickerHandler.postDelayed(this, ONE_SECOND_IN_MS);
+		}
+	};
 
 	// Permission Menu Item management
 	private MenuItem checkAppPermissionItem;
@@ -803,42 +811,12 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	}
 
 	private void setupRelativeDateUpdater() {
-		if (executorService != null) {
-			executorService.shutdownNow();
-		}
-
-		executorService = Executors.newFixedThreadPool(1);
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					long startTime = new Date().getTime();
-
-					while (!executorService.isShutdown()) {
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								long currentTime = new Date().getTime();
-								try {
-									onPeriodicBackgroundTask(startTime, currentTime);
-								} catch (Exception e) {
-									Timber.e(e);
-									Timber.w("SHUTTING DOWN BACKGROUND LOOP!");
-									executorService.shutdown();
-								}
-							}
-						});
-						Thread.sleep(ONE_SECOND_IN_MS);
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Timber.e(e, "Loop interrupted!");
-				}
-			}
-		});
+		tickerHandler.removeCallbacks(tickerRunnable);
+		tickerStartTime = System.currentTimeMillis();
+		tickerHandler.post(tickerRunnable);
 	}
 
-	private synchronized void onPeriodicBackgroundTask(long startTime, long currentTime) {
+	private void onPeriodicBackgroundTask(long startTime, long currentTime) {
 		// Permanent update loop, running in the background.
 		long timeTiff = currentTime - startTime;
 		Timber.v("Running in the background for: " + timeTiff + " ms.");
@@ -1073,9 +1051,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		databaseAdapter.deleteObserver(this);
 		databaseAdapter.close();
 
-		if (executorService != null) {
-			executorService.shutdownNow();
-		}
+		tickerHandler.removeCallbacks(tickerRunnable);
 
 		Timber.i("Mainactivity: onPause() [Show notifications? " + isShowNotifications() + "]");
 		if (isShowNotifications()) {

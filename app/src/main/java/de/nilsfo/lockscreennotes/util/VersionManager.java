@@ -1,7 +1,5 @@
 package de.nilsfo.lockscreennotes.util;
 
-import static de.nilsfo.lockscreennotes.util.NotesNotificationManager.PREFERENCE_HIGH_PRIORITY_NOTE;
-
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -129,8 +127,8 @@ public abstract class VersionManager {
 		}
 
 		SimpleDateFormat jasonDatePattern = new SimpleDateFormat(VERSION_RELEASE_DATE_PATTERN);
-		Timber.i("Looking for version changelog for entry: " + version);
-		Timber.i("Read changelog JSON: " + versionList.toString());
+		Timber.i("Looking for version changelog for entry: %s", version);
+		Timber.i("Read changelog JSON: %s", versionList.toString());
 
 		String versionName = null, changelog = null, wholeChangelog = null;
 		try {
@@ -230,8 +228,8 @@ public abstract class VersionManager {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = inflater.inflate(R.layout.dialog_changelog, null, false);
 
-		TextView nameTF = (TextView) v.findViewById(R.id.dialog_changelog_fragment_name);
-		TextView changelogTF = (TextView) v.findViewById(R.id.dialog_changelog_fragment_changelog);
+		TextView nameTF = v.findViewById(R.id.dialog_changelog_fragment_name);
+		TextView changelogTF = v.findViewById(R.id.dialog_changelog_fragment_changelog);
 		nameTF.setText(title);
 		changelogTF.setText(text);
 
@@ -265,11 +263,12 @@ public abstract class VersionManager {
 				Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
 				// To count with Play market backstack, After pressing back button,
 				// to taken back to our application, we need to add following flags to intent.
-				goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-						Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-				}
+				goToMarket.addFlags(
+						Intent.FLAG_ACTIVITY_NO_HISTORY
+								|
+								Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+				);
+				goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 				try {
 					context.startActivity(goToMarket);
 				} catch (ActivityNotFoundException e) {
