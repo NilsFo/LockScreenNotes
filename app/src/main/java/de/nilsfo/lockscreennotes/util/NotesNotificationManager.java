@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -431,7 +432,7 @@ public class NotesNotificationManager {
 		try {
 			backupFileCount = backupManager.findBackupFiles().size();
 			fileCountText = String.valueOf(backupFileCount);
-		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			Timber.e(e);
 		}

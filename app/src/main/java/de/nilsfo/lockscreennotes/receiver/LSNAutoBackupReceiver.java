@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
+import de.nilsfo.lockscreennotes.io.backups.BackupFile;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.receiver.alarms.LSNAlarmManager;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
@@ -41,7 +43,7 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 			BackupManager backupManager = new BackupManager(context);
 			StoragePermissionManager storagePermissionManager = new StoragePermissionManager(context);
 			if (storagePermissionManager.hasExternalStoragePermission()) {
-				File f = null;
+				BackupFile f = null;
 				try {
 					f = backupManager.createAndWriteBackup();
 				} catch (Exception e) {
@@ -58,19 +60,20 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 				}
 
 				if (deleteOld) {
-					ArrayList<File> backups = new ArrayList<>();
+					ArrayList<BackupFile> backups = new ArrayList<>();
 					try {
 						backups = backupManager.findBackupFiles();
-					} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+					} catch (IOException e) {
 						e.printStackTrace();
+						Timber.e(e);
 					}
 
 					Timber.i("Checking if old files should be deleted. File count: " + backups.size());
 					if (backups.size() > AUTO_DELETE_MAX_FILE_COUNT) {
-						Collections.sort(backups, new Comparator<File>() {
+						Collections.sort(backups, new Comparator<BackupFile>() {
 							@Override
-							public int compare(File file, File t1) {
-								return String.valueOf(file.lastModified()).compareTo(String.valueOf(t1.lastModified()));
+							public int compare(BackupFile file, BackupFile t1) {
+								return String.valueOf(file.getLastModified()).compareTo(String.valueOf(t1.getLastModified()));
 							}
 						});
 
@@ -79,11 +82,15 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 						int deletedCount = 0;
 
 						while (backups.size() > AUTO_DELETE_MAX_FILE_COUNT) {
-							File current = backups.get(0);
+							BackupFile current = backups.get(0);
 							backups.remove(0);
-							success &= current.delete();
+
+							// success &= current.delete();
+							Timber.e("TODO: Delete");
+							success = false;
+
 							deletedCount++;
-							Timber.i("In an attempt to auto-clean up old backup files, this file was attempted to be deleted: " + f.getAbsolutePath());
+							Timber.i("In an attempt to auto-clean up old backup files, this file was attempted to be deleted: " + f.getName());
 						}
 						Timber.i("Deleted old files. Count: " + deletedCount + " All successfull: " + success);
 

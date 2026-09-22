@@ -3,26 +3,23 @@ package de.nilsfo.lockscreennotes.io.backups;
 import static de.nilsfo.lockscreennotes.io.backups.NoteJSONUtils.VERSION_NOT_AVAILABLE;
 
 import android.content.Context;
-import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import de.nilsfo.lockscreennotes.data.Note;
-import de.nilsfo.lockscreennotes.io.FileManager;
-import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
-import de.nilsfo.lockscreennotes.io.StoragePermissionManager.InsufficientStoragePermissionException;
-import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lockscreennotes.util.VersionManager;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
@@ -31,114 +28,181 @@ public class BackupManager {
 
 	public static final int AUTO_DELETE_MAX_FILE_COUNT = 20;
 
-	private final Context context;
-	private final FileManager fileManager;
-	private final StoragePermissionManager storagePermissionManager;
+	public static final String FILENAME_BACKUP_BASE_NAME = "lsn_backup_";
+	public static final String FILENAME_BACKUP_EXTENSION = ".json";
 
-	public BackupManager(Context context) {
-		this.context = context;
-		fileManager = new FileManager(context);
-		storagePermissionManager = new StoragePermissionManager(context);
+	private static final String FILENAME_TIMESTAMP_FORMATTER =
+			"yyyy_MM_dd-HH_mm_ss";
+
+	private final Context context;
+	private final BackupStorage storage;
+
+	public BackupManager(@NonNull Context context) {
+		this(
+				context,
+				new SafBackupStorage(context.getApplicationContext())
+		);
 	}
 
-	public File createAndWriteBackup() throws JSONException, IOException, InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasExternalStoragePermission()) {
-			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
-		}
+	BackupManager(
+			@NonNull Context context,
+			@NonNull BackupStorage storage
+	) {
+		this.context = context.getApplicationContext();
+		this.storage = storage;
+	}
+
+	@NonNull
+	public BackupStorageState getStorageState() {
+		return storage.getState();
+	}
+
+	@NonNull
+	public BackupFile createAndWriteBackup()
+			throws JSONException, IOException {
 
 		JSONObject data = NoteJSONUtils.toJSON(context);
-		Timber.i("Transforming notes to JSON: " + data.toString());
 
-		File f = new File(fileManager.getNoteBackupDir(), fileManager.getDynamicNoteBackupFilename());
-		Timber.i("Exporting JSON notes to: " + f.getAbsolutePath());
+		Timber.i("Transforming notes to JSON: %s", data);
 
-		FileWriter fw = new FileWriter(f);
-		fw.write(data.toString());
-		fw.close();
+		BackupFile backup = storage.writeBackup(
+				createBackupFilename(),
+				data.toString()
+		);
 
-		fileManager.notifyMediaScanner(f);
-		return f;
+		/*
+		 * Only prune AFTER the new backup has been completely written.
+		 * A failed backup must never destroy an existing recovery point.
+		 */
+		pruneOldBackups();
+
+		return backup;
 	}
 
-	public ArrayList<File> findBackupFiles() throws InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasExternalStoragePermission()) {
-			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
-		}
-		ArrayList<File> list = new ArrayList<>();
+	@NonNull
+	public ArrayList<BackupFile> findBackupFiles() throws IOException {
+		ArrayList<BackupFile> result =
+				new ArrayList<>(storage.findBackups());
 
-		File dir = fileManager.getNoteBackupDir();
-		File[] files = dir.listFiles();
-		if (files == null) {
-			return list;
-		}
+		Timber.i("Backup count: %d", result.size());
 
-		for (File f : files) {
-			String name = f.getAbsolutePath().toLowerCase();
-			if (name.endsWith(FileManager.FILENAME_BACKUP_EXTENSION)) {
-				list.add(f);
-			}
-		}
-
-		Timber.i("List of backup Files found: " + Arrays.toString(list.toArray()));
-		Timber.i("Count: " + list.size());
-		return list;
+		return result;
 	}
 
-	public boolean hasBackupsMade() throws InsufficientStoragePermissionException {
+	public boolean hasBackupsMade() throws IOException {
 		return !findBackupFiles().isEmpty();
 	}
 
-	public BackupMetaData getMetaData(File file) throws IOException, JSONException, InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasExternalStoragePermission()) {
-			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
-		}
+	@NonNull
+	public BackupMetaData getMetaData(@NonNull BackupFile file)
+			throws IOException, JSONException {
 
-		JSONObject data = new JSONObject(FileManager.readFile(file));
+		JSONObject data = readBackupJson(file);
+
 		return new BackupMetaData(data, context);
 	}
 
-	public ArrayList<Note> readBackupFile(File file) throws IOException, JSONException, InsufficientStoragePermissionException {
-		if (!storagePermissionManager.hasExternalStoragePermission()) {
-			throw new InsufficientStoragePermissionException("Insufficient app permissions.");
-		}
+	@NonNull
+	public ArrayList<Note> readBackupFile(@NonNull BackupFile file)
+			throws IOException, JSONException {
 
-		JSONObject data = new JSONObject(FileManager.readFile(file));
+		JSONObject data = readBackupJson(file);
 		BackupMetaData metaData = new BackupMetaData(data, context);
 
 		JSONArray notes = data.getJSONArray("notes");
-		return NoteJSONUtils.toNotes(notes, metaData.version, VersionManager.getCurrentVersion(context));
+
+		return NoteJSONUtils.toNotes(
+				notes,
+				metaData.version,
+				VersionManager.getCurrentVersion(context)
+		);
 	}
 
 	@Nullable
-	public File getLatestBackupFile() throws InsufficientStoragePermissionException {
-		ArrayList<File> list = findBackupFiles();
-		Collections.sort(list, (file1, file2) -> {
-			long lastModifiedF1 = file1.lastModified();
-			long lastModifiedF2 = file2.lastModified();
+	public BackupFile getLatestBackupFile() throws IOException {
+		List<BackupFile> backups = storage.findBackups();
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				return Long.compare(lastModifiedF2, lastModifiedF1);
+		BackupFile latest = null;
+		long latestTimestamp = Long.MIN_VALUE;
+
+		for (BackupFile backup : backups) {
+			long timestamp = getBackupTimestamp(backup);
+
+			if (latest == null || timestamp > latestTimestamp) {
+				latest = backup;
+				latestTimestamp = timestamp;
 			}
-
-			String s1 = String.valueOf(file2);
-			String s2 = String.valueOf(file1);
-			return s1.compareTo(s2);
-		});
-
-		Timber.i("Here's the reversed list state:");
-		TimeUtils timeUtils = new TimeUtils(context);
-		for (File f : list) {
-			long date = f.lastModified();
-			Timber.i(f.getName() + " -> " + timeUtils.formatDateAccordingToPreferences(date));
 		}
 
-		if (list.isEmpty()) return null;
-		File f = list.get(0);
-		Timber.i("Assumed latest Backup File: " + f.getAbsolutePath());
-		return f;
+		if (latest != null) {
+			Timber.i("Latest backup: %s", latest.getName());
+		}
+
+		return latest;
+	}
+
+	private void pruneOldBackups() throws IOException {
+		List<BackupFile> backups = storage.findBackups();
+
+		if (backups.size() <= AUTO_DELETE_MAX_FILE_COUNT) {
+			return;
+		}
+
+		backups.sort(
+				Comparator.comparingLong(this::getBackupTimestamp)
+						.reversed()
+		);
+
+		for (int i = AUTO_DELETE_MAX_FILE_COUNT;
+		     i < backups.size();
+		     i++) {
+
+			BackupFile oldBackup = backups.get(i);
+
+			if (!storage.deleteBackup(oldBackup)) {
+				Timber.w(
+						"Unable to delete old backup: %s",
+						oldBackup.getName()
+				);
+			}
+		}
+	}
+
+	private long getBackupTimestamp(@NonNull BackupFile backup) {
+		try {
+			return getMetaData(backup).getTimestamp();
+		} catch (IOException | JSONException e) {
+			Timber.w(
+					e,
+					"Unable to read timestamp from %s; using provider timestamp.",
+					backup.getName()
+			);
+
+			return backup.getLastModified();
+		}
+	}
+
+	@NonNull
+	private JSONObject readBackupJson(@NonNull BackupFile backup)
+			throws IOException, JSONException {
+
+		return new JSONObject(storage.readBackup(backup));
+	}
+
+	@NonNull
+	private String createBackupFilename() {
+		SimpleDateFormat format = new SimpleDateFormat(
+				FILENAME_TIMESTAMP_FORMATTER,
+				Locale.US
+		);
+
+		return FILENAME_BACKUP_BASE_NAME
+				+ format.format(new Date())
+				+ FILENAME_BACKUP_EXTENSION;
 	}
 
 	public static class BackupMetaData {
+
 		private long timestamp;
 		private String count;
 		private int version;
@@ -147,21 +211,20 @@ public class BackupManager {
 			try {
 				timestamp = data.getLong("timestamp");
 			} catch (JSONException e) {
-				e.printStackTrace();
 				Timber.e(e);
 				timestamp = 0;
 			}
+
 			try {
 				count = String.valueOf(data.getInt("count"));
 			} catch (JSONException e) {
-				e.printStackTrace();
 				Timber.e(e);
 				count = context.getString(R.string.error_unknown);
 			}
+
 			try {
 				version = data.getInt("version");
 			} catch (JSONException e) {
-				e.printStackTrace();
 				Timber.e(e);
 				version = VERSION_NOT_AVAILABLE;
 			}

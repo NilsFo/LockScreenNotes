@@ -47,7 +47,6 @@ import com.skydoves.balloon.OnBalloonClickListener;
 
 import org.json.JSONException;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -66,6 +65,7 @@ import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogPhon
 import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogURLs;
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
+import de.nilsfo.lockscreennotes.io.backups.BackupFile;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NoteSharer;
@@ -499,15 +499,15 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		String lastBackup = getString(R.string.info_number_not_available);
 		try {
 			if (backupManager.hasBackupsMade()) {
-				File latestBackupFile = backupManager.getLatestBackupFile();
+				BackupFile latestBackupFile = backupManager.getLatestBackupFile();
 
 				if (latestBackupFile != null) {
 					backupCount = String.valueOf(backupManager.findBackupFiles().size());
-					long l = latestBackupFile.lastModified();
+					long l = latestBackupFile.getLastModified();
 					lastBackup = new TimeUtils(this).formatDateAccordingToPreferences(l);
 				}
 			}
-		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+		} catch (IOException e) {
 			Toast.makeText(this, R.string.error_external_permissions_require_upgrade, Toast.LENGTH_LONG).show();
 			storagePermissionManager.requestExternalStoragePermission(this);
 			return;
@@ -543,27 +543,26 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	public void requestBackupExport() {
 		BackupManager backupManager = new BackupManager(this);
-		File backupFile;
+		BackupFile backupFile;
 		try {
 			backupFile = backupManager.createAndWriteBackup();
-		} catch (JSONException | IOException |
-				 StoragePermissionManager.InsufficientStoragePermissionException e) {
+		} catch (JSONException | IOException e) {
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();
 			return;
 		}
 
-		Timber.i("Everything saved! -> %s", backupFile.getAbsolutePath());
+		Timber.i("Everything saved! -> %s", backupFile.getName());
 		Toast.makeText(this, R.string.action_export_success, Toast.LENGTH_LONG).show();
 	}
 
 	public void requestBackupImportMenu() {
 		BackupManager manager = new BackupManager(this);
-		File f = null;
+		BackupFile f = null;
 		try {
 			f = manager.getLatestBackupFile();
-		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
@@ -584,7 +583,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 	}
 
-	public void requestBackupImportMenuConfirmFile(final File file) throws IOException, JSONException, StoragePermissionManager.InsufficientStoragePermissionException {
+	public void requestBackupImportMenuConfirmFile(final BackupFile file) throws IOException, JSONException, StoragePermissionManager.InsufficientStoragePermissionException {
 		BackupManager manager = new BackupManager(this);
 		BackupManager.BackupMetaData metaData = manager.getMetaData(file);
 
@@ -622,7 +621,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		builder.show();
 	}
 
-	public void requestBackupImportMenuConfirmData(File source) {
+	public void requestBackupImportMenuConfirmData(BackupFile source) {
 		BackupManager manager = new BackupManager(this);
 		final ArrayList<Note> list;
 		try {
@@ -637,12 +636,12 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
 			return;
-		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
-			e.printStackTrace();
-			Timber.e(e);
-			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
-			return;
-		}
+		}//catch ( StoragePermissionManager.InsufficientStoragePermissionException e) {
+		//	e.printStackTrace();
+		//	Timber.e(e);
+		//	Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
+		//	return;
+		//
 
 		Timber.i("Found " + list.size() + " notes in file: " + Arrays.toString(list.toArray()));
 		int currentNoteCount = databaseAdapter.getAllRows().getCount();
@@ -685,10 +684,10 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	public void requestBackupImportChoose() {
 		BackupManager manager = new BackupManager(this);
-		ArrayList<File> list = null;
+		ArrayList<BackupFile> list = null;
 		try {
 			list = manager.findBackupFiles();
-		} catch (StoragePermissionManager.InsufficientStoragePermissionException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
@@ -707,7 +706,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 
 		ArrayList<String> filenames = new ArrayList<>();
-		for (File f : list) {
+		for (BackupFile f : list) {
 			filenames.add(f.getName());
 		}
 		Collections.sort(filenames);
@@ -730,35 +729,38 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		builder.setPositiveButton(R.string.action_select, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
-				CharSequence sequence = null;
-				for (int i = 0; i < sequences.length; i++) {
-					if (sel.get(i)) {
-						sequence = sequences[i];
-					}
-				}
-				Timber.i("On accept: " + sequence);
-				if (sequence == null) {
-					Toast.makeText(builder.getContext(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
-					return;
-				}
+				Timber.e("TODO: Implement");
+				/**
+				 SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
+				 CharSequence sequence = null;
+				 for (int i = 0; i < sequences.length; i++) {
+				 if (sel.get(i)) {
+				 sequence = sequences[i];
+				 }
+				 }
+				 Timber.i("On accept: " + sequence);
+				 if (sequence == null) {
+				 Toast.makeText(builder.getContext(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
+				 return;
+				 }
 
-				File file = new File(new FileManager(MainActivity.this).getNoteBackupDir(), sequence.toString());
-				Timber.i("Assumed backup File: " + file.getAbsolutePath() + " - Exists: " + file.exists());
+				 BackupFile file = new BackupFile(new FileManager(MainActivity.this).getNoteBackupDir(), sequence.toString());
+				 Timber.i("Assumed backup File: " + file.getAbsolutePath() + " - Exists: " + file.exists());
 
-				if (!file.exists()) {
-					Timber.e("Failed to set up a selected file! This file does not exist: " + file.getAbsolutePath());
-					Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-					return;
-				}
+				 if (!file.exists()) {
+				 Timber.e("Failed to set up a selected file! This file does not exist: " + file.getAbsolutePath());
+				 Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+				 return;
+				 }
 
-				try {
-					requestBackupImportMenuConfirmFile(file);
-				} catch (Exception e) {
-					e.printStackTrace();
-					Timber.e(e);
-					Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-				}
+				 try {
+				 requestBackupImportMenuConfirmFile(file);
+				 } catch (Exception e) {
+				 e.printStackTrace();
+				 Timber.e(e);
+				 Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+				 }
+				 **/
 			}
 		});
 		builder.setNeutralButton(R.string.action_external_file, new DialogInterface.OnClickListener() {
@@ -1027,7 +1029,9 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 					if (fileSelectionSuccess) {
 						try {
-							requestBackupImportMenuConfirmFile(new File(path));
+							// TODO check this
+							Timber.e("TODO: Implement");
+							// requestBackupImportMenuConfirmFile(new BackupFile(uri, path,0 ));
 						} catch (Exception e) {
 							e.printStackTrace();
 							Timber.e(e);
