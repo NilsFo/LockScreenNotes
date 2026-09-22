@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.view.MenuCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
@@ -300,6 +301,9 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 			MenuItem menuURL = menu.findItem(R.id.action_card_open_url);
 			MenuItem menuPhone = menu.findItem(R.id.action_card_open_phone);
 			MenuItem menuMail = menu.findItem(R.id.action_card_open_mail);
+
+			// Adding separators based on group
+			MenuCompat.setGroupDividerEnabled(menu, true);
 
 			if (!contentAnalyzer.containsURL()) {
 				Timber.i("Disabling URL menu item.");

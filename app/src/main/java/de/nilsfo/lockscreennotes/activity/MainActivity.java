@@ -30,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
+import androidx.core.view.MenuCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -877,8 +878,16 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+
+		// Adding separators based on group
+		MenuCompat.setGroupDividerEnabled(menu, true);
+
+		// After inflation, we receive the permission menu item to display the balloon later
 		checkAppPermissionItem = menu.findItem(R.id.action_notification_permissions);
 		updateNotificationPermissionMenuItem();
+
+		// TODO check if the 'action_review_permissions' menu item needs
+		//  special care for light / dark mode
 
 		return true;
 	}

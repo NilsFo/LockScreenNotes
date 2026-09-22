@@ -30,6 +30,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
+import androidx.core.view.MenuCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -278,6 +279,9 @@ public class EditNoteActivity extends NotesActivity {
 		menuURL = menu.findItem(R.id.action_open_url);
 		menuPhone = menu.findItem(R.id.action_open_phone);
 		menuMail = menu.findItem(R.id.action_open_mail);
+
+		// Adding separators based on group
+		MenuCompat.setGroupDividerEnabled(menu, true);
 
 		if (LockScreenNotes.isDarkMode(this)) {
 			menu.findItem(R.id.action_clear).setIcon(AppCompatResources.getDrawable(this, R.drawable.ic_clear_white_24dp));

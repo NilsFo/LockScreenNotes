@@ -9,28 +9,34 @@
         android:title="@string/action_review_permissions"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_delete_all"
-        android:title="@string/action_delete_all"
-        app:showAsAction="never" />
+    <group android:id="@+id/menu_main_group_delete">
+        <item
+            android:id="@+id/action_delete_all"
+            android:title="@string/action_delete_all"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_delete_all_disabled"
-        android:title="@string/action_delete_all_disabled"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_delete_all_disabled"
+            android:title="@string/action_delete_all_disabled"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_disable_all"
-        android:title="@string/action_disable_all"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_disable_all"
+            android:title="@string/action_disable_all"
+            app:showAsAction="never" />
+    </group>
 
-    <item
-        android:id="@+id/action_backup"
-        android:title="@string/action_backup"
-        app:showAsAction="never" />
+    <group android:id="@+id/menu_main_group_backup">
+        <item
+            android:id="@+id/action_backup"
+            android:title="@string/action_backup"
+            app:showAsAction="never" />
+    </group>
 
-    <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+    <group android:id="@+id/menu_main_group_settings">
+        <item
+            android:id="@+id/action_settings"
+            android:title="@string/action_settings"
+            app:showAsAction="never" />
+    </group>
 </menu>

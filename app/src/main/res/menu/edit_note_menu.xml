@@ -1,54 +1,66 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context="de.nilsfo.lockscreennotes.activity.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.nilsfo.lockscreennotes.activity.MainActivity">
 
-    <item
-        android:id="@+id/action_clear"
-        android:icon="@drawable/baseline_clear_black_24"
-        android:title="@string/action_clear"
-        app:showAsAction="ifRoom"/>
+    <group android:id="@+id/menu_edit_group_clear">
+        <item
+            android:id="@+id/action_clear"
+            android:icon="@drawable/baseline_clear_black_24"
+            android:title="@string/action_clear"
+            app:showAsAction="ifRoom" />
+    </group>
 
-    <item
-        android:id="@+id/action_share"
-        android:title="@string/action_share"
-        android:icon="@drawable/baseline_share_black_24"
-        app:showAsAction="ifRoom"/>
+    <group android:id="@+id/menu_edit_group_share">
+        <item
+            android:id="@+id/action_share"
+            android:icon="@drawable/baseline_share_black_24"
+            android:title="@string/action_share"
+            app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_copy_note"
-        android:title="@string/action_copy_text"
-        android:icon="@drawable/outline_file_copy_black_24"
-        app:showAsAction="ifRoom"/>
+        <item
+            android:id="@+id/action_copy_note"
+            android:icon="@drawable/outline_file_copy_black_24"
+            android:title="@string/action_copy_text"
+            app:showAsAction="ifRoom" />
+    </group>
 
-    <item
-        android:id="@+id/action_move_to_bottom"
-        android:title="@string/action_move_to_bottom"
-        app:showAsAction="never"/>
+    <group android:id="@+id/menu_edit_group_move">
+        <item
+            android:id="@+id/action_move_to_bottom"
+            android:title="@string/action_move_to_bottom"
+            app:showAsAction="never" />
+    </group>
 
-    <item
-        android:id="@+id/action_open_url"
-        android:title="@string/action_open_weblinks"
-        app:showAsAction="never"/>
+    <group android:id="@+id/menu_edit_group_external_content">
+        <item
+            android:id="@+id/action_open_url"
+            android:title="@string/action_open_weblinks"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_open_phone"
-        android:title="@string/action_open_phone"
-        app:showAsAction="never"/>
+        <item
+            android:id="@+id/action_open_phone"
+            android:title="@string/action_open_phone"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_open_mail"
-        android:title="@string/action_open_mail"
-        app:showAsAction="never"/>
+        <item
+            android:id="@+id/action_open_mail"
+            android:title="@string/action_open_mail"
+            app:showAsAction="never" />
+    </group>
 
-    <item
-        android:id="@+id/action_to_qr_code"
-        android:title="@string/action_to_qr_code"
-        app:showAsAction="never"/>
+    <group android:id="@+id/menu_edit_group_qr">
+        <item
+            android:id="@+id/action_to_qr_code"
+            android:title="@string/action_to_qr_code"
+            app:showAsAction="never" />
+    </group>
 
-    <item
-        android:id="@+id/action_cancel_edit"
-        android:title="@string/action_cancel_edit"
-        app:showAsAction="never"/>
+    <group android:id="@+id/menu_edit_group_cancel">
+        <item
+            android:id="@+id/action_cancel_edit"
+            android:title="@string/action_cancel_edit"
+            app:showAsAction="never" />
+    </group>
 
 </menu>
