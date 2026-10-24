@@ -1,7 +1,7 @@
 package de.nilsfo.lockscreennotes.activity;
 
+import static android.widget.Toast.LENGTH_LONG;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.PREFS_TAG;
-import static de.nilsfo.lockscreennotes.LockScreenNotes.REQUEST_CODE_INTENT_EXTERNAL_SEARCH;
 import static de.nilsfo.lockscreennotes.LockScreenNotes.isDarkMode;
 
 import android.app.Activity;
@@ -9,14 +9,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.OpenableColumns;
 import android.text.TextUtils;
-import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -48,12 +51,13 @@ import com.skydoves.balloon.OnBalloonClickListener;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -66,7 +70,10 @@ import de.nilsfo.lockscreennotes.data.content.browse.NoteContentBrowseDialogURLs
 import de.nilsfo.lockscreennotes.io.FileManager;
 import de.nilsfo.lockscreennotes.io.StoragePermissionManager;
 import de.nilsfo.lockscreennotes.io.backups.BackupFile;
+import de.nilsfo.lockscreennotes.io.backups.BackupLocationStore;
 import de.nilsfo.lockscreennotes.io.backups.BackupManager;
+import de.nilsfo.lockscreennotes.io.backups.BackupStorageState;
+import de.nilsfo.lockscreennotes.io.backups.SafBackupStorage;
 import de.nilsfo.lockscreennotes.sql.DBAdapter;
 import de.nilsfo.lockscreennotes.util.NoteSharer;
 import de.nilsfo.lockscreennotes.util.NotesNotificationManager;
@@ -105,6 +112,85 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	private MenuItem checkAppPermissionItem;
 	private Balloon checkNotificationPermissionBalloon;
 	private PermissionBalloonTimer permissionBalloonTimer;
+
+	// ########################################################################################
+
+	private final ActivityResultLauncher<String[]> backupFileLauncher =
+			registerForActivityResult(
+					new ActivityResultContracts.OpenDocument(),
+					uri -> {
+						if (uri == null) {
+							// User canceled the picker.
+							return;
+						}
+
+						BackupFile file = new BackupFile(
+								uri,
+								getSelectedDocumentName(uri),
+								0L
+						);
+
+						try {
+							requestBackupImportMenuConfirmFile(file);
+						} catch (IOException | SecurityException e) {
+							Timber.e(e, "Unable to read selected backup");
+							Toast.makeText(this, R.string.error_backup_file_access_failed, LENGTH_LONG).show();
+						} catch (JSONException e) {
+							Timber.e(e, "Invalid backup JSON");
+							Toast.makeText(this, R.string.error_invalid_file_format, LENGTH_LONG).show();
+						}
+					}
+			);
+
+
+	private final ActivityResultLauncher<Intent> backupFolderLauncher =
+			registerForActivityResult(
+					new ActivityResultContracts.StartActivityForResult(),
+					result -> {
+						Intent data = result.getData();
+
+						if (result.getResultCode() == RESULT_CANCELED) {
+							Toast.makeText(this, R.string.error_backup_setup_cancel, LENGTH_LONG).show();
+							return;
+						}
+
+						if (result.getResultCode() != RESULT_OK || data == null) {
+							Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
+							return;
+						}
+
+						Uri uri = data.getData();
+						if (uri == null) {
+							Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
+							return;
+						}
+
+						int flags = data.getFlags()
+								& (Intent.FLAG_GRANT_READ_URI_PERMISSION
+								| Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+						boolean uriSavingFailed = false;
+						try {
+							getContentResolver().takePersistableUriPermission(uri, flags);
+							Timber.i("Path selected: " + uri.getPath());
+							new BackupLocationStore(this).setTreeUri(uri);
+						} catch (SecurityException e) {
+							Timber.e(e);
+							uriSavingFailed = true;
+						}
+
+						if (uriSavingFailed) {
+							new BackupLocationStore(this).clearTreeUri();
+							Toast.makeText(this, R.string.error_file_access_error, LENGTH_LONG).show();
+						} else {
+							Toast.makeText(this, R.string.new_backup_folder_configured, LENGTH_LONG).show();
+						}
+					}
+			);
+
+	// ########################################################################################
+	// METHODS BEGIN HERE
+	// ########################################################################################
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -237,6 +323,8 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	}
 
 	private void onTutorialCBclicked(boolean isChecked) {
+		// TODO rename this function and check diff
+
 		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
 		editor.putBoolean(PREFS_HIDE_TUTORIAL, isChecked);
 		Timber.i("Changed the 'dont show tutorial again' prefs: " + isChecked);
@@ -251,17 +339,17 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	public void requestRecoverNote(Note note) {
 		try {
 			addNewNote(note);
-			Toast.makeText(this, getString(R.string.info_note_recovered, getNoteSnackBarPreview(note)), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.info_note_recovered, getNoteSnackBarPreview(note)), LENGTH_LONG).show();
 		} catch (Exception e) {
 			Timber.e(e, "Failed to add note " + note.getTextPreview() + " to the database!");
-			Toast.makeText(this, R.string.error_note_save_failed, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_note_save_failed, LENGTH_LONG).show();
 		}
 	}
 
 	public void requestDeleteNote(long databaseID) {
 		final Note note = Note.getNoteFromDB(databaseID, databaseAdapter);
 		if (note == null) {
-			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
 			return;
 		}
 
@@ -317,7 +405,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 	private void requestDeleteAll() {
 		if (Note.getAllNotesFromDB(databaseAdapter).isEmpty()) {
-			Toast.makeText(this, R.string.error_no_note_to_delete, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_no_note_to_delete, LENGTH_LONG).show();
 			return;
 		}
 
@@ -364,7 +452,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		Timber.i("Disabling check. Count: " + disabledCount + " - ListSize: " + disabledList.size());
 
 		if (disabledCount == 0 || disabledList.isEmpty()) {
-			Toast.makeText(this, R.string.error_no_note_to_delete, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_no_note_to_delete, LENGTH_LONG).show();
 			return;
 		}
 
@@ -411,7 +499,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 
 		// All permissions granted.
-		Toast.makeText(this, R.string.info_review_notification_permissions_granted, Toast.LENGTH_LONG).show();
+		Toast.makeText(this, R.string.info_review_notification_permissions_granted, LENGTH_LONG).show();
 	}
 
 	public void showPermissionDialogNotification() {
@@ -431,7 +519,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 						notesNotificationManager.requestPermissionRationale(activity);
 					} catch (Exception e) {
 						Timber.e(e);
-						Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+						Toast.makeText(activity, R.string.error_internal_error, LENGTH_LONG).show();
 					}
 				}
 			});
@@ -446,7 +534,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 						startActivity(intent);
 					} catch (Exception e) {
 						Timber.e(e);
-						Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+						Toast.makeText(activity, R.string.error_internal_error, LENGTH_LONG).show();
 					}
 				}
 			});
@@ -462,7 +550,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 					startActivity(intent);
 				} catch (Exception e) {
 					Timber.e(e);
-					Toast.makeText(activity, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+					Toast.makeText(activity, R.string.error_internal_error, LENGTH_LONG).show();
 				}
 			}
 		});
@@ -483,41 +571,202 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	}
 
 	private void requestBackupMenu() {
+		// debug:
+		// new BackupLocationStore(this).clearTreeUri();
+
 		BackupManager backupManager = new BackupManager(this);
-		StoragePermissionManager storagePermissionManager = new StoragePermissionManager(this);
-		boolean hasExternalStoragePermission = storagePermissionManager.hasExternalStoragePermission();
-		Timber.i("Has external Storage Permission: %s", hasExternalStoragePermission);
+		BackupStorageState storageState = backupManager.getStorageState();
+		Timber.i("FYI: Current storage state is: %s", storageState);
 
-		// Checking if external permissions are granted
-		if (!hasExternalStoragePermission) {
-			Toast.makeText(this, R.string.warning_no_storage_permission, Toast.LENGTH_LONG).show();
-			storagePermissionManager.requestExternalStoragePermission(this);
-			return;
+		// Debug info
+		BackupLocationStore store = new BackupLocationStore(this);
+		Uri uri = store.getTreeUri();
+		if (uri != null) {
+			Timber.i("Uri (all): " + uri);
+			Timber.i("Uri (Path): " + uri.getPath());
+			Timber.i("Uri (Encoded): " + uri.getEncodedPath());
+			Timber.i("Uri (Last Segment): " + uri.getLastPathSegment());
+			Timber.i("Uri (Authority): " + uri.getAuthority());
+			Timber.i("Uri (Host): " + uri.getHost());
+			Timber.i("Uri (human readable): " + store.getHumanReadableURI());
 		}
 
-		String backupCount = getString(R.string.info_number_not_available);
-		String lastBackup = getString(R.string.info_number_not_available);
-		try {
-			if (backupManager.hasBackupsMade()) {
-				BackupFile latestBackupFile = backupManager.getLatestBackupFile();
-
-				if (latestBackupFile != null) {
-					backupCount = String.valueOf(backupManager.findBackupFiles().size());
-					long l = latestBackupFile.getLastModified();
-					lastBackup = new TimeUtils(this).formatDateAccordingToPreferences(l);
-				}
-			}
-		} catch (IOException e) {
-			Toast.makeText(this, R.string.error_external_permissions_require_upgrade, Toast.LENGTH_LONG).show();
-			storagePermissionManager.requestExternalStoragePermission(this);
-			return;
+		switch (storageState) {
+			case NOT_CONFIGURED:
+				requestBackupMenuNotConfigured();
+				break;
+			case AVAILABLE:
+				requestBackupMenuAvailable();
+				break;
+			case PERMISSION_LOST:
+				requestBackupMenuPermissionLost();
+				break;
+			case LOCATION_UNAVAILABLE:
+				requestBackupMenuUnavailable();
+				break;
+			case READ_ONLY:
+				requestBackupMenuReadOnly();
+				break;
+			default:
+				Timber.e("The ");
+				Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
+				break;
 		}
+	}
 
-		FileManager manager = new FileManager(this);
+	private void requestBackupMenuNotConfigured() {
+		Timber.i("Backup storage has not been configured yet. Prompting the user to do so.");
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.action_backup);
 		builder.setIcon(R.mipmap.ic_launcher);
-		builder.setMessage(getString(R.string.action_backup_info, manager.getNoteBackupDir().getAbsolutePath(), backupCount, lastBackup));
+		String msg = "To set up automatic updates, you need to specify a directory. " +
+				"This folder will be a permanent locations for backups to be stored in.\n" +
+				"Backups are persistent and will remain after the app has been uninstalled.\n\n" +
+				"If you have backups from a previous installation, you can restore from those instead.";
+		// TODO export to strings xml
+		builder.setMessage(msg);
+
+		// Negative button: Cancel
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+
+		// Positive button: Choose backup folder
+		builder.setPositiveButton(R.string.action_set_up_backup_directory, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+				requestBackupDirectorySelection();
+			}
+		});
+
+		builder.show();
+	}
+
+	private void requestBackupMenuPermissionLost() {
+		getBackupMenuResetErrorDialog(
+				R.string.reason_backup_error_uri_permission_lost
+		);
+	}
+
+	private void requestBackupMenuUnavailable() {
+		getBackupMenuResetErrorDialog(
+				R.string.reason_backup_error_uri_unavailable
+		);
+	}
+
+	private void requestBackupMenuReadOnly() {
+		getBackupMenuResetErrorDialog(
+				R.string.reason_backup_error_uri_read_only
+		);
+	}
+
+	private void getBackupMenuResetErrorDialog(int msg_id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_review_notification_permissions);
+
+		BackupLocationStore backupLocationStore = new BackupLocationStore(this);
+		Uri uri = backupLocationStore.getTreeUri();
+		String path = getString(R.string.error_unknown);
+
+		if (uri == null) {
+			Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
+			Timber.e("Failed to get stored path from URI. What is up here?");
+		} else {
+			path = backupLocationStore.getHumanReadableURI();
+		}
+
+		String error_reason = getString(msg_id);
+		String message = getString(R.string.reason_backup_error_base_msg, error_reason, path);
+		builder.setMessage(message);
+
+		int icon = R.drawable.warning_black_48;
+		if (isDarkMode(this)) {
+			icon = R.drawable.warning_white_48;
+		}
+		builder.setIcon(icon);
+
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+
+		builder.setPositiveButton(R.string.action_set_up_backup_directory, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+				requestBackupDirectorySelection();
+			}
+		});
+
+		builder.show();
+	}
+
+	private void requestBackupDirectorySelection() {
+		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+		intent.addFlags(
+				Intent.FLAG_GRANT_READ_URI_PERMISSION
+						| Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+						| Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+						| Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+		);
+
+		backupFolderLauncher.launch(intent);
+	}
+
+	/**
+	 * The basic "home" node for the backup action-flow.
+	 */
+	private void requestBackupMenuAvailable() {
+		SafBackupStorage backupStorage = new SafBackupStorage(this);
+		BackupLocationStore backupLocationStore = new BackupLocationStore(this);
+
+		if (backupStorage.getState() != BackupStorageState.AVAILABLE) {
+			// How did we get here, if the state is not available?
+			Timber.e("Cannot open the available menu, if the storage is not available.");
+			Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
+			// TODO show more elaborate error msg
+			return;
+		}
+
+		List<BackupFile> backupFilesList = null;
+		try {
+			backupFilesList = backupStorage.findBackups();
+		} catch (IOException e) {
+			Timber.e(e);
+			Toast.makeText(this, R.string.error_backup_directory_access_failed, LENGTH_LONG).show();
+			return;
+		}
+
+		ArrayList<BackupFile> sortedList = new ArrayList<>(backupFilesList);
+		Collections.sort(sortedList, new Comparator<BackupFile>() {
+			@Override
+			public int compare(BackupFile o1, BackupFile o2) {
+				return Long.compare(o1.getLastModified(), o2.getLastModified());
+			}
+		});
+
+		String backupCount = String.valueOf(backupFilesList.size());
+		BackupFile latestBackupFile = null;
+		String lastBackupTimeStamp = getString(R.string.info_number_not_available);
+
+		if (!backupFilesList.isEmpty()) {
+			latestBackupFile = sortedList.get(sortedList.size() - 1);
+			long l = latestBackupFile.getLastModified();
+			lastBackupTimeStamp = new TimeUtils(this).formatDateAccordingToPreferences(l);
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.action_backup);
+		builder.setIcon(R.mipmap.ic_launcher);
+		builder.setMessage(getString(R.string.action_backup_info, backupLocationStore.getHumanReadableURI(), backupCount, lastBackupTimeStamp));
+
 		builder.setPositiveButton(R.string.action_create_backup, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -538,26 +787,47 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				dialog.cancel();
 			}
 		});
+
 		builder.show();
 	}
 
+	/**
+	 * Creates a new backup file and writes it to the user selected directory
+	 */
 	public void requestBackupExport() {
 		BackupManager backupManager = new BackupManager(this);
 		BackupFile backupFile;
 		try {
 			backupFile = backupManager.createAndWriteBackup();
 		} catch (JSONException | IOException e) {
+			// TODO show different error msgs based on what exception has been caught
+			// TODO also check possible nested exceptions
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_action_export, Toast.LENGTH_LONG).show();
 			return;
 		}
-
 		Timber.i("Everything saved! -> %s", backupFile.getName());
 		Toast.makeText(this, R.string.action_export_success, Toast.LENGTH_LONG).show();
 	}
 
+	/**
+	 * Root node for the decision to import backup. This node splits into two user decisions:
+	 * 1) No backup file exists in selected directory. So we automatically run {@link #requestBackupImportChoose}.
+	 * 2)
+	 */
 	public void requestBackupImportMenu() {
+		SafBackupStorage backupStorage = new SafBackupStorage(this);
+		if (backupStorage.getState() != BackupStorageState.AVAILABLE) {
+			// How did we get here, if the state is not available?
+			Timber.e("Cannot open the import menu, if the storage is not available.");
+			String reason = getString(R.string.error_backup_directory_access_failed);
+			Toast.makeText(this, getString(R.string.action_backup_directory_access_failed_so_manually_choose, reason), LENGTH_LONG).show();
+			requestBackupImportChoose();
+			return;
+		}
+
+		// We now search the backup directory for the lastest created backup file
 		BackupManager manager = new BackupManager(this);
 		BackupFile f = null;
 		try {
@@ -565,15 +835,23 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		} catch (IOException e) {
 			e.printStackTrace();
 			Timber.e(e);
-			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
+
+			String reason = getString(R.string.error_backup_directory_access_failed);
+			Toast.makeText(this, getString(R.string.action_backup_directory_access_failed_so_manually_choose, reason), LENGTH_LONG).show();
+
+			requestBackupImportChoose();
 			return;
 		}
 
+		// If there are no files to import, we'll prompt the user to select a file
 		if (f == null) {
-			Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
-			requestBackupImportExternal();
+			String reason = getString(R.string.error_no_backup);
+			Toast.makeText(this, getString(R.string.action_backup_directory_access_failed_so_manually_choose, reason), LENGTH_LONG).show();
+			requestBackupImportChoose();
 			return;
 		}
+
+		// We have found a file. We now prompt the user if they want to import it
 		try {
 			requestBackupImportMenuConfirmFile(f);
 		} catch (Exception e) {
@@ -583,7 +861,15 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		}
 	}
 
-	public void requestBackupImportMenuConfirmFile(final BackupFile file) throws IOException, JSONException, StoragePermissionManager.InsufficientStoragePermissionException {
+	/**
+	 * We present a backup file to the user. The user can decide if they want to import it.
+	 *
+	 * @param file The path to the file
+	 * @throws IOException
+	 * @throws JSONException
+	 */
+	public void requestBackupImportMenuConfirmFile(final BackupFile file)
+			throws JSONException, IOException {
 		BackupManager manager = new BackupManager(this);
 		BackupManager.BackupMetaData metaData = manager.getMetaData(file);
 
@@ -598,6 +884,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		builder.setTitle(R.string.action_import_backup);
 		builder.setIcon(R.mipmap.ic_launcher);
 		builder.setMessage(msg.trim());
+
 		builder.setPositiveButton(R.string.action_import_this, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -605,6 +892,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				requestBackupImportMenuConfirmData(file);
 			}
 		});
+
 		builder.setNeutralButton(R.string.action_different_file, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -612,15 +900,27 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				requestBackupImportChoose();
 			}
 		});
+
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.cancel();
 			}
 		});
+
 		builder.show();
 	}
 
+	/**
+	 * The user has picked a file to import. If the user has no notes currently, import will be
+	 * done instantly. If they have at least one note, they will be asked:
+	 * <p>
+	 * 1) Merge? (all imported notes are added to existing list of notes)
+	 * <p>
+	 * 2) Override (deletes all current nodes and then adds the imported ones)
+	 *
+	 * @param source The file to read notes from
+	 */
 	public void requestBackupImportMenuConfirmData(BackupFile source) {
 		BackupManager manager = new BackupManager(this);
 		final ArrayList<Note> list;
@@ -629,20 +929,16 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		} catch (IOException e) {
 			e.printStackTrace();
 			Timber.e(e);
-			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_backup_directory_access_failed, Toast.LENGTH_LONG).show();
 			return;
 		} catch (JSONException e) {
 			e.printStackTrace();
 			Timber.e(e);
 			Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
 			return;
-		}//catch ( StoragePermissionManager.InsufficientStoragePermissionException e) {
-		//	e.printStackTrace();
-		//	Timber.e(e);
-		//	Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
-		//	return;
-		//
+		}
 
+		// No notes currently exist. We add all read notes and we are done here.
 		Timber.i("Found " + list.size() + " notes in file: " + Arrays.toString(list.toArray()));
 		int currentNoteCount = databaseAdapter.getAllRows().getCount();
 		if (currentNoteCount == 0) {
@@ -650,6 +946,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 			return;
 		}
 
+		// Building notes summary
 		String summary = "";
 		for (Note n : list) {
 			summary = "-" + n.getTextPreview(IMPORT_NOTE_PREVIEW_SIZE) + "\n" + summary;
@@ -660,12 +957,14 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		builder.setTitle(R.string.action_import_choose);
 		builder.setIcon(R.mipmap.ic_launcher);
 		builder.setMessage(getString(R.string.action_backup_import_replace_confirm, String.valueOf(currentNoteCount), String.valueOf(list.size()), summary));
+
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.cancel();
 			}
 		});
+
 		builder.setPositiveButton(R.string.action_replace, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -673,122 +972,25 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				addNewNote(list);
 			}
 		});
+
 		builder.setNeutralButton(R.string.action_merge, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				addNewNote(list);
 			}
 		});
+
 		builder.show();
 	}
 
+	/**
+	 * The app failed to auto-select a notes backup file, or it was rejected by the user.
+	 * We now open a file browser for the user to pick a file themselves.
+	 */
 	public void requestBackupImportChoose() {
-		BackupManager manager = new BackupManager(this);
-		ArrayList<BackupFile> list = null;
-		try {
-			list = manager.findBackupFiles();
-		} catch (IOException e) {
-			e.printStackTrace();
-			Timber.e(e);
-			Toast.makeText(this, R.string.error_no_external_storage_permissions, Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		switch (list.size()) {
-			case 0:
-				Toast.makeText(this, R.string.error_no_backup, Toast.LENGTH_LONG).show();
-				requestBackupImportExternal();
-				return;
-			case 1:
-				Toast.makeText(this, R.string.error_only_one_backup, Toast.LENGTH_LONG).show();
-				requestBackupImportExternal();
-				return;
-		}
-
-		ArrayList<String> filenames = new ArrayList<>();
-		for (BackupFile f : list) {
-			filenames.add(f.getName());
-		}
-		Collections.sort(filenames);
-		Collections.reverse(filenames);
-		final CharSequence[] sequences = new CharSequence[filenames.size()];
-		for (int i = 0; i < filenames.size(); i++) {
-			sequences[i] = filenames.get(i);
-		}
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.action_import_choose);
-		builder.setIcon(R.mipmap.ic_launcher);
-		builder.setSingleChoiceItems(sequences, 0, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
-				Timber.v("File(s) selection updated: " + sel);
-			}
-		});
-		builder.setPositiveButton(R.string.action_select, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Timber.e("TODO: Implement");
-				/**
-				 SparseBooleanArray sel = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
-				 CharSequence sequence = null;
-				 for (int i = 0; i < sequences.length; i++) {
-				 if (sel.get(i)) {
-				 sequence = sequences[i];
-				 }
-				 }
-				 Timber.i("On accept: " + sequence);
-				 if (sequence == null) {
-				 Toast.makeText(builder.getContext(), R.string.error_internal_error, Toast.LENGTH_LONG).show();
-				 return;
-				 }
-
-				 BackupFile file = new BackupFile(new FileManager(MainActivity.this).getNoteBackupDir(), sequence.toString());
-				 Timber.i("Assumed backup File: " + file.getAbsolutePath() + " - Exists: " + file.exists());
-
-				 if (!file.exists()) {
-				 Timber.e("Failed to set up a selected file! This file does not exist: " + file.getAbsolutePath());
-				 Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-				 return;
-				 }
-
-				 try {
-				 requestBackupImportMenuConfirmFile(file);
-				 } catch (Exception e) {
-				 e.printStackTrace();
-				 Timber.e(e);
-				 Toast.makeText(MainActivity.this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
-				 }
-				 **/
-			}
-		});
-		builder.setNeutralButton(R.string.action_external_file, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				requestBackupImportExternal();
-			}
-		});
-		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-		builder.show();
-	}
-
-	private void requestBackupImportExternal() {
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("*/*");
-		intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-		try {
-			startActivityForResult(
-					Intent.createChooser(intent, getString(R.string.action_import_choose)), REQUEST_CODE_INTENT_EXTERNAL_SEARCH);
-		} catch (android.content.ActivityNotFoundException ex) {
-			Toast.makeText(this, R.string.error_no_file_manager, Toast.LENGTH_SHORT).show();
-		}
+		Timber.i("Opening a file browser for the user to select a file.");
+		Toast.makeText(this, R.string.hint_select_backup_file, LENGTH_LONG).show();
+		backupFileLauncher.launch(new String[]{"application/json"});
 	}
 
 	private void deleteNote(long id) {
@@ -923,6 +1125,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		int balloonTextColor = getResources().getColor(android.R.color.primary_text_dark);
 		checkNotificationPermissionBalloon = new Balloon.Builder(this)
+				// TODO derive margins, paddings, etc from layout xml files
 				.setArrowSize(10)
 				.setArrowOrientation(ArrowOrientation.TOP)
 				.setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
@@ -990,64 +1193,65 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 				return true;
 			default:
 				Timber.w("Unknown menu item pressed.");
-				Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
 		}
 
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Timber.i("Got an Activity result intent! Code: " + requestCode + " Data: " + data);
-		switch (requestCode) {
-			case REQUEST_CODE_INTENT_EXTERNAL_SEARCH:
-				if (resultCode == RESULT_OK) {
-					Timber.i("Haha, it was an file searcher result, all along!");
-					Uri uri = data.getData();
-					Timber.i("File Uri: " + uri.toString());
-					String path = null;
-					boolean fileSelectionSuccess = true;
-					try {
-						path = new FileManager(this).getPath(uri);
-						Timber.i("File Path: " + path);
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
-						Timber.e(e);
-						fileSelectionSuccess = false;
-					}
-
-					if (!fileSelectionSuccess) {
-						// TOOD handle this
-					}
-
-					if (path == null && fileSelectionSuccess) {
-						// Path is null. Looks like the file was not found?
-						Timber.e("Error! The file path is NULL!");
-						//TODO handle this!
-						break;
-					}
-
-					if (fileSelectionSuccess) {
-						try {
-							// TODO check this
-							Timber.e("TODO: Implement");
-							// requestBackupImportMenuConfirmFile(new BackupFile(uri, path,0 ));
-						} catch (Exception e) {
-							e.printStackTrace();
-							Timber.e(e);
-							Toast.makeText(this, R.string.error_invalid_file_format, Toast.LENGTH_LONG).show();
-						}
-					} else {
-						// File selector failed
-						// TODO Handle this
-					}
-				} else {
-					// TODO what if not OK?
-				}
-				break;
-		}
-		super.onActivityResult(requestCode, resultCode, data);
-	}
+	/**
+	 * @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	 * Timber.i("Got an Activity result intent! Code: " + requestCode + " Data: " + data);
+	 * switch (requestCode) {
+	 * case REQUEST_CODE_INTENT_EXTERNAL_SEARCH:
+	 * if (resultCode == RESULT_OK) {
+	 * Timber.i("Haha, it was an file searcher result, all along!");
+	 * Uri uri = data.getData();
+	 * Timber.i("File Uri: " + uri.toString());
+	 * String path = null;
+	 * boolean fileSelectionSuccess = true;
+	 * try {
+	 * path = new FileManager(this).getPath(uri);
+	 * Timber.i("File Path: " + path);
+	 * } catch (URISyntaxException e) {
+	 * e.printStackTrace();
+	 * Timber.e(e);
+	 * fileSelectionSuccess = false;
+	 * }
+	 * <p>
+	 * if (!fileSelectionSuccess) {
+	 * // TOOD handle this
+	 * }
+	 * <p>
+	 * if (path == null && fileSelectionSuccess) {
+	 * // Path is null. Looks like the file was not found?
+	 * Timber.e("Error! The file path is NULL!");
+	 * //TODO handle this!
+	 * break;
+	 * }
+	 * <p>
+	 * if (fileSelectionSuccess) {
+	 * try {
+	 * // TODO check this
+	 * Timber.e("TODO: Implement");
+	 * // requestBackupImportMenuConfirmFile(new BackupFile(uri, path,0 ));
+	 * } catch (Exception e) {
+	 * e.printStackTrace();
+	 * Timber.e(e);
+	 * Toast.makeText(this, R.string.error_invalid_file_format, LENGTH_LONG).show();
+	 * }
+	 * } else {
+	 * // File selector failed
+	 * // TODO Handle this
+	 * }
+	 * } else {
+	 * // TODO what if not OK?
+	 * }
+	 * break;
+	 * }
+	 * super.onActivityResult(requestCode, resultCode, data);
+	 * }
+	 **/
 
 	@Override
 	protected void onPause() {
@@ -1086,7 +1290,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 		Note note = Note.getNoteFromDB(noteID, databaseAdapter);
 
 		if (note == null) {
-			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
 			return;
 		}
 
@@ -1115,7 +1319,7 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 	public void onCardNoteToggleImagePressed(long noteID) {
 		Note note = Note.getNoteFromDB(noteID, databaseAdapter);
 		if (note == null) {
-			Toast.makeText(this, R.string.error_internal_error, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.error_internal_error, LENGTH_LONG).show();
 			return;
 		}
 
@@ -1162,4 +1366,34 @@ public class MainActivity extends NotesActivity implements Observer, NotesRecycl
 
 		noteRecyclerAdapter.refreshNotesList();
 	}
+
+	@NonNull
+	private String getSelectedDocumentName(@NonNull Uri uri) {
+		try (Cursor cursor = getContentResolver().query(
+				uri,
+				new String[]{OpenableColumns.DISPLAY_NAME},
+				null,
+				null,
+				null
+		)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				int index = cursor.getColumnIndex(
+						OpenableColumns.DISPLAY_NAME
+				);
+
+				if (index >= 0 && !cursor.isNull(index)) {
+					String name = cursor.getString(index);
+					if (name != null && !name.isEmpty()) {
+						return name;
+					}
+				}
+			}
+		} catch (RuntimeException e) {
+			Timber.w(e, "Could not retrieve document name");
+		}
+
+		String fallback = uri.getLastPathSegment();
+		return fallback != null ? fallback : "Selected backup";
+	}
+
 }

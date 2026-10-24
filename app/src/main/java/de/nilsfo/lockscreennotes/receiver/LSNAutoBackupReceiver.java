@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import de.nilsfo.lockscreennotes.util.TimeUtils;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
+@Deprecated
 public class LSNAutoBackupReceiver extends BroadcastReceiver {
 
 	@Override
@@ -114,7 +114,7 @@ public class LSNAutoBackupReceiver extends BroadcastReceiver {
 				}
 			} else {
 				Timber.w("Schedule received, but the user has not granted the permission to write the external storage!");
-				String errorText = context.getString(R.string.error_no_external_storage_permissions);
+				String errorText = context.getString(R.string.error_backup_directory_access_failed);
 				notificationManager.displayNotificationAutomaticBackup(false, errorText);
 			}
 

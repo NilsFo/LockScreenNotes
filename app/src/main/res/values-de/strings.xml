@@ -126,7 +126,6 @@
     <string name="pref_update_day_counter_summary">Letzte Aktualisierung war vor %1$s Tag(en).\nApp seitdem %2$s mal gestartet (%3$s mal seit Installation).</string>
     <string name="action_github_url_success">Feed URL in die Zwischenablage kopiert.</string>
     <string name="error_no_backup">Keine Backup-Datei in dem Standardpfad gefunden.</string>
-    <string name="action_different_file">Andere Datei importieren</string>
     <string name="action_backup_import_confirm">Bitte bestätigen. Möchten Sie die Daten aus dieser Datei importieren:\n%1$s\n\nZeitstempel: %2$s\nNotizen beinhaltet: %3$s\n\n%4$s</string>
     <string name="warning_backup_version_difference">Das Backup wurde mit einer anderen Version erstellt. Es könnte zu Problemen durch Kompatibilität führen.</string>
     <string name="action_import_this">Dies importieren</string>
@@ -163,7 +162,6 @@
     <string name="info_channel_auto_backup_description">Alle Benachrichtigungen, welche aufgrund von automatischen Backups angezeigt werden.</string>
     <string name="notification_auto_backup_success">Automatisches Backup erstellt</string>
     <string name="notification_auto_backup_failed">Automatisches Backup fehlgeschlagen</string>
-    <string name="error_no_external_storage_permissions">Die App hat keinen Zugriff auf den externen Speicher.</string>
     <string name="error_no_old_backup_files_deleted">Aber es konnten keine alten Backups gelöscht werden!</string>
     <string name="delete_dialog_content_multiple">Sollen diese %1$s Notizen wirklich gelöscht werden?</string>
     <string name="notification_auto_backup_next_detail">%1$s\nBackups bisher angelegt: %2$s.</string>

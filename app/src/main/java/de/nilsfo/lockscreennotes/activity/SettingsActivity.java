@@ -403,6 +403,12 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
 	public static class AutoBackupPreferenceFragment extends PreferenceFragmentCompat {
 
+		// TODO update description where backup path is
+
+		// TODO make user change backup path here
+
+		// TODO update main activity dialog text to tell user they can change backup path here
+
 		@Override
 		public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 			setPreferencesFromResource(R.xml.prefs_auto_backup, rootKey);

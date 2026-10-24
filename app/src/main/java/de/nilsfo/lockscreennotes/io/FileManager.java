@@ -19,6 +19,7 @@ import java.util.Date;
 import de.nilsfo.lsn.R;
 import timber.log.Timber;
 
+@Deprecated
 public class FileManager {
 
 	public static final String NO_MEDIA = ".nomedia";

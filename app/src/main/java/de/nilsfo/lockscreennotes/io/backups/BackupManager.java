@@ -3,6 +3,7 @@ package de.nilsfo.lockscreennotes.io.backups;
 import static de.nilsfo.lockscreennotes.io.backups.NoteJSONUtils.VERSION_NOT_AVAILABLE;
 
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -31,8 +33,7 @@ public class BackupManager {
 	public static final String FILENAME_BACKUP_BASE_NAME = "lsn_backup_";
 	public static final String FILENAME_BACKUP_EXTENSION = ".json";
 
-	private static final String FILENAME_TIMESTAMP_FORMATTER =
-			"yyyy_MM_dd-HH_mm_ss";
+	private static final String FILENAME_TIMESTAMP_FORMATTER = "yyyy_MM_dd-HH_mm_ss";
 
 	private final Context context;
 	private final BackupStorage storage;
@@ -44,9 +45,7 @@ public class BackupManager {
 		);
 	}
 
-	BackupManager(
-			@NonNull Context context,
-			@NonNull BackupStorage storage
+	private BackupManager(@NonNull Context context, @NonNull BackupStorage storage
 	) {
 		this.context = context.getApplicationContext();
 		this.storage = storage;
@@ -148,15 +147,24 @@ public class BackupManager {
 			return;
 		}
 
-		backups.sort(
-				Comparator.comparingLong(this::getBackupTimestamp)
-						.reversed()
-		);
+		// Compare backups based on LastModified.
+		// Depending on android version this might be more or less different / efficient
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			backups.sort(
+					Comparator.comparingLong(this::getBackupTimestamp)
+							.reversed()
+			);
+		} else {
+			Collections.sort(backups, new Comparator<BackupFile>() {
+				@Override
+				public int compare(BackupFile file1, BackupFile file2) {
+					return Long.compare(file1.getLastModified(), file2.getLastModified());
+					//return String.valueOf(file1.getLastModified()).compareTo(String.valueOf(file2.getLastModified()));
+				}
+			});
+		}
 
-		for (int i = AUTO_DELETE_MAX_FILE_COUNT;
-		     i < backups.size();
-		     i++) {
-
+		for (int i = AUTO_DELETE_MAX_FILE_COUNT; i < backups.size(); i++) {
 			BackupFile oldBackup = backups.get(i);
 
 			if (!storage.deleteBackup(oldBackup)) {
@@ -172,9 +180,7 @@ public class BackupManager {
 		try {
 			return getMetaData(backup).getTimestamp();
 		} catch (IOException | JSONException e) {
-			Timber.w(
-					e,
-					"Unable to read timestamp from %s; using provider timestamp.",
+			Timber.w(e, "Unable to read timestamp from %s; using provider timestamp.",
 					backup.getName()
 			);
 
@@ -185,7 +191,6 @@ public class BackupManager {
 	@NonNull
 	private JSONObject readBackupJson(@NonNull BackupFile backup)
 			throws IOException, JSONException {
-
 		return new JSONObject(storage.readBackup(backup));
 	}
 

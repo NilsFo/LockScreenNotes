@@ -148,7 +148,7 @@
     <string name="action_backup_import_confirm">Please confirm. Do you want to import data from this file:\n%1$s\n\nTimestamp: %2$s\nNotes included: %3$s\n%4$s</string>
     <string name="warning_backup_version_difference">The backup was created with another version. This might result in compatibility problems.</string>
     <string name="action_import_this">Import this</string>
-    <string name="error_only_one_backup">There is only one backup in the default directory.</string>
+    <string name="error_only_one_backup">There is only one backup in the selected directory.</string>
     <string name="action_import_choose">Choose a file to import</string>
     <string name="action_select">Select</string>
     <string name="error_invalid_file_format">Error: Invalid file format.</string>
@@ -180,7 +180,6 @@
     <string name="info_channel_auto_backup_description">All notifications that relate to automatic backups.</string>
     <string name="notification_auto_backup_success">Automatic backup created</string>
     <string name="notification_auto_backup_failed">Automatic backup failed</string>
-    <string name="error_no_external_storage_permissions">Failed to obtain permissions to access the external storage.</string>
     <string name="error_no_old_backup_files_deleted">But failed to delete old backup files!</string>
     <string name="notification_auto_backup_next_detail">%1$s\nTotal backups: %2$s.</string>
     <string name="notification_auto_backup_next">Next backup: %1$s.</string>
@@ -228,4 +227,16 @@
     <string name="error_failed_to_cancel_backup_alarm">Failed to stop / disable the backup schedule. This is a severe error. If this keeps happening, please contact the developer!</string>
     <string name="error_failed_to_setup_backup_alarm">Failed to set up the backup schedule. This is a severe error. If this keeps happening, please contact the developer!</string>
     <string name="content_description_activity_main_fab">Create new note</string>
+    <string name="error_file_access_error">Failed to obtain sufficient permissions for selected directory. Please try again or a different folder.</string>
+    <string name="error_backup_setup_cancel">Backup configuration canceled.</string>
+    <string name="new_backup_folder_configured">New backup folder configured.</string>
+    <string name="error_backup_directory_access_failed">Failed to access the backup directory.</string>
+    <string name="error_backup_file_access_failed">Failed to access the selected backup file.</string>
+    <string name="action_backup_directory_access_failed_so_manually_choose">%1$s You can manually select a backup file to use.</string>
+    <string name="reason_backup_error_uri_permission_lost">Permission lost for selected backup folder.</string>
+    <string name="reason_backup_error_uri_unavailable">Selected backup directory no longer available.</string>
+    <string name="reason_backup_error_uri_read_only">Backup directory is read only.</string>
+    <string name="reason_backup_error_base_msg">The selected directory for backups is no longer viable.\nReason: %1$s\n\nPreviously selected directory:\n%2$s\n\nIf this location is online, make sure your device has an active connection to it.\nIf this directory is no longer available, please select a different directory. You can attempt to re-select it to refresh permissions.</string>
+    <string name="action_set_up_backup_directory">Set up backup directory</string>
+    <string name="hint_select_backup_file">Please select a backup file to use.</string>
 </resources>

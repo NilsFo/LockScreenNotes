@@ -22,7 +22,6 @@ import java.util.List;
 
 public final class SafBackupStorage implements BackupStorage {
 
-	private static final String BACKUP_DIRECTORY_NAME = "lsn_backups";
 	private static final String MIME_TYPE_JSON = "application/json";
 
 	private final ContentResolver contentResolver;
@@ -48,9 +47,9 @@ public final class SafBackupStorage implements BackupStorage {
 		}
 
 		try {
-			Uri rootDocumentUri = getRootDocumentUri(treeUri);
+			Uri directoryUri = getRootDocumentUri(treeUri);
 
-			int flags = queryDocumentFlags(rootDocumentUri);
+			int flags = queryDocumentFlags(directoryUri);
 
 			if (flags == -1) {
 				return BackupStorageState.LOCATION_UNAVAILABLE;
@@ -73,17 +72,16 @@ public final class SafBackupStorage implements BackupStorage {
 	@NonNull
 	@Override
 	public List<BackupFile> findBackups() throws IOException {
-		Uri backupDirectory = getBackupDirectory(false);
-
 		List<BackupFile> result = new ArrayList<>();
+		Uri directoryUri = getSelectedDirectoryUri();
 
-		if (backupDirectory == null) {
+		if (directoryUri == null) {
 			return result;
 		}
 
-		String documentId = DocumentsContract.getDocumentId(backupDirectory);
+		String documentId = DocumentsContract.getDocumentId(directoryUri);
 		Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-				backupDirectory,
+				directoryUri,
 				documentId
 		);
 
@@ -131,12 +129,13 @@ public final class SafBackupStorage implements BackupStorage {
 				}
 
 				Uri uri = DocumentsContract.buildDocumentUriUsingTree(
-						backupDirectory,
+						directoryUri,
 						id
 				);
 
 				result.add(new BackupFile(uri, name, lastModified));
 			}
+
 		} catch (SecurityException e) {
 			throw new IOException("Backup storage permission is unavailable.", e);
 		}
@@ -155,15 +154,15 @@ public final class SafBackupStorage implements BackupStorage {
 			throw new IOException("Backup storage is not writable.");
 		}
 
-		Uri backupDirectory = getBackupDirectory(true);
+		Uri directoryUri = getSelectedDirectoryUri();
 
-		if (backupDirectory == null) {
-			throw new IOException("Unable to create backup directory.");
+		if (directoryUri == null) {
+			throw new IOException("Backup storage is not configured.");
 		}
 
 		Uri fileUri = DocumentsContract.createDocument(
 				contentResolver,
-				backupDirectory,
+				directoryUri,
 				MIME_TYPE_JSON,
 				filename
 		);
@@ -238,98 +237,21 @@ public final class SafBackupStorage implements BackupStorage {
 					contentResolver,
 					backup.getUri()
 			);
+
 		} catch (SecurityException e) {
 			throw new IOException("Unable to delete backup.", e);
 		}
 	}
 
 	@Nullable
-	private Uri getBackupDirectory(boolean create) throws IOException {
+	private Uri getSelectedDirectoryUri() {
 		Uri treeUri = locationStore.getTreeUri();
 
 		if (treeUri == null) {
 			return null;
 		}
 
-		Uri rootUri = getRootDocumentUri(treeUri);
-		Uri existing = findChild(rootUri, BACKUP_DIRECTORY_NAME);
-
-		if (existing != null) {
-			return existing;
-		}
-
-		if (!create) {
-			return null;
-		}
-
-		try {
-			return DocumentsContract.createDocument(
-					contentResolver,
-					rootUri,
-					DocumentsContract.Document.MIME_TYPE_DIR,
-					BACKUP_DIRECTORY_NAME
-			);
-		} catch (SecurityException e) {
-			throw new IOException("Unable to create backup directory.", e);
-		}
-	}
-
-	@Nullable
-	private Uri findChild(
-			@NonNull Uri parentUri,
-			@NonNull String displayName
-	) throws IOException {
-
-		String parentId = DocumentsContract.getDocumentId(parentUri);
-
-		Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-				parentUri,
-				parentId
-		);
-
-		String[] projection = {
-				DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-				DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-				DocumentsContract.Document.COLUMN_MIME_TYPE
-		};
-
-		try (Cursor cursor = contentResolver.query(
-				childrenUri,
-				projection,
-				null,
-				null,
-				null
-		)) {
-			if (cursor == null) {
-				return null;
-			}
-
-			int idColumn = cursor.getColumnIndexOrThrow(
-					DocumentsContract.Document.COLUMN_DOCUMENT_ID
-			);
-			int nameColumn = cursor.getColumnIndexOrThrow(
-					DocumentsContract.Document.COLUMN_DISPLAY_NAME
-			);
-			int mimeColumn = cursor.getColumnIndexOrThrow(
-					DocumentsContract.Document.COLUMN_MIME_TYPE
-			);
-
-			while (cursor.moveToNext()) {
-				String name = cursor.getString(nameColumn);
-				String mime = cursor.getString(mimeColumn);
-
-				if (displayName.equals(name)
-						&& DocumentsContract.Document.MIME_TYPE_DIR.equals(mime)) {
-
-					return DocumentsContract.buildDocumentUriUsingTree(
-							parentUri,
-							cursor.getString(idColumn)
-					);
-				}
-			}
-		}
-
-		return null;
+		return getRootDocumentUri(treeUri);
 	}
 
 	@NonNull
